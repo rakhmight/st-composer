@@ -51,7 +51,7 @@
 <script>
 import WorkCard from '@/components/WorkCard.vue'
 import Instruction from '@/components/Instruction.vue';
-import CreateTest from '@/components/CreateTest.vue';
+import CreateTest from '@/components/dialogs/CreateTest.vue';
 
   export default {
     components:{
@@ -81,5 +81,25 @@ import CreateTest from '@/components/CreateTest.vue';
   gap: 20px;
   grid-template-columns: repeat(auto-fill, 250px);
   justify-content: space-between;
+}
+
+.dialog-errors-box{
+    width: 100%;
+}
+
+.dashboard__btn{
+  width: 100%;
+}
+
+.v-menu__content{
+  overflow: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+.v-list{
+  padding: 0;
+}
+.v-dialog{
+  overflow: hidden;
 }
 </style>

@@ -20,6 +20,9 @@ export default {
 </script>
 
 <style>
+html{
+  overflow: hidden;
+}
 .wrapper{
   width: 100%;
   height: 100%;
@@ -27,5 +30,17 @@ export default {
 }
 .container{
   padding: 0 15px;
+}
+
+.input{
+  width: 	100%;
+  height: 35px;
+  text-indent: 10px;
+  border: 1px solid rgb(214, 214, 214);
+  border-radius: 5px;
+}
+.input:focus{
+  outline: none;
+    box-shadow: 0px 0px 5px 5px #0b465a42;
 }
 </style>

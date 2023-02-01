@@ -26,12 +26,28 @@
 
             <div class="dialog-content">
                 <div class="content__subject-box">
-                    <v-icon>mdi-pound</v-icon>
-                    <input class="input" type="text" placeholder="ID предмета" v-model="jailName">
+                    <v-icon class="mr-1">mdi-pound</v-icon>
+                    <input class="input" type="text" placeholder="ID предмета" v-model="subjectID">
                 </div>
-                <v-divider width="70%" center></v-divider>
+                <v-divider width="80%" center></v-divider>
                 <div class="content__template-box">
-                    <h4>Параметры шаблона <span style="color: #777;font-size:0.8em">(необязательно)</span></h4>
+                    <h4 style="text-align: center">Параметры шаблона <span style="color: #777;font-size:0.8em">(необязательно)</span></h4>
+                    <div class="content__template-inputs d-flex flex-row justify-space-around mt-3">
+                        <div class="d-flex flex-column">
+                            <label for="questions-count" class="body-2">Количество вопросов</label>
+                            <div class="d-flex flex-row">
+                                <v-icon class="mr-1">mdi-help</v-icon>
+                                <input id="questions-count" class="input" type="number">
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <label for="answers-count" class="body-2">Количество ответов на вопрос</label>
+                            <div class="d-flex flex-row">
+                                <v-icon class="mr-1">mdi-lightbulb-auto</v-icon>
+                                <input id="answers-count" class="input" type="number">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -82,7 +98,8 @@ export default {
             dialog: false,
             errors:[],
             blockBtn: false,
-            showProgress: false
+            showProgress: false,
+            subjectID: undefined
         }
     },
     methods: {
@@ -91,7 +108,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .add-btn.theme--light.v-btn {
     color: rgb(255 255 255 / 87%);
 }
@@ -103,9 +120,19 @@ export default {
     align-items: center;
 }
 .content__subject-box{
-    padding: 20px 0;
+    padding: 30px;
+    width: 100%;
+    display: flex;
 }
 .content__template-box{
-    padding: 20px 0;
+    padding: 30px;
+    width: 100%;
+}
+
+.v-dialog > .v-card > .v-card__action{
+    padding: 15px;
+}
+.v-card__actions{
+    padding: 15px;
 }
 </style>

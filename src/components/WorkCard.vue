@@ -45,52 +45,41 @@
           </table>
         </div>
       </div>
-      <div class="work__menu">
+      <div class="work__menu d-flex justify-space-between">
         <v-tooltip bottom color="#00000073">
           <template v-slot:activator="{ on, attrs }">
-            <div
-            class="work__item d-flex justify-center"
-              v-bind="attrs"
-              v-on="on"
-            >
-            <v-icon>mdi-clock-time-eight</v-icon>
-          </div>
+            <v-menu offset-y max-width="120" v-bind="attrs" v-on="on">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    height="31"
+                    text
+                    v-bind="attrs"
+                    v-on="on"
+                    >
+                  <v-icon color="#304654">mdi-dots-horizontal</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <edit-test/>
+                  <test-history/>
+                  <delete-test/>
+                </v-list>
+            </v-menu>
           </template>
-          <span>Посмотреть историю изменений</span>
+          <span>Действия</span>
         </v-tooltip>
-        <v-tooltip bottom color="error">
-          <template v-slot:activator="{ on, attrs }">
-            <div
-            class="work__item d-flex justify-center"
-              v-bind="attrs"
-              v-on="on"
-            >
-            <v-icon color="red">mdi-delete</v-icon>
-          </div>
-          </template>
-          <span>Удалить</span>
-        </v-tooltip>
+
         <v-tooltip bottom color="#00000073">
           <template v-slot:activator="{ on, attrs }">
-            <div
-            class="work__item d-flex justify-center"
+            <v-btn
               v-bind="attrs"
               v-on="on"
-            >
-            <v-icon>mdi-pen</v-icon>
-          </div>
-          </template>
-          <span>Изменить параметры</span>
-        </v-tooltip>
-        <v-tooltip bottom color="#00000073">
-          <template v-slot:activator="{ on, attrs }">
-            <div
-            class="work__item d-flex justify-center"
-              v-bind="attrs"
-              v-on="on"
-            >
-            <v-icon color="#0167FF">mdi-arrow-right-thin</v-icon>
-          </div>
+              height="31"
+              text
+              body-2
+              >
+              <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
+            </v-btn>
           </template>
           <span>Перейти к редактированию</span>
         </v-tooltip>
@@ -99,11 +88,20 @@
 </template>
 
 <script>
+import EditTest from './dialogs/EditTest.vue'
+import TestHistory from './dialogs/TestHistory.vue'
+import DeleteTest from '@/components/dialogs/DeleteTest.vue'
+
 export default {
+  components:{
+    DeleteTest,
+    EditTest,
+    TestHistory
+  }
 }
 </script>
 
-<style>
+<style scoped>
 .work{
   width: 250px;
   height: 150px;
@@ -139,6 +137,7 @@ padding: 15px 10px 0;
   display: grid;
   border-top: 1px solid rgb(156, 156, 156);
   grid-template-columns: 1fr 1fr 1fr 1.5fr;
+  background-color: rgb(212, 212, 212);
 }
 
 .work__item:hover{
