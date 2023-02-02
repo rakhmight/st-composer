@@ -21,7 +21,17 @@ export default {
 
 <style>
 html{
-  overflow: hidden;
+  overflow-y: scroll;
+}
+::-webkit-scrollbar {
+    width: 12px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
+
+/* ползунок скроллбара */
+::-webkit-scrollbar-thumb {
+    background-color: #1b6eec9a;
+    border-radius: 1em;
 }
 .wrapper{
   width: 100%;

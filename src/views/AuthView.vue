@@ -21,6 +21,9 @@ export default {
 </script>
 
 <style>
+::-webkit-scrollbar {
+    width: 0
+}
 .auth__wrapper{
     width: 100%;
     display: flex;

@@ -40,7 +40,6 @@
             elevation="2"
             dark
             class="mb-6"
-            @click="$router.push('/db')"
             >
             <v-icon
             color="#fff"
