@@ -22,10 +22,28 @@
                         <v-divider></v-divider>
 
                         <div class="test__question-box mt-3 mb-3">
-                            <p style="color: #888">Сущность вопроса:</p>
-                            <div class="d-flex flex-row">
-                                <v-icon class="mr-1">mdi-help-circle-outline</v-icon>
-                                <div class="editor" contenteditable="true"></div>
+                            <div class="mb-3">
+                                <p style="color: #888">Сущность вопроса:</p>
+                                <div class="d-flex flex-row">
+                                    <v-icon class="mr-2">mdi-help-circle-outline</v-icon>
+                                    <div class="editor" contenteditable="true"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <v-file-input
+                                        :rules="rules"
+                                        accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
+                                        placeholder="Выберите изображение"
+                                        label="Загрузить изображение"
+                                        outlined
+                                        dense
+                                        min-width="100%"
+                                        prepend-icon="mdi-camera"
+                                        @change="handleFileUpload( $event )"
+                                    ></v-file-input>
+                            </div>
+                            <div class="d-flex justify-center">
+                                <v-img width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview"/>
                             </div>
                         </div>
 
@@ -44,8 +62,8 @@
                             <div class="test__answers mt-3">
                                 <div class="answer">
                                     <div>
-                                        <div class="d-flex flex-row">
-                                            <v-icon class="mr-1">mdi-lightbulb-auto</v-icon>
+                                        <div class="d-flex flex-row mb-2">
+                                            <v-icon class="mr-2">mdi-lightbulb-auto</v-icon>
                                             <div class="editor currect-answer" contenteditable="true"></div>
                                         </div>
                                     </div>
@@ -57,12 +75,13 @@
                                         outlined
                                         dense
                                         min-width="100%"
+                                        prepend-icon="mdi-camera"
                                     ></v-file-input>
                                 </div>
                                 <div class="answer">
                                     <div>
-                                        <div class="d-flex flex-row">
-                                            <v-icon class="mr-1">mdi-lightbulb-auto</v-icon>
+                                        <div class="d-flex flex-row mb-2">
+                                            <v-icon class="mr-2">mdi-lightbulb-auto</v-icon>
                                             <div class="editor" contenteditable="true"></div>
                                         </div>
                                     </div>
@@ -74,6 +93,25 @@
                                         outlined
                                         dense
                                         min-width="100%"
+                                        prepend-icon="mdi-camera"
+                                    ></v-file-input>
+                                </div>
+                                <div class="answer">
+                                    <div>
+                                        <div class="d-flex flex-row mb-2">
+                                            <v-icon class="mr-2">mdi-lightbulb-auto</v-icon>
+                                            <div class="editor" contenteditable="true"></div>
+                                        </div>
+                                    </div>
+                                    <v-file-input
+                                        :rules="rules"
+                                        accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
+                                        placeholder="Выберите изображение"
+                                        label="Загрузить изображение"
+                                        outlined
+                                        dense
+                                        min-width="100%"
+                                        prepend-icon="mdi-camera"
                                     ></v-file-input>
                                 </div>
                             </div>
@@ -93,7 +131,50 @@ export default {
             rules: [
                 value => !value || value.size < 2000000 || 'Размер файла не должен превышать 2МБ',
             ],
+			file: '',
+            showPreview: false,
+            imagePreview: ''
         }
+    },
+    methods: {
+			handleFileUpload( event ){
+				/*
+					Set the local file variable to what the user has selected.
+				*/
+				this.file = event
+
+				/*
+					Initialize a File Reader object
+				*/
+				let reader  = new FileReader();
+
+				/*
+					Add an event listener to the reader that when the file
+					has been loaded, we flag the show preview as true and set the
+					image to be what was read from the reader.
+				*/
+				reader.addEventListener("load", function () {
+					this.showPreview = true;
+					this.imagePreview = reader.result;
+				}.bind(this), false);
+
+				/*
+					Check to see if the file is not empty.
+				*/
+				if( this.file ){
+					/*
+						Ensure the file is an image file.
+					*/
+					if ( /\.(jpe?g|png|gif)$/i.test( this.file.name ) ) {
+						/*
+							Fire the readAsDataURL method which will read the file in and
+							upon completion fire a 'load' event which we will listen to and
+							display the image in the preview.
+						*/
+						reader.readAsDataURL( this.file );
+					}
+				}
+			}
     },
 }
 </script>
@@ -120,21 +201,22 @@ export default {
 
 .workspace__content{
     margin-bottom: 30px;
-    padding-left: 30px;
+    padding-left: 40px;
     text-align: justify;
     display: grid;
     grid-template-rows: auto;
-    gap: 30px;
+    gap: 40px;
 }
 
 .test{
     background-color: aliceblue;
     border-radius: 5px;
     padding: 15px;
+    box-shadow: 0px 0px 5px 5px #4444441c;
 }
 
 .editor{
-    background-color: rgb(225, 225, 226);
+    background-color: rgb(220, 220, 252);
     padding: 10px;
     word-break: break-all;
     border-radius: 5px;
@@ -147,13 +229,13 @@ export default {
 
 .test__answers{
     display: grid;
-    grid-template-rows: auto;
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, 47%);
+    justify-content: space-between;
+    gap: 30px;
 }
 .answer{
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 15px;
+    display: flex;
+    flex-direction: column;
 }
 .answer>.editor{
     max-height: auto;

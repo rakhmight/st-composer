@@ -51,6 +51,6 @@ html{
 }
 .input:focus{
   outline: none;
-    box-shadow: 0px 0px 5px 5px #0b465a42;
+  box-shadow: 0px 0px 5px 5px #0b465a42;
 }
 </style>
