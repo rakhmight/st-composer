@@ -49,7 +49,7 @@
 
 <script>
 import { mapMutations } from 'vuex'
-import AuthSignInfo from '@/components/AuthSignInfo.vue'
+import AuthSignInfo from '@/components/authForms/AuthSignInfo.vue'
 
 export default {
     components:{

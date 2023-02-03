@@ -8,8 +8,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import OwnSignForm from '@/components/OwnSignForm.vue'
-import FreeSignForm from '@/components/FreeSignForm.vue'
+import OwnSignForm from '@/components/authForms/OwnSignForm.vue'
+import FreeSignForm from '@/components/authForms/FreeSignForm.vue'
 
 export default {
     components:{
