@@ -1,24 +1,35 @@
 <template>
     <div class="answer">
-        <div>
-            <div class="d-flex flex-row mb-2">
-                <v-icon class="mr-2">mdi-lightbulb-auto</v-icon>
-                {{ ctx }}
-                <div class="editor" :class="{'currect-answer': id == 1}" contenteditable="true" :placeholder="id==1 ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"></div>
+        <div class="d-flex flex-row">
+            <v-divider vertical class="mr-3" color="#bbb"></v-divider>
+            <div style="flex:auto">
+                <div>
+                    <v-textarea
+                        dense
+                        outlined
+                        :placeholder="id==1 ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"
+                        rows="2"
+                        prepend-icon="mdi-lightbulb-auto"
+                        v-model="answerCtx"
+                        :success="id==1"
+                    ></v-textarea>
+                </div>
+                <div>
+                    <v-file-input
+                        :rules="rules"
+                        accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
+                        placeholder="Выберите изображение"
+                        label="Загрузить изображение"
+                        outlined
+                        dense
+                        min-width="100%"
+                        prepend-icon="mdi-camera"
+                        @change="handleFileUpload( $event )"
+                        @click:clear="showPreview=false"
+                        @click="showPreview=false"
+                    ></v-file-input>
+                </div>
             </div>
-        </div>
-        <div>
-            <v-file-input
-                :rules="rules"
-                accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
-                placeholder="Выберите изображение"
-                label="Загрузить изображение"
-                outlined
-                dense
-                min-width="100%"
-                prepend-icon="mdi-camera"
-                @change="handleFileUpload( $event )"
-            ></v-file-input>
         </div>
         <div class="d-flex justify-center">
             <v-img width="300" height="150" contain v-bind:src="imagePreview" v-show="showPreview"/>
@@ -39,7 +50,8 @@ export default {
 			file: '',
             showPreview: false,
             imagePreview: '',
-            id: this.number
+            id: this.number,
+            answerCtx: ''
         }
     },
     methods: {
@@ -66,12 +78,5 @@ export default {
 .answer{
     display: flex;
     flex-direction: column;
-}
-.answer>.editor{
-    max-height: auto;
-}
-.currect-answer{
-    background-color: rgb(190, 255, 210);
-}
-    
+}    
 </style>
