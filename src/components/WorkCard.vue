@@ -26,8 +26,7 @@
               <td style="color:#0167FF">02536</td>
             </tr>
             <tr>
-              <td>Вопросов:</td>
-              <td style="color:#0167FF">25</td>
+              <td style="opacity:0">space</td>
             </tr>
             <tr>
               <td>Создан:</td>
@@ -60,6 +59,7 @@
                   </v-btn>
                 </template>
                 <v-list>
+                  <info-test/>
                   <edit-test/>
                   <test-history/>
                   <delete-test/>
@@ -88,12 +88,14 @@
 </template>
 
 <script>
+import InfoTest from './dialogs/InfoTest.vue'
 import EditTest from './dialogs/EditTest.vue'
 import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
 
 export default {
   components:{
+    InfoTest,
     DeleteTest,
     EditTest,
     TestHistory
