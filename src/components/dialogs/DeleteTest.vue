@@ -17,9 +17,10 @@
 
         <v-card>
             <v-card-title
-            class="text-h5 lighten-2"
+            class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
             Подтверждение удаления теста
+            <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
             <v-divider></v-divider>

@@ -17,9 +17,10 @@
 
         <v-card>
             <v-card-title
-            class="text-h5 lighten-2"
+            class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
             Изменить параметры теста
+            <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
             <v-divider></v-divider>
@@ -28,12 +29,42 @@
                 <div class="content__subject-box flex-column">
                     
                     <div class="d-flex flex-column">
-                            <label class="body-2">Изменение ID: {{ oldID }} → {{ subjectID }}</label>
-                            <div class="d-flex flex-row">
-                                <v-icon class="mr-1">mdi-pound</v-icon>
-                                <input class="input" type="text" placeholder="Новое ID предмета" v-model="subjectID">
-                            </div>
-                        </div>
+                        <label class="body-2">Изменение ID предмета: {{ oldID }} → {{ newID }}</label>
+                        <v-text-field
+                        dense
+                        outlined
+                        prepend-icon="mdi-pound"
+                        v-model="newID"
+                        placeholder="ID предмета"
+                        >
+                        </v-text-field>
+                    </div>
+                    <div>
+                        <label class="body-2">Изменение тем: {{ oldThemes }} → {{ newThemes }}</label>
+                        <v-text-field
+                        dense
+                        outlined
+                        prepend-icon="mdi-alpha-t-box-outline"
+                        v-model="newThemes"
+                        placeholder="Укажите темы через запятую"
+                        >
+                        </v-text-field>
+                    </div>
+                    <div class="d-flex flex-row justify-space-between">
+                        <v-checkbox
+                        v-model="haveLevel"
+                        label="Учитывать уровень сложности?"
+                        ></v-checkbox>
+                        
+                        <v-checkbox
+                        v-model="haveBall"
+                        label="Учитывать балльную систему?"
+                        ></v-checkbox>
+                    </div>
+
+                    <div v-if="haveBall" class="pb-2 pt-2 ball-box">
+                        <ball-settings :toEdit="{oldMinBall,oldMaxBall,oldInterval}" :mode="'edit'"></ball-settings>
+                    </div>
                 </div>
                 
             </div>
@@ -70,6 +101,7 @@
                 width="200"
                 :disabled="blockBtn"
                 class="edit-btn"
+                @click="LOG"
             >
                 Сохранить изменения
             </v-btn>
@@ -87,6 +119,8 @@
 </template>
 
 <script>
+import BallSettings from '@/components/dialogs/BallSettings.vue'
+
 export default {
     data() {
         return {
@@ -95,10 +129,37 @@ export default {
             errors: [],
             blockBtn: false,
             showProgress: false,
-            subjectID: undefined,
-            oldID: 'some'
+
+            newID: undefined,
+            oldID: 'some',
+            newThemes: undefined,
+            oldThemes: 'some',
+            newMinBall: undefined,
+
+            oldMinBall: '0.1',
+            oldMaxBall: '10',
+            oldInterval: '0.1',
+            haveLevel: true,
+            haveBall: true
         }
     },
+    methods: {
+        LOG(){
+            if(this.$store.getters.getMinBall == this.oldMinBall){
+                return this.errors.push('Новое значение совпадает со старым')
+            }
+
+            console.log(this.$store.getters.getMinBall)
+
+            this.$store.commit('updateMin', this.$store.getters.getMinBall)
+        }
+    },
+    mounted() {
+        this.$store.commit('updateMin', this.oldMinBall)
+    }, 
+    components:{
+        BallSettings
+    }
 }
 </script>
 

@@ -17,9 +17,10 @@
 
         <v-card style="max-height: 600px;overflow-y: scroll;">
             <v-card-title
-            class="text-h5 lighten-2"
+            class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
             Создать тест
+            <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
             <v-divider></v-divider>
@@ -59,34 +60,7 @@
                     </div>
 
                     <div v-if="haveBall" class="pb-2 pt-2 ball-box">
-                        <div>
-                            <v-text-field
-                            dense
-                            outlined
-                            v-model="minBall"
-                            :counter="4"
-                            :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
-                            prepend-icon="mdi-minus-thick"
-                            label="Укажите минимальный балл"
-                            ></v-text-field>
-                            <v-text-field
-                            dense
-                            outlined
-                            v-model="maxBall"
-                            :counter="4"
-                            :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
-                            prepend-icon="mdi-plus-thick"
-                            label="Укажите максимальный балл"
-                            ></v-text-field>
-                        </div>
-                        <v-text-field
-                        dense
-                        outlined
-                        v-model="ballInterval"
-                        :counter="4"
-                            :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
-                        label="интервал между баллами"
-                        ></v-text-field>
+                        <ball-settings :mode="'create'"></ball-settings>
                     </div>
                 </div>
 
@@ -153,6 +127,7 @@
                 width="200"
                 :disabled="blockBtn"
                 class="add-btn"
+                @click="LOG"
             >
                 Создать
             </v-btn>
@@ -171,7 +146,9 @@
 
 <script> 
 // import { ValidationProvider} from 'vee-validate'
+import { mapGetters } from 'vuex'
 import VueSlider from 'vue-slider-component'
+import BallSettings from '@/components/dialogs/BallSettings.vue'
 import 'vue-slider-component/theme/default.css'
 
 export default {
@@ -186,35 +163,6 @@ export default {
             haveLevel: false,
             haveBall:false,
             useTemplate: false,
-            
-            minBall: '0.01',
-            maxBall: '1',
-            ballInterval: '0.01',
-
-            rules: {
-                valueIsNumber: v => {
-                    const pattern = /^[0-9]*\.?[0-9]*$/
-                    return pattern.test(v) || 'Введённое значение должно быть числом'
-                },
-                valueNotZero: v => {
-                    return v!=0 || 'Введённое значение должно быть больше 0'
-                },
-
-                valueLength: v => {
-                    return v.length <= 4 || 'Значение не может быть больше 4-ёх значного числа (включая дробь)'
-                },
-                invalidValue: v => {
-                    const start = /^0[0-9]+/
-                    const pattern = /^0(?=\.)/
-                    if(v.match(start)){
-                        return 'Указано не валидное число'
-                    }
-                    return true
-                },
-                emptyValue: v => {
-                    return v.length!=0 || 'Обязательное поле для заполнения'
-                }
-            },
 
             questionsCount: 10,
             answersCount: 3,
@@ -270,9 +218,18 @@ export default {
             }
         }
     },
+    computed: mapGetters(['getMinBall', 'getMaxBall', 'getBallInterval']), // скоро понадобится
+    methods: {
+        LOG(){
+            console.log(this.$store.getters.getMinBall)
+
+            this.$store.commit('updateMin', '0.01')
+        }
+    },
     components: {
         // ValidationProvider,
-        VueSlider
+        VueSlider,
+        BallSettings
     }
 }
 </script>

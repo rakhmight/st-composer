@@ -47,7 +47,7 @@
       <div class="work__menu d-flex justify-space-between">
         <v-tooltip bottom color="#00000073">
           <template v-slot:activator="{ on, attrs }">
-            <v-menu offset-y max-width="120" v-bind="attrs" v-on="on">
+            <v-menu offset-y max-width="140" v-bind="attrs" v-on="on">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     height="31"
@@ -60,6 +60,7 @@
                 </template>
                 <v-list>
                   <info-test/>
+                  <saved-tests/>
                   <edit-test/>
                   <test-history/>
                   <delete-test/>
@@ -89,6 +90,7 @@
 
 <script>
 import InfoTest from './dialogs/InfoTest.vue'
+import SavedTests from './dialogs/SavedTests.vue'
 import EditTest from './dialogs/EditTest.vue'
 import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
@@ -96,6 +98,7 @@ import DeleteTest from '@/components/dialogs/DeleteTest.vue'
 export default {
   components:{
     InfoTest,
+    SavedTests,
     DeleteTest,
     EditTest,
     TestHistory
