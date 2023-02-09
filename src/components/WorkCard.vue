@@ -1,23 +1,35 @@
 <template>
-    <div class="work">
+    <div class="work" v-if="!status.isDeleted">
       <div class="work__content d-flex">
         <div class="work__logo d-flex flex-column justify-content-center justify-center">
           <v-img
+          v-if="!status.isSigned"
           src="@/assets/media/work.png"
           contain
           max-width="40"
           ></v-img>
-        <!-- <v-tooltip left color="error">
-          <template v-slot:activator="{ on, attrs }">
-            <div class="clear mb-1" 
-              v-bind="attrs"
-              v-on="on"> 
-                <v-icon size="20" color="#ff4500">mdi-delete</v-icon>
-                4
-            </div>
-          </template>
-          <span>Автоматический удалится через: 4дн.</span>
-        </v-tooltip> -->
+
+          <!-- isSigned -->
+          <v-img
+          v-if="status.isSigned"
+          src="@/assets/media/work-complete.png"
+          contain
+          max-width="40"
+          ></v-img>
+
+          <v-tooltip left color="error" v-if="status.isSigned">
+            <template v-slot:activator="{ on, attrs }">
+              <div class="clear mb-1" 
+                v-bind="attrs"
+                v-on="on"> 
+                  <v-icon size="20" color="#ff4500">mdi-delete</v-icon>
+                  4
+              </div>
+            </template>
+            <span>Автоматический удалится через: 4дн.</span>
+          </v-tooltip>
+          <!--  -->
+
         </div>
         <div class="work__info d-flex justify-content-center">
           <table>
@@ -32,15 +44,18 @@
               <td>Создан:</td>
               <td style="color:#0167FF">02.08.2023</td>
             </tr>
-            <tr>
+            <tr v-if="!status.isSigned">
               <td>Изменён:</td>
               <td style="color:#0167FF">02.08.2023</td>
             </tr>
-            
-            <!-- <tr>
+
+            <!-- isSigned -->
+            <tr v-else>
               <td style="color:orangered">Завершён:</td>
               <td style="color:orangered">02.08.2023</td>
-            </tr> -->
+            </tr>
+            <!--  -->
+
           </table>
         </div>
       </div>
@@ -59,7 +74,7 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <info-test/>
+                  <info-test :id="testID"/>
                   <saved-tests/>
                   <edit-test/>
                   <test-history/>
@@ -96,6 +111,16 @@ import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
 
 export default {
+  props:{
+    id:Number,
+    status: Object
+  },
+  data() {
+    return {
+      testID: this.id,
+      testStatus: this.status
+    }
+  },
   components:{
     InfoTest,
     SavedTests,

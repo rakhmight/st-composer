@@ -62,7 +62,7 @@
                         ></v-checkbox>
                     </div>
 
-                    <div v-if="haveBall" class="pb-2 pt-2 ball-box">
+                    <div v-if="haveBall" class="pb-2 pt-2">
                         <ball-settings :toEdit="{oldMinBall,oldMaxBall,oldInterval}" :mode="'edit'"></ball-settings>
                     </div>
                 </div>

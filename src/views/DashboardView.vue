@@ -27,19 +27,15 @@
         <div class="dashboard__content">
           <div class="dashboard__content-info d-flex justify-space-between">
             <h4 class="">Сохранённые работы</h4>
-            <keep-alive>
-              <instruction/>
-            </keep-alive>
+
+            <!-- INSTRUCTION -->
+            <to-instruction></to-instruction>
+
           </div>
 
           <div class="dashboard__saved">
 
-            <work-card></work-card>
-            <work-card></work-card>
-            <work-card></work-card>
-            <work-card></work-card>
-            <work-card></work-card>
-            <work-card></work-card>
+            <work-card v-for="card in cards" :id="card.id" :status="card.status"/>
 
           </div>
         </div>
@@ -50,13 +46,25 @@
 
 <script>
 import WorkCard from '@/components/WorkCard.vue'
-import Instruction from '@/components/Instruction.vue';
-import CreateTest from '@/components/dialogs/CreateTest.vue';
+import ToInstruction from '@/components/ToInstruction.vue'
+import CreateTest from '@/components/dialogs/CreateTest.vue'
 
   export default {
+    data() {
+      return {
+        cards:[
+          {id:1, status:{ inProcess: true, isSigned: false, isDeleted: false }},
+          {id:2, status:{ inProcess: true, isSigned: true, isDeleted: false }},
+          {id:3, status:{ inProcess: true, isSigned: false, isDeleted: false }},
+          {id:4, status:{ inProcess: true, isSigned: true, isDeleted: false }},
+          {id:5, status:{ inProcess: true, isSigned: false, isDeleted: false }},
+          {id:6, status:{ inProcess: true, isSigned: true, isDeleted: true }}
+        ]
+      }
+    },
     components:{
       WorkCard,
-      Instruction,
+      ToInstruction,
       CreateTest
     }
   }
@@ -67,11 +75,6 @@ import CreateTest from '@/components/dialogs/CreateTest.vue';
   width: 100%;
   height: 100%;
   padding-top: 30px;
-}
-
-.instruction:hover{
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 .dashboard__saved{

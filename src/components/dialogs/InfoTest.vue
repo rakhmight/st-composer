@@ -66,8 +66,9 @@
                         <div><span style="color:rgb(54, 162, 235)">►</span> вопросов с изображениями: <b>30</b></div>
                         <div><span style="color:rgb(255, 205, 86)">►</span> вопросов с выбранной областью: <b>20</b></div>
                     </div>
-                    <div>
-                        <canvas id="questionsChart" width="250" height="250"></canvas>
+                    <div class="canvas-box">
+                        <!-- Нужно создавать canvas с помощью скрипта -->
+                        <canvas :id="`questionsChart-${testID}`" width="250" height="250"></canvas>
                     </div>
                 </div>
             </div>
@@ -80,17 +81,22 @@
 import Chart from 'chart.js/auto'
 
 export default {
+    props:{
+        id: Number
+    },
     data() {
         return {
             dialog: false,
+            chartAvaible:false,
+            testID: this.id
         }
     },
 
     watch:{
         dialog(){
-            if(this.dialog==true){
-                setTimeout(()=>{
-                    const ctx = document.getElementById('questionsChart')
+            if(this.dialog && !this.chartAvaible){
+                setTimeout(()=> {
+                    const ctx = document.querySelector(`#questionsChart-${this.testID}`)
                     new Chart(ctx, {
                         type: 'pie',
                         data: {
@@ -117,11 +123,8 @@ export default {
                             }
                         }
                     })
-                },300)
-            }
-            else{
-                const ctx = document.getElementById('questionsChart')
-                ctx.remove()
+                    this.chartAvaible = true
+                },500)
             }
         }
     }
@@ -144,9 +147,14 @@ export default {
 
 .question-info{
     display: grid;
-    grid-template-columns: 1.2fr 0.3fr;
+    grid-template-columns: 1.2fr 0.7fr;
     gap: 20px;
     justify-content: space-between;
     align-items: center;
+}
+
+.canvas-box{
+    width: 100%;
+    height: auto;
 }
 </style>

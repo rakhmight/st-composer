@@ -28,11 +28,12 @@
                 </div>
             </div>
 
-            <div>
+            <div class="mb-10 pl-3 pr-3">
                 <!-- range -->
+                <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
                 <vue-slider
                     ref="slider"
-                    v-model="value"
+                    v-model="ball"
                     v-bind="options"
                 ></vue-slider>
             </div>
@@ -113,8 +114,6 @@ import Answer from '@/components/tests/Answer.vue'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
 
-let marks = [0,0.5,1]
-
 export default {
     data() {
         return {
@@ -137,14 +136,13 @@ export default {
             difficulty: undefined,
 
             
-    	    value: 0,
+    	    ball: 0.01,
             options: {
                 dotSize: 14,
                 width: 'auto',
                 height: 4,
                 contained: false,
                 direction: 'ltr',
-                data: null,
                 dataLabel: 'label',
                 dataValue: 'value',
                 min: 0.01,
@@ -157,27 +155,13 @@ export default {
                 lazy: false,
                 tooltip: 'active',
                 tooltipPlacement: 'top',
-                tooltipFormatter: void 0,
                 useKeyboard: false,
-                keydownHook: null,
                 dragOnClick: false,
                 enableCross: true,
                 fixed: false,
-                minRange: void 0,
-                maxRange: void 0,
                 order: true,
-                marks: marks,
-                dotOptions: void 0,
-                dotAttrs: void 0,
+                marks: [0.01,1],
                 process: true,
-                dotStyle: void 0,
-                railStyle: void 0,
-                processStyle: void 0,
-                tooltipStyle: void 0,
-                stepStyle: void 0,
-                stepActiveStyle: void 0,
-                labelStyle: void 0,
-                labelActiveStyle: void 0,
             }
         }
     },

@@ -59,7 +59,7 @@
                         ></v-checkbox>
                     </div>
 
-                    <div v-if="haveBall" class="pb-2 pt-2 ball-box">
+                    <div v-if="haveBall" class="pb-2 pt-2">
                         <ball-settings :mode="'create'"></ball-settings>
                     </div>
                 </div>
@@ -253,13 +253,6 @@ export default {
 .content__template-box{
     padding: 0 30px;
     width: 100%;
-}
-
-.ball-box{
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-    justify-content: space-between;
-    gap: 40px;
 }
 
 .v-dialog > .v-card > .v-card__action{

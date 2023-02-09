@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="ball-box">
         <div>
             <v-text-field
             dense
@@ -90,3 +90,12 @@ export default {
     }, 
 }
 </script>
+
+<style scoped>
+.ball-box{
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    justify-content: space-between;
+    gap: 40px;
+}
+</style>

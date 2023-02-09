@@ -1,6 +1,18 @@
 <template>
-
-    <v-dialog
+       <v-btn
+           small
+           text
+           class="caption"
+           @click="goToInstruction"
+           >
+               <v-icon v-if="currentRoute != 'dashboard'" size="20" class="mr-1" color="#fff">mdi-book-open-page-variant-outline</v-icon>
+               <v-icon v-else size="20" class="mr-1" color="#0167ff">mdi-book-open-page-variant-outline</v-icon>
+               <span v-if="currentRoute != 'dashboard'" style="color: #fff">Инструкция по эксплуатации</span>
+               <span v-else style="color: #0167ff">Инструкция по эксплуатации</span>
+               <v-icon  v-if="currentRoute != 'dashboard'" size="16" color="#fff">mdi-open-in-new</v-icon>
+               <v-icon  v-else size="16" color="#0167ff">mdi-open-in-new</v-icon>
+       </v-btn>
+    <!-- <v-dialog
     v-model="dialog"
     width="750"
     >
@@ -59,7 +71,7 @@
             </v-btn>
             </v-card-actions>
         </v-card>
-    </v-dialog>
+    </v-dialog> -->
 
 </template>
 
@@ -67,9 +79,14 @@
 export default {
     data() {
         return {
-            dialog: false,
+            currentRoute: this.$route.name
         }
     },
+    methods:{
+        goToInstruction(){
+            this.$router.push('/instruction')
+        }
+    }
 }
 </script>
 

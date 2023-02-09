@@ -63,19 +63,11 @@
                                 </v-btn>
                                 </v-list>
                             </v-menu>
-                        </div>
+                        </div>                        
 
-                        
-                        <v-btn
-                            small
-                            dark
-                            text
-                            class="caption"
-                            >
-                                <v-icon size="20" class="mr-1">mdi-book-open-page-variant-outline</v-icon>
-                                Инструкция по эксплуатации
-                                <v-icon size="16">mdi-open-in-new</v-icon>
-                        </v-btn>
+                        <!-- INSTRUCTION -->
+                        <to-instruction></to-instruction>
+
                     </div>
                 </div>
             </div>
@@ -85,6 +77,7 @@
 
 <script>
 import Question from '@/components/tests/Question.vue'
+import ToInstruction from '@/components/ToInstruction.vue'
 
 export default {
     data() {
@@ -101,7 +94,8 @@ export default {
         }
     },
     components:{
-        Question
+        Question,
+        ToInstruction
     }
 }
 </script>
@@ -141,7 +135,7 @@ export default {
     left:0;
     width: 100%;
     height: 60px;
-    background-color: #414141;
+    background-color: #2b2b2b;
     padding:10px;
     display: flex;
     align-items: center;
