@@ -7,15 +7,16 @@
                     <v-textarea
                         dense
                         outlined
-                        :placeholder="id==1 ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"
+                        :placeholder="answerID==1 ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"
                         rows="2"
                         prepend-icon="mdi-lightbulb-auto"
                         v-model="answerCtx"
-                        :success="id==1"
+                        :success="answerID==1"
                     ></v-textarea>
                 </div>
                 <div>
                     <v-file-input
+                        v-if="questionType=='question-with-images'"
                         :rules="rules"
                         accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
                         placeholder="Выберите изображение"
@@ -30,8 +31,12 @@
                     ></v-file-input>
                 </div>
             </div>
+            
+            <div>
+                <v-icon v-if="answerID!=1 && answerID!=2 && answerID!=3" color="red" @click="deleteAnswer(answerID)" size="25" class="mt-5">mdi-close-circle</v-icon>
+            </div>
         </div>
-        <div class="d-flex justify-center">
+        <div class="d-flex justify-center" v-if="questionType=='question-with-images'">
             <v-img width="300" height="150" contain v-bind:src="imagePreview" v-show="showPreview"/>
         </div>
     </div>
@@ -40,7 +45,9 @@
 <script>
 export default {
     props:{
-        number: Number
+        id: Number,
+        type: String,
+        deleteFunc: Function
     },
     data() {
         return {
@@ -50,7 +57,8 @@ export default {
 			file: '',
             showPreview: false,
             imagePreview: '',
-            id: this.number,
+            answerID: this.id,
+            questionType: this.type,
             answerCtx: ''
         }
     },
@@ -69,7 +77,11 @@ export default {
 					reader.readAsDataURL( this.file )
 				}
 			}
-		}
+		},
+
+        deleteAnswer(id){
+            this.deleteFunc(id)
+        }
     },
 }
 </script>

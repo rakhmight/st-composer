@@ -1,13 +1,81 @@
 <template>
-    <div class="test">
-        <div class="test__header d-flex flex-row justify-space-between mb-2">
+    <div class="test" :class="`question_${testID}`"  :question-id="testID">
+        <div class="test__header d-flex flex-row justify-space-between mb-2" style="position: relative;">
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-pound</v-icon>
-                <p style="color: #888">Вопрос n</p>
+                <p style="color: #888">Вопрос {{ serialNumber }} (п/п) | {{ testID }} (ID)</p>
+
+                <v-tooltip bottom v-if="testType=='basic-question'">
+                <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                    class="ml-5"
+                    v-bind="attrs"
+                    v-on="on"
+                    color="#888"
+                    >
+                    mdi-text
+                    </v-icon>
+                </template>
+                <span>Простой текстовый вопрос</span>
+                </v-tooltip>
+
+                <v-tooltip bottom v-if="testType=='question-with-images'">
+                <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                    class="ml-5"
+                    v-bind="attrs"
+                    v-on="on"
+                    color="#888"
+                    >
+                    mdi-image-outline
+                    </v-icon>
+                </template>
+                <span>Вопрос с картинками</span>
+                </v-tooltip>
+
+                <v-tooltip bottom v-if="testType=='question-with-field'">
+                <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                    class="ml-5"
+                    v-bind="attrs"
+                    v-on="on"
+                    color="#888"
+                    >
+                    mdi-selection-ellipse-arrow-inside
+                    </v-icon>
+                </template>
+                <span>Вопрос с выбором области на картинке</span>
+                </v-tooltip>
             </div>
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
                 <p style="color: #888">Последнее изменение: 00.00.0000 в 00:00</p>
+                
+                <v-tooltip bottom color="error">
+                <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                    class="ml-8"
+                    color="red"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="launchConfirm"
+                    >
+                    mdi-close
+                    </v-icon>
+                </template>
+                <span>Удалить</span>
+                </v-tooltip>
+            </div>
+
+            <div class="confirm-delete" v-if="showConfirmWithDelete">
+                <v-btn
+                small
+                color="#ff5f3b"
+                dark
+                @click="deleteQuestion(testID)"
+                >
+                    Уверены?
+                </v-btn>
             </div>
         </div>
 
@@ -38,8 +106,14 @@
                 ></vue-slider>
             </div>
 
-            <div class="test__question-param">
+            <div class="test__question-param" :class="{'params-3': testType=='question-with-images', 'params-2': testType!='question-with-images'}"> 
+                <!-- 
+                    3params 
+                    2params
+                    1params
+                -->
                 <v-file-input
+                v-if="testType=='question-with-images'"
                 :rules="rules"
                 accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
                 placeholder="Выберите изображение"
@@ -98,23 +172,34 @@
             class="subtitle-2 mt-2"
             v-for="error in errors"
             >{{ error }}</v-alert>
+
             <div class="test__answers mt-3">
 
                 <!--  -->
-                <answer v-for="answer in getAnswers" :key="answer.number" :number="answer.number"/>
-
+                <answer
+                v-for="answer in answers"
+                :key="answer.id"
+                :id="answer.id"
+                :type="testType"
+                :deleteFunc="deleteAnswer"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Answer from '@/components/tests/Answer.vue'
+import Answer from '@/components/tests/AnswerTemplates.vue'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
 
 export default {
+    props:{
+        id: Number,
+        type: String,
+        deleteFunc: Function,
+        number: Number
+    },
     data() {
         return {
             rules: [
@@ -130,6 +215,14 @@ export default {
                 {value:2, text:'Средний'},
                 {value:3, text:'Трудный'}
             ],
+
+            answers: [{id:1}, {id:2}, {id:3}],
+            answersCounter:3,
+
+            testID: this.id,
+            testType: this.type,
+            showConfirmWithDelete: false,
+            serialNumber: this.number,
 
             questionCtx:'',
             theme: undefined,
@@ -182,15 +275,33 @@ export default {
 			}
 		},
 
+        deleteQuestion(id){
+            //console.log(id)
+            this.deleteFunc(id)
+        },
+
         addAnswer(){
-            let nextAnswer = this.getAnswers.length+1
-            if(this.getAnswers.length >= 6){
+            if(this.answers.length >= 6){
                 return this.errors.push('Ответов не может быть больше 6')
             }
-            this.getAnswers.push({number: nextAnswer})
+            
+            let nextID=++this.answersCounter
+            this.answers.push({id: nextID})
+        },
+
+        deleteAnswer(id){
+            if(id!=1 || id!=2 || id!=3){
+                let target = this.answers.find(el => el.id==id)
+                let index = this.answers.indexOf(target)
+                this.answers.splice(index, 1)
+            }
+        },
+
+        launchConfirm(){
+            this.showConfirmWithDelete = true
+            setTimeout(()=> this.showConfirmWithDelete = false, 3000)
         }
     },
-    computed: mapGetters(['getAnswers']),
     components:{
         Answer,
         VueSlider
@@ -214,9 +325,25 @@ export default {
 }
 
 .test__question-param{
+    width: 100%;
+}
+
+.params-3{
     display: grid;
     grid-template-columns: 2fr 1fr 0.5fr;
     justify-content: space-between;
     gap: 30px;
+}
+.params-2{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.confirm-delete{
+    position: absolute;
+    right:30px;
+    top:-2px;
 }
 </style>
