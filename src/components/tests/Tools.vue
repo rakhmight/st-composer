@@ -4,7 +4,7 @@
             <v-btn
                 small
                 dark
-                color="#105ae0"
+                color="#0d5fd8"
                 class="mr-8"
                 @click="createQuestion('basic-question')"
                 >
@@ -21,7 +21,7 @@
                 <v-btn
                     small
                     dark
-                    color="#105ae0"
+                    color="#0d5fd8"
                     v-bind="attrs"
                     v-on="on"
                     class="mr-8"

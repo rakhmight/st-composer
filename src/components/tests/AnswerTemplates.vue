@@ -47,7 +47,7 @@ export default {
     props:{
         id: Number,
         type: String,
-        deleteFunc: Function
+        deleteFunc: Function,
     },
     data() {
         return {

@@ -6,12 +6,12 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/dashboard', //dashboard
+    path: '/jb', //dashboard
     name: 'dashboard',
     component: DashboardView
   },
   {
-    path: '/auth', //
+    path: '/hh', //
     name: 'auth',
     component: () => import('../views/AuthView.vue')
   },

@@ -45,6 +45,7 @@
             color="#fff"
             class="mr-2"
             size="20"
+            @click="goToDashboard"
             >
                 mdi-upload
             </v-icon>
@@ -88,7 +89,11 @@ export default {
         }
     },
     methods: {
-        ...mapMutations(['updateTab'])
+        ...mapMutations(['updateTab']),
+        
+        goToDashboard(){
+            this.$router.push('/dashboard')
+        }
     },
     components:{
         AuthSignInfo

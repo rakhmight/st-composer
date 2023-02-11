@@ -93,6 +93,7 @@
               height="31"
               text
               body-2
+              @click="goToWorkspace"
               >
               <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
             </v-btn>
@@ -119,6 +120,11 @@ export default {
     return {
       testID: this.id,
       testStatus: this.status
+    }
+  },
+  methods: {
+    goToWorkspace(){
+      this.$router.push('/workspace')
     }
   },
   components:{

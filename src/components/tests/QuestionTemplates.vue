@@ -1,51 +1,13 @@
 <template>
-    <div class="test" :class="`question_${testID}`"  :question-id="testID">
+    <div class="test" :class="`question_${currentQuestion.id}`"  :question-id="currentQuestion.id">
         <div class="test__header d-flex flex-row justify-space-between mb-2" style="position: relative;">
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-pound</v-icon>
-                <p style="color: #888">Вопрос {{ serialNumber }} (п/п) | {{ testID }} (ID)</p>
+                <p style="color: #888" class="mr-5">Вопрос {{ serialNumber }} (п/п) | {{ currentQuestion.id }} (ID)</p>
 
-                <v-tooltip bottom v-if="testType=='basic-question'">
-                <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                    class="ml-5"
-                    v-bind="attrs"
-                    v-on="on"
-                    color="#888"
-                    >
-                    mdi-text
-                    </v-icon>
-                </template>
-                <span>Простой текстовый вопрос</span>
-                </v-tooltip>
+                <!--  -->
+                <test-type-icons :type="currentQuestion.type" />
 
-                <v-tooltip bottom v-if="testType=='question-with-images'">
-                <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                    class="ml-5"
-                    v-bind="attrs"
-                    v-on="on"
-                    color="#888"
-                    >
-                    mdi-image-outline
-                    </v-icon>
-                </template>
-                <span>Вопрос с картинками</span>
-                </v-tooltip>
-
-                <v-tooltip bottom v-if="testType=='question-with-field'">
-                <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                    class="ml-5"
-                    v-bind="attrs"
-                    v-on="on"
-                    color="#888"
-                    >
-                    mdi-selection-ellipse-arrow-inside
-                    </v-icon>
-                </template>
-                <span>Вопрос с выбором области на картинке</span>
-                </v-tooltip>
             </div>
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
@@ -72,7 +34,7 @@
                 small
                 color="#ff5f3b"
                 dark
-                @click="deleteQuestion(testID)"
+                @click="deleteQuestion(currentQuestion.id)"
                 >
                     Уверены?
                 </v-btn>
@@ -101,19 +63,20 @@
                 <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
                 <vue-slider
                     ref="slider"
-                    v-model="ball"
+                    v-model="currentQuestion.ball"
                     v-bind="options"
+                    @change="changeBall()"
                 ></vue-slider>
             </div>
 
-            <div class="test__question-param" :class="{'params-3': testType=='question-with-images', 'params-2': testType!='question-with-images'}"> 
+            <div class="test__question-param" :class="{'params-3': currentQuestion.type=='question-with-images', 'params-2': currentQuestion.type!='question-with-images'}"> 
                 <!-- 
                     3params 
                     2params
                     1params
                 -->
                 <v-file-input
-                v-if="testType=='question-with-images'"
+                v-if="currentQuestion.type=='question-with-images'"
                 :rules="rules"
                 accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
                 placeholder="Выберите изображение"
@@ -132,8 +95,8 @@
                 placeholder="Тема"
                 outlined
                 dense
-                v-model="theme"
-                :success="theme!=undefined"
+                v-model="currentQuestion.theme"
+                :success="currentQuestion.theme!=undefined"
                 ></v-select>
 
                 <v-select
@@ -141,8 +104,8 @@
                 placeholder="Сложность"
                 outlined
                 dense
-                v-model="difficulty"
-                :success="difficulty!=undefined"
+                v-model="currentQuestion.difficulty"
+                :success="currentQuestion.difficulty!=undefined"
                 ></v-select>
             </div>
             <div class="d-flex justify-center">
@@ -177,10 +140,10 @@
 
                 <!--  -->
                 <answer
-                v-for="answer in answers"
+                v-for="answer in currentQuestion.answers"
                 :key="answer.id"
                 :id="answer.id"
-                :type="testType"
+                :type="currentQuestion.type"
                 :deleteFunc="deleteAnswer"
                 />
             </div>
@@ -190,18 +153,20 @@
 
 <script>
 import Answer from '@/components/tests/AnswerTemplates.vue'
+import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
 
 export default {
     props:{
-        id: Number,
-        type: String,
+        question: Object,
         deleteFunc: Function,
-        number: Number
+        questions: Array,
+        questionCtxFunc: Function,
     },
     data() {
         return {
+            // Question start params ==============
             rules: [
                 value => !value || value.size < 2000000 || 'Размер файла не должен превышать 2МБ',
             ],
@@ -215,21 +180,6 @@ export default {
                 {value:2, text:'Средний'},
                 {value:3, text:'Трудный'}
             ],
-
-            answers: [{id:1}, {id:2}, {id:3}],
-            answersCounter:3,
-
-            testID: this.id,
-            testType: this.type,
-            showConfirmWithDelete: false,
-            serialNumber: this.number,
-
-            questionCtx:'',
-            theme: undefined,
-            difficulty: undefined,
-
-            
-    	    ball: 0.01,
             options: {
                 dotSize: 14,
                 width: 'auto',
@@ -255,7 +205,22 @@ export default {
                 order: true,
                 marks: [0.01,1],
                 process: true,
-            }
+            },
+            answersCounter: this.question.answers.length,
+            showConfirmWithDelete: false,
+            serialNumber: 0,
+            allQuestions: this.questions,
+            // ===================================
+
+            // Question in props
+            currentQuestion: this.question,
+
+            // сделать динамичными  - нач. значения
+            answers: this.question.answers,
+            questionCtx: this.question.questionCtx,
+            theme: this.question.theme,
+            difficulty: this.question.difficulty,
+    	    ball: this.question.ball,
         }
     },
     methods: {
@@ -279,32 +244,55 @@ export default {
             //console.log(id)
             this.deleteFunc(id)
         },
+        changeBall(){
+
+        }, // не нужен -> перевести в watch
 
         addAnswer(){
-            if(this.answers.length >= 6){
+            if(this.currentQuestion.answers.length >= 6){
                 return this.errors.push('Ответов не может быть больше 6')
             }
             
             let nextID=++this.answersCounter
-            this.answers.push({id: nextID})
+            this.currentQuestion.answers.push({id: nextID})
         },
-
         deleteAnswer(id){
             if(id!=1 || id!=2 || id!=3){
-                let target = this.answers.find(el => el.id==id)
-                let index = this.answers.indexOf(target)
-                this.answers.splice(index, 1)
+                let target = this.currentQuestion.answers.find(el => el.id==id)
+                let index = this.currentQuestion.answers.indexOf(target)
+                this.currentQuestion.answers.splice(index, 1)
             }
         },
 
         launchConfirm(){
             this.showConfirmWithDelete = true
             setTimeout(()=> this.showConfirmWithDelete = false, 3000)
+        },
+        checkIndex(){
+            this.questions.filter(el => {
+                if(el.id==this.currentQuestion.id){
+                    this.serialNumber = this.questions.indexOf(el)+1
+                    
+                }
+            })
         }
+    },
+    watch:{
+        questionCtx(){
+            this.questionCtxFunc(this.questionCtx, this.currentQuestion.id)
+        },
+
+        allQuestions(){
+            this.checkIndex()
+        }
+    },
+    mounted() {
+        this.checkIndex()
     },
     components:{
         Answer,
-        VueSlider
+        VueSlider,
+        TestTypeIcons
     }
 }
 </script>
@@ -315,6 +303,7 @@ export default {
     border-radius: 5px;
     padding: 15px;
     box-shadow: 0px 0px 5px 5px #4444441c;
+    scroll-margin-top:90px;
 }
 
 .test__answers{
