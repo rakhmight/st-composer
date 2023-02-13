@@ -33,7 +33,7 @@
             </div>
             
             <div>
-                <v-icon v-if="answerID!=1 && answerID!=2 && answerID!=3" color="red" @click="deleteAnswer(answerID)" size="25" class="mt-5">mdi-close-circle</v-icon>
+                <v-icon v-if="answerID!=1 && answerID!=2 && answerID!=3" color="red" @click="deleteAnswer" size="25" class="mt-5">mdi-close-circle</v-icon>
             </div>
         </div>
         <div class="d-flex justify-center" v-if="questionType=='question-with-images'">
@@ -45,9 +45,10 @@
 <script>
 export default {
     props:{
-        id: Number,
+        answer: Object,
         type: String,
-        deleteFunc: Function,
+        answerFunc: Function,
+        questionID: Number
     },
     data() {
         return {
@@ -57,9 +58,10 @@ export default {
 			file: '',
             showPreview: false,
             imagePreview: '',
-            answerID: this.id,
+
+            answerID: this.answer.id,
             questionType: this.type,
-            answerCtx: ''
+            answerCtx: this.answer.answerCtx
         }
     },
     methods: {
@@ -79,10 +81,15 @@ export default {
 			}
 		},
 
-        deleteAnswer(id){
-            this.deleteFunc(id)
+        deleteAnswer(){
+            this.answerFunc('delete', null, this.questionID, this.answerID)
         }
     },
+    watch:{
+        answerCtx(){
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.answerID)
+        }
+    }
 }
 </script>
 

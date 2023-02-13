@@ -67,7 +67,7 @@
                                         class="map-orient"
                                         >
                                             <td style="width:20px">
-                                                <test-type-icons :type="question.type" :map="currentMap"/>
+                                                <test-type-icons :type="question.type" :questionID="question.id" :questions="questions" />
                                             </td>
                                             <td>{{ i+1 }}</td>
                                             <td>
@@ -76,13 +76,19 @@
                                                     <span style="color:#888" v-else>Пока не заполнено</span>
                                                 </p>
                                             </td>
-                                            <td v-if="showFullMap" style="min-width:20vw">
+                                            <td v-if="showFullMap" style="min-width:20vw; max-width:20vw; word-break: break-all;">
                                                 <p
                                                 v-for="answer in question.answers"
+                                                :key="answer.id"
                                                 class="body-2"
                                                 :style="answer.id==1 ? 'color:green' : 'color:#484848'"
                                                 >
                                                     • {{ answer.answerCtx }}
+                                                </p>
+                                                <p
+                                                v-if="question.type=='question-with-field'"
+                                                >
+                                                    x: {{ question.answer.x }}<br>y: {{ question.answer.y }}
                                                 </p>
                                             </td>
                                         </tr>
@@ -115,10 +121,10 @@
                     :key="question.id"
 
                     :question="question"
-
                     :questions="questions"
                     :deleteFunc="deleteQuestion"
-                    :questionCtxFunc="chengeQuestionCtx"
+
+                    :questionFunc="changeQuestion"
                     />
 
                     <div v-if="questions.length==0" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
@@ -167,21 +173,34 @@ export default {
             questionsCounter: 0,
             questionsDeleted: true,
 
-            currentMap:0,
-            showFullMap: false
+            showFullMap: false,
+            //currentMap: 0
         }
     },
     methods:{
         createQuestion(type){
-            this.questions.push({
+            let question = {
                 id: this.questionsCounter+1,
                 type,
                 questionCtx:'',
-                answers: [{id:1, answerCtx:'asdasd'}, {id:2, answerCtx:'343434'}, {id:3, answerCtx:'+++++'}],
                 theme: undefined,
                 difficulty: undefined,
                 ball:0.01
-            })
+            }
+
+            if(type=='question-with-field'){
+                // позже реализовать логику обнуления x и y если нет картинки
+                question.answer = {x:undefined, y:undefined, fault: 20}
+            }
+            else{
+                if(type=='question-with-images'){
+                    question.answers = [{id:1, img:''}, {id:2, img:''}, {id:3, img:''}]
+                } else{
+                    question.answers = [{id:1, answerCtx:''}, {id:2, answerCtx:''}, {id:3, answerCtx:''}, {id:4, answerCtx:''}]
+                }
+            }
+
+            this.questions.push(question)
             this.questionsCounter++
         },
 
@@ -194,11 +213,42 @@ export default {
             })
         },
 
-        chengeQuestionCtx(ctx, id){
+        changeQuestion(type, ctx, id, aID){
             this.questions.filter(el =>{
                 if(el.id==id){
                     let index = this.questions.indexOf(el)
-                    this.questions[index].questionCtx = ctx
+
+                    if(type=='questionCtx'){
+                        this.questions[index].questionCtx = ctx
+                    }else if(type=='ball'){
+                        this.questions[index].ball = ctx
+                    }else if(type=='theme'){
+                        this.questions[index].theme = ctx
+                    }else if(type=='difficulty'){
+                        this.questions[index].difficulty = ctx
+                    }else if(type=='answer-answerCtx'){
+                        this.questions[index].answers.filter(el => {
+                            if(el.id == aID){
+                                let aIndex = this.questions[index].answers.indexOf(el)
+                                this.questions[index].answers[aIndex].answerCtx = ctx
+                            }
+                        })
+                    }else if(type=='answer-delete'){
+                        this.questions[index].answers.filter(el => {
+                            if(el.id == aID){
+                                let aIndex = this.questions[index].answers.indexOf(el)
+                                this.questions[index].answers.splice(aIndex, 1)
+                            }
+                        })
+                    }else if(type=='answer-add'){
+                        this.questions[index].answers.push({
+                            id: aID,
+                            answerCtx: ''
+                        })
+                    }else if(type=='field-answer'){
+                        this.questions[index].answer.y = ctx.y
+                        this.questions[index].answer.x = ctx.x
+                    }
                 }
             })
         },
@@ -215,7 +265,6 @@ export default {
                         behavior: 'smooth',
                         block: 'start',
                     })
-                    this.currentMap = +questionID
                 })
             }
         }
@@ -261,11 +310,12 @@ export default {
     background-color: aliceblue;
     border-radius: 0 0 5px 5px;
     overflow-y: scroll;
-    box-shadow: 0px 0px 5px 5px #3131314b;
+    overflow-x: hidden;
+    border-bottom: #0d5fd8 5px solid;
 }
-.workspace__map-full{
+/* .workspace__map-full{
     overflow-x: scroll;
-}
+} */
 .workspace__map-empty{
     height: 30vh;
     background-color: #aaaaaa80;

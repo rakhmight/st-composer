@@ -1,12 +1,12 @@
 <template>
-    <div class="test" :class="`question_${currentQuestion.id}`"  :question-id="currentQuestion.id">
+    <div class="test" :class="`question_${currentQuestion.id}`" :id="currentQuestion.id">
         <div class="test__header d-flex flex-row justify-space-between mb-2" style="position: relative;">
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-pound</v-icon>
                 <p style="color: #888" class="mr-5">Вопрос {{ serialNumber }} (п/п) | {{ currentQuestion.id }} (ID)</p>
 
                 <!--  -->
-                <test-type-icons :type="currentQuestion.type" />
+                <test-type-icons :type="currentQuestion.type" :questionID="currentQuestion.id" :questions="allQuestions"/>
 
             </div>
             <div class="d-flex flex-row">
@@ -63,20 +63,19 @@
                 <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
                 <vue-slider
                     ref="slider"
-                    v-model="currentQuestion.ball"
+                    v-model="ball"
                     v-bind="options"
-                    @change="changeBall()"
                 ></vue-slider>
             </div>
 
-            <div class="test__question-param" :class="{'params-3': currentQuestion.type=='question-with-images', 'params-2': currentQuestion.type!='question-with-images'}"> 
+            <div class="test__question-param" :class="{'params-3': currentQuestion.type=='question-with-images' || currentQuestion.type=='question-with-field', 'params-2': currentQuestion.type=='basic-question'}"> 
                 <!-- 
                     3params 
                     2params
                     1params
                 -->
                 <v-file-input
-                v-if="currentQuestion.type=='question-with-images'"
+                v-if="currentQuestion.type=='question-with-images' || currentQuestion.type=='question-with-field'"
                 :rules="rules"
                 accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
                 placeholder="Выберите изображение"
@@ -95,8 +94,8 @@
                 placeholder="Тема"
                 outlined
                 dense
-                v-model="currentQuestion.theme"
-                :success="currentQuestion.theme!=undefined"
+                v-model="theme"
+                :success="theme!=undefined"
                 ></v-select>
 
                 <v-select
@@ -104,18 +103,18 @@
                 placeholder="Сложность"
                 outlined
                 dense
-                v-model="currentQuestion.difficulty"
-                :success="currentQuestion.difficulty!=undefined"
+                v-model="difficulty"
+                :success="difficulty!=undefined"
                 ></v-select>
             </div>
             <div class="d-flex justify-center">
-                <v-img width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview" class="mb-3"/>
+                <v-img v-if="currentQuestion.type!='question-with-field'" width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview" class="mb-3"/>
             </div>
         </div>
 
         <v-divider color="#bbb"></v-divider>
 
-        <div class="test__answers-box mt-3">
+        <div class="test__answers-box mt-3" v-if="currentQuestion.type!='question-with-field'">
             <div class="d-flex flex-row justify-space-between align-center">
                 <p style="color: #888">Ответы:</p>
                 <v-btn
@@ -133,19 +132,46 @@
             elevation="3"
             type="error"
             class="subtitle-2 mt-2"
-            v-for="error in errors"
+            v-for="(error, i) in errors"
+            :key="i"
             >{{ error }}</v-alert>
 
             <div class="test__answers mt-3">
 
                 <!--  -->
                 <answer
-                v-for="answer in currentQuestion.answers"
+                v-if="currentQuestion.type!='question-with-field'"
+                v-for="answer in answers"
+                :answer="answer"
                 :key="answer.id"
-                :id="answer.id"
                 :type="currentQuestion.type"
-                :deleteFunc="deleteAnswer"
+                :answerFunc="changeAnswer"
+                :questionID="currentQuestion.id"
                 />
+            </div>
+        </div>
+        
+        <div class="test__answers-box mt-3" v-else>
+            <p style="color: #888">
+                <span style="font-style: italic;color:#0d5fd8">Рекомендуемое разрешение изображения 1920:1080px (либо соотношение 16:9)</span><br>
+                Отметьте нужный участок в области: X = {{ answer.x }} | Y = {{ answer.y }}
+            </p>
+            <div class="mt-3" v-if="showPreview">
+                <v-img width="955" height="540" contain v-bind:src="imagePreview" v-show="showPreview" :class="`img_${currentQuestion.id}`" style="border: 3px solid #0d5fd8; margin:0 auto; position: relative;" @click="getPosition()"/>
+            </div>
+            <div v-else  class="mt-3 d-flex justify-center align-center">
+                <v-img width="400" height="300" contain src="@/assets/media/upload.png" style="opacity: 0.5;" />
+            </div>
+
+            <div v-if="showPreview" class="mt-5 pb-6">
+                <p style="color: #888">Приемлемый радиус погрешности ответа: <b>{{ answer.fault }}</b></p>
+                
+                <vue-slider
+                    ref="slider"
+                    v-model="answer.fault"
+                    v-bind="faultOptions"
+                    class="pr-3 pl-3"
+                ></vue-slider>
             </div>
         </div>
     </div>
@@ -162,7 +188,8 @@ export default {
         question: Object,
         deleteFunc: Function,
         questions: Array,
-        questionCtxFunc: Function,
+
+        questionFunc: Function,
     },
     data() {
         return {
@@ -193,7 +220,6 @@ export default {
                 interval: 0.01,
                 disabled: false,
                 clickable: true,
-                duration: 0.5,
                 adsorb: false,
                 lazy: false,
                 tooltip: 'active',
@@ -206,7 +232,32 @@ export default {
                 marks: [0.01,1],
                 process: true,
             },
-            answersCounter: this.question.answers.length,
+            faultOptions: {
+                dotSize: 14,
+                width: 'auto',
+                height: 4,
+                contained: false,
+                direction: 'ltr',
+                dataLabel: 'label',
+                dataValue: 'value',
+                min: 10,
+                max: 50,
+                interval: 1,
+                disabled: false,
+                clickable: true,
+                adsorb: false,
+                lazy: false,
+                tooltip: 'active',
+                tooltipPlacement: 'top',
+                useKeyboard: false,
+                dragOnClick: false,
+                enableCross: true,
+                fixed: false,
+                order: true,
+                marks: [10,15,20,25,30,35,40,45,50],
+                process: true,
+            },
+            answersCounter: 0,
             showConfirmWithDelete: false,
             serialNumber: 0,
             allQuestions: this.questions,
@@ -221,6 +272,21 @@ export default {
             theme: this.question.theme,
             difficulty: this.question.difficulty,
     	    ball: this.question.ball,
+
+            answer: this.question.answer
+        }
+    },
+    mounted() {
+        this.checkIndex()
+
+        if(this.answer){
+            if(this.answer.x){
+                this.summonField()
+            }
+        }
+
+        if(this.currentQuestion.type != 'question-with-field'){
+            this.answersCounter = this.question.answers.length
         }
     },
     methods: {
@@ -241,12 +307,8 @@ export default {
 		},
 
         deleteQuestion(id){
-            //console.log(id)
             this.deleteFunc(id)
         },
-        changeBall(){
-
-        }, // не нужен -> перевести в watch
 
         addAnswer(){
             if(this.currentQuestion.answers.length >= 6){
@@ -254,13 +316,16 @@ export default {
             }
             
             let nextID=++this.answersCounter
-            this.currentQuestion.answers.push({id: nextID})
+            this.questionFunc('answer-add', null, this.currentQuestion.id, nextID)
         },
-        deleteAnswer(id){
-            if(id!=1 || id!=2 || id!=3){
-                let target = this.currentQuestion.answers.find(el => el.id==id)
-                let index = this.currentQuestion.answers.indexOf(target)
-                this.currentQuestion.answers.splice(index, 1)
+
+        changeAnswer(type, ctx, id, aID){
+            if(type=='delete'){
+                if(aID!=1 || aID!=2 || aID!=3){
+                    this.questionFunc('answer-delete', ctx, id, aID)
+                }
+            } else if(type=='answerCtx'){
+                this.questionFunc('answer-answerCtx', ctx, id, aID)
             }
         },
 
@@ -275,19 +340,100 @@ export default {
                     
                 }
             })
+        },
+
+        getCoords(elem) {
+                let box = elem.getBoundingClientRect();
+
+                return {
+                    top: Math.floor(box.top + pageYOffset),
+                    left: Math.floor(box.left + pageXOffset)
+                };
+
+        },
+
+        getPosition(){
+            // Определение координат клика
+            let clickX,clickY = 0
+            let field = window.event
+        
+            if (field.pageX || field.pageY){
+                clickX = field.pageX
+                clickY = field.pageY
+            } else if (field.clientX || field.clientY){
+                clickX = field.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
+                clickY = field.clientY + document.body.scrollTop + document.documentElement.scrollTop
+            }
+
+            // Определение координат элемента
+            let target = document.querySelector(`.img_${this.currentQuestion.id}`)
+            let obj = this.getCoords(target)
+
+            this.answer.y = clickY - obj.top
+            this.answer.x = clickX - obj.left
+
+            this.summonField()
+        },
+
+        summonField(){
+            let removeEl = document.querySelector(`#target-${this.currentQuestion.id}`)
+            if(removeEl){
+                removeEl.remove()
+            }
+
+            let field = document.createElement('div')
+            field.id=`target-${this.currentQuestion.id}`
+            field.style.padding = this.answer.fault+'px'
+            field.style.backgroundColor = 'red'
+            field.style.opacity = '0.5'
+            field.style.position = 'absolute'
+
+            let target = document.querySelector(`.img_${this.currentQuestion.id}`)
+            let obj = this.getCoords(target)
+
+            field.style.left = this.answer.x-this.answer.fault+'px'
+            field.style.top =  this.answer.y-this.answer.fault+'px'
+            field.style.zIndex = 10  
+
+            target.appendChild(field)
         }
     },
     watch:{
         questionCtx(){
-            this.questionCtxFunc(this.questionCtx, this.currentQuestion.id)
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+        },
+        ball(){
+            this.questionFunc('ball', this.ball, this.currentQuestion.id)
+        },
+        theme(){
+            this.questionFunc('theme', this.ball, this.currentQuestion.id)
+        },
+        difficulty(){
+            this.questionFunc('difficulty', this.ball, this.currentQuestion.id)
+        },
+        answer(){
+            this.questionFunc('field-answer', this.answer, this.currentQuestion.id)
+                let removeEl = document.querySelector(`#target-${this.currentQuestion.id}`)
+                if(removeEl){
+                    removeEl.remove()
+                }
         },
 
         allQuestions(){
             this.checkIndex()
+        },
+
+        showPreview(){
+            if(!this.showPreview){
+                let removeEl = document.querySelector(`#target-${this.currentQuestion.id}`)
+                if(removeEl){
+                    removeEl.remove()
+                }
+
+                this.answer.y = undefined
+                this.answer.x = undefined
+            }
         }
-    },
-    mounted() {
-        this.checkIndex()
     },
     components:{
         Answer,
