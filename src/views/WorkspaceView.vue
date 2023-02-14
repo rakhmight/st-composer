@@ -67,7 +67,7 @@
                                         class="map-orient"
                                         >
                                             <td style="width:20px">
-                                                <test-type-icons :type="question.type" :questionID="question.id" :questions="questions" />
+                                                <test-type-icons :type="question.type" :questionID="question.id" :questions="questions" :visible="visibleQuestions"/>
                                             </td>
                                             <td>{{ i+1 }}</td>
                                             <td>
@@ -117,15 +117,46 @@
 
                     <!--  -->
                     <question
-                    v-for="question in questions"
+                    v-for="(question, i) in questions"
                     :key="question.id"
+                    v-if="questions[i].id==visibleQuestions[0] || questions[i].id==visibleQuestions[1] || questions[i].id==visibleQuestions[2] || questions[i].id==visibleQuestions[3] || questions[i].id==visibleQuestions[4] || questions[i].id==visibleQuestions[5] || questions[i].id==visibleQuestions[6] || questions[i].id==visibleQuestions[7] || questions[i].id==visibleQuestions[8] || questions[i].id==visibleQuestions[9]"
+                   
 
                     :question="question"
                     :questions="questions"
+                    :visible="visibleQuestions"
                     :deleteFunc="deleteQuestion"
 
                     :questionFunc="changeQuestion"
                     />
+
+                    <!-- <div
+                    v-else
+                    :class="`question_${question.id}`"
+                    class="test question__template d-flex flex-column justify-center align-center"
+                    :id="question.id"
+                    >
+                        <v-icon
+                        color="#888"
+                        size="150"
+                        class="mb-3"
+                        >
+                            mdi-help-rhombus-outline
+                        </v-icon>
+                        <h2 class="mb-2">
+                            Вопрос #{{ i+1 }} (ID: {{ question.id }}) в пассивном режиме
+                        </h2>
+                        <v-btn
+                        dense
+                        small
+                        dark
+                        color="#0d5fd8"
+                        @click="changeVisibleQuestions(question.id)"
+                        >
+                            Активировать
+                        </v-btn>
+
+                    </div> -->
 
                     <div v-if="questions.length==0" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
                         <v-img
@@ -174,7 +205,8 @@ export default {
             questionsDeleted: true,
 
             showFullMap: false,
-            //currentMap: 0
+            
+            visibleQuestions:[1,2,3,4,5,6,7,8,9,10]
         }
     },
     methods:{
@@ -261,13 +293,29 @@ export default {
                 let desiredQuestion = document.querySelector(`.question_${questionID}`)
 
                 questions[i].addEventListener('click', ()=>{
-                    desiredQuestion.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                    })
+                    if(questionID==this.visibleQuestions[0] || questionID==this.visibleQuestions[1] || questionID==this.visibleQuestions[2] || questionID==this.visibleQuestions[3] || questionID==this.visibleQuestions[4] || questionID==this.visibleQuestions[5] || questionID==this.visibleQuestions[6] || questionID==this.visibleQuestions[7] || questionID==this.visibleQuestions[8] || questionID==this.visibleQuestions[9]){
+                        if(desiredQuestion){
+                            desiredQuestion.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                            })
+                        }
+                    } else{
+                        // поменять visibleQuestions
+                        for(let j = 0; j<=10; j++){
+                            this.visibleQuestions[j] = +questionID + j
+                        }
+                        this.visibleQuestions.push()
+                        this.visibleQuestions.pop()
+                    }
                 })
             }
-        }
+        },
+
+
+        // changeVisibleQuestions(id){
+        //     this.visibleQuestions.current = id
+        // }
     },
     mounted(){
         this.mapOriented()
@@ -276,6 +324,16 @@ export default {
         questions(){
             setTimeout(()=>{
                 this.mapOriented()
+            },300)
+        },
+        visibleQuestions(){
+            setTimeout(()=>{
+                this.mapOriented()
+
+                document.querySelector(`.question_${this.visibleQuestions[0]}`).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                })
             },300)
         }
     },
@@ -381,5 +439,14 @@ export default {
     width: 90vw;
     z-index: 9;
     overflow:hidden
+}
+
+.question__template{
+    width: 100%;
+    height: 40vw;
+    background-color: #aaaaaa80;
+    color: #888;
+    border-radius: 5px;
+    scroll-margin-top:90px;
 }
 </style>
