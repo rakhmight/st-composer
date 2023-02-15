@@ -69,11 +69,11 @@
                                             <td style="width:20px">
                                                 <test-type-icons :type="question.type" :questionID="question.id" :questions="questions" :visible="visibleQuestions"/>
                                             </td>
-                                            <td>{{ i+1 }}</td>
+                                            <td :style="question.id==visibleQuestions[0] || question.id==visibleQuestions[1] || question.id==visibleQuestions[2] || question.id==visibleQuestions[3] || question.id==visibleQuestions[4] || question.id==visibleQuestions[5] || question.id==visibleQuestions[6] || question.id==visibleQuestions[7] || question.id==visibleQuestions[8] || question.id==visibleQuestions[9] ? 'color:#0d5fd8;font-weight: bolder' : 'color:#000'">{{ i+1 }}</td>
                                             <td>
                                                 <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap, 'map-full':showFullMap}">
                                                     <span v-if="question.questionCtx">{{ question.questionCtx }}</span>
-                                                    <span style="color:#888" v-else>Пока не заполнено</span>
+                                                    <span style="color:#888;" v-else>Пока не заполнено</span>
                                                 </p>
                                             </td>
                                             <td v-if="showFullMap" style="min-width:20vw; max-width:20vw; word-break: break-all;">
@@ -119,7 +119,7 @@
                     <question
                     v-for="(question, i) in questions"
                     :key="question.id"
-                    v-if="questions[i].id==visibleQuestions[0] || questions[i].id==visibleQuestions[1] || questions[i].id==visibleQuestions[2] || questions[i].id==visibleQuestions[3] || questions[i].id==visibleQuestions[4] || questions[i].id==visibleQuestions[5] || questions[i].id==visibleQuestions[6] || questions[i].id==visibleQuestions[7] || questions[i].id==visibleQuestions[8] || questions[i].id==visibleQuestions[9]"
+                    v-if="(questions[i].id)==visibleQuestions[0] || (questions[i].id)==visibleQuestions[1] || (questions[i].id)==visibleQuestions[2] || (questions[i].id)==visibleQuestions[3] || (questions[i].id)==visibleQuestions[4] || (questions[i].id)==visibleQuestions[5] || (questions[i].id)==visibleQuestions[6] || (questions[i].id)==visibleQuestions[7] || (questions[i].id)==visibleQuestions[8] || (questions[i].id)==visibleQuestions[9]"
                    
 
                     :question="question"
@@ -241,6 +241,36 @@ export default {
                 if(el.id==id){
                     let index = this.questions.indexOf(el)
                     this.questions.splice(index, 1)
+                }
+            })
+
+            this.visibleQuestions.filter(el=>{
+                if(el==id){
+                    let index = this.visibleQuestions.indexOf(el)
+                    let counter = id+1
+
+                    for(let i = index; i != this.visibleQuestions.length; i++){
+                        let isAvaible = false
+
+                        if(counter>this.questionsCounter){
+                            this.visibleQuestions[i]=counter
+                            counter++
+                        }else{
+                            this.questions.filter(e=>{
+                                if(e.id==counter){
+                                    this.visibleQuestions[i]=counter
+                                    isAvaible = true
+                                }
+                            })
+                            
+                            if(!isAvaible){
+                                counter++
+                                i--
+                            }else{
+                                counter++
+                            }
+                        }
+                    }
                 }
             })
         },
