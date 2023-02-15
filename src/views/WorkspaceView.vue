@@ -81,7 +81,7 @@
                                                 v-for="answer in question.answers"
                                                 :key="answer.id"
                                                 class="body-2"
-                                                :style="answer.id==1 ? 'color:green' : 'color:#484848'"
+                                                :style="answer.isCurrect ? 'color:green' : 'color:#484848'"
                                                 >
                                                     • {{ answer.answerCtx }}
                                                 </p>
@@ -130,33 +130,9 @@
                     :questionFunc="changeQuestion"
                     />
 
-                    <!-- <div
-                    v-else
-                    :class="`question_${question.id}`"
-                    class="test question__template d-flex flex-column justify-center align-center"
-                    :id="question.id"
-                    >
-                        <v-icon
-                        color="#888"
-                        size="150"
-                        class="mb-3"
-                        >
-                            mdi-help-rhombus-outline
-                        </v-icon>
-                        <h2 class="mb-2">
-                            Вопрос #{{ i+1 }} (ID: {{ question.id }}) в пассивном режиме
-                        </h2>
-                        <v-btn
-                        dense
-                        small
-                        dark
-                        color="#0d5fd8"
-                        @click="changeVisibleQuestions(question.id)"
-                        >
-                            Активировать
-                        </v-btn>
-
-                    </div> -->
+                    <div v-if="questions.length">
+                        <p style="color:#444; text-align: center;">В целях оптимизации отображаются выбранные 10 вопросов. Для их переключения используйте панель содержания слева. Отображаемые вопросы подсвечаны</p>
+                    </div>
 
                     <div v-if="questions.length==0" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
                         <v-img
@@ -217,7 +193,8 @@ export default {
                 questionCtx:'',
                 theme: undefined,
                 difficulty: undefined,
-                ball:0.01
+                ball:0.01,
+                multipleAnswers: false
             }
 
             if(type=='question-with-field'){
@@ -226,9 +203,9 @@ export default {
             }
             else{
                 if(type=='question-with-images'){
-                    question.answers = [{id:1, img:''}, {id:2, img:''}, {id:3, img:''}]
+                    question.answers = [{id:1, img:'', isCurrect:true}, {id:2, img:'', isCurrect:false}, {id:3, img:'', isCurrect:false}]
                 } else{
-                    question.answers = [{id:1, answerCtx:''}, {id:2, answerCtx:''}, {id:3, answerCtx:''}, {id:4, answerCtx:''}]
+                    question.answers = [{id:1, answerCtx:'', isCurrect:true}, {id:2, answerCtx:'', isCurrect:false}, {id:3, answerCtx:'', isCurrect:false}, {id:4, answerCtx:'', isCurrect:false}]
                 }
             }
 
@@ -305,11 +282,23 @@ export default {
                     }else if(type=='answer-add'){
                         this.questions[index].answers.push({
                             id: aID,
-                            answerCtx: ''
+                            answerCtx: '',
+                            isCurrect: false
                         })
                     }else if(type=='field-answer'){
                         this.questions[index].answer.y = ctx.y
                         this.questions[index].answer.x = ctx.x
+                    }else if(type=='multipleAnswers'){
+                        this.questions[index].multipleAnswers = ctx
+                    }else if(type=='answers'){
+                        this.questions[index].answers = ctx
+                    }else if(type=='answer-answerIsCurrect'){
+                        this.questions[index].answers.filter(el => {
+                            if(el.id == aID){
+                                let aIndex = this.questions[index].answers.indexOf(el)
+                                this.questions[index].answers[aIndex].isCurrect = ctx
+                            }
+                        })
                     }
                 }
             })
@@ -341,11 +330,6 @@ export default {
                 })
             }
         },
-
-
-        // changeVisibleQuestions(id){
-        //     this.visibleQuestions.current = id
-        // }
     },
     mounted(){
         this.mapOriented()
@@ -401,9 +385,6 @@ export default {
     overflow-x: hidden;
     border-bottom: #0d5fd8 5px solid;
 }
-/* .workspace__map-full{
-    overflow-x: scroll;
-} */
 .workspace__map-empty{
     height: 30vh;
     background-color: #aaaaaa80;

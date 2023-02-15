@@ -3,20 +3,28 @@
         <div class="d-flex flex-row">
             <v-divider vertical class="mr-3" color="#bbb"></v-divider>
             <div style="flex:auto">
-                <div>
+                <div style="position: relative">
                     <v-textarea
                         dense
                         outlined
-                        :placeholder="answerID==1 ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"
+                        :placeholder="answer.isCurrect ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"
                         rows="2"
                         prepend-icon="mdi-lightbulb-auto"
                         v-model="answerCtx"
-                        :success="answerID==1"
+                        :success="answer.isCurrect"
                     ></v-textarea>
+
+                    <v-checkbox
+                    v-if="isMultiple && currentAnswer.id!=1"
+                    v-model="isCurrect"
+                    color="success"
+                    hide-details
+                    style="position: absolute; top:35px;"
+                ></v-checkbox>
                 </div>
-                <div>
+
+                <div v-if="questionType=='question-with-images'">
                     <v-file-input
-                        v-if="questionType=='question-with-images'"
                         :rules="rules"
                         accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
                         placeholder="Выберите изображение"
@@ -33,7 +41,7 @@
             </div>
             
             <div>
-                <v-icon v-if="answerID!=1 && answerID!=2 && answerID!=3" color="red" @click="deleteAnswer" size="25" class="mt-5">mdi-close-circle</v-icon>
+                <v-icon v-if="currentAnswer.id!=1 && currentAnswer.id!=2 && currentAnswer.id!=3" color="red" @click="deleteAnswer" size="25" class="mt-5">mdi-close-circle</v-icon>
             </div>
         </div>
         <div class="d-flex justify-center" v-if="questionType=='question-with-images'">
@@ -48,7 +56,8 @@ export default {
         answer: Object,
         type: String,
         answerFunc: Function,
-        questionID: Number
+        questionID: Number,
+        isMultiple: Boolean,
     },
     data() {
         return {
@@ -59,9 +68,10 @@ export default {
             showPreview: false,
             imagePreview: '',
 
-            answerID: this.answer.id,
             questionType: this.type,
-            answerCtx: this.answer.answerCtx
+            answerCtx: this.answer.answerCtx,
+            currentAnswer: this.answer,
+            isCurrect: this.answer.isCurrect,
         }
     },
     methods: {
@@ -82,14 +92,24 @@ export default {
 		},
 
         deleteAnswer(){
-            this.answerFunc('delete', null, this.questionID, this.answerID)
+            this.answerFunc('delete', null, this.questionID, this.currentAnswer.id)
         }
     },
     watch:{
         answerCtx(){
-            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.answerID)
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+        },
+
+        isCurrect(){
+            this.answerFunc('answerIsCurrect', this.isCurrect, this.questionID, this.currentAnswer.id)
+        },
+
+        isMultiple(){
+            if(!this.isMultiple){
+                this.isCurrect = false
+            }
         }
-    }
+    },
 }
 </script>
 

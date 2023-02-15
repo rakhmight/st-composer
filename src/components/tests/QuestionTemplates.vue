@@ -108,7 +108,34 @@
                 ></v-select>
             </div>
             <div class="d-flex justify-center">
-                <v-img v-if="currentQuestion.type!='question-with-field'" width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview" class="mb-3"/>
+                <v-img v-if="currentQuestion.type=='question-with-images'" width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview" class="mb-3"/>
+            </div>
+
+            <div class="mb-5 d-flex flex-row justify-space-between">
+                <!--  -->
+                <v-switch
+                v-model="multipleAnswers"
+                :label="currentQuestion.type!='question-with-field' ? 'Несколько ответов' : 'Несколько верных областей'"
+                color="#0d5fd8"
+                hide-details
+                dense
+                ></v-switch>
+
+                <v-btn
+                small
+                dark
+                color="#4e4e4e"
+                v-if="currentQuestion.type=='question-with-field'"
+                >
+                <v-icon
+                size="15"
+                class="mr-1"
+                color="#fff"
+                >
+                    mdi-cancel
+                </v-icon>
+                очистить
+                </v-btn>
             </div>
         </div>
 
@@ -147,6 +174,8 @@
                 :type="currentQuestion.type"
                 :answerFunc="changeAnswer"
                 :questionID="currentQuestion.id"
+
+                :isMultiple="multipleAnswers"
                 />
             </div>
         </div>
@@ -272,6 +301,7 @@ export default {
             theme: this.question.theme,
             difficulty: this.question.difficulty,
     	    ball: this.question.ball,
+    	    multipleAnswers: this.question.multipleAnswers,
 
             answer: this.question.answer
         }
@@ -326,6 +356,8 @@ export default {
                 }
             } else if(type=='answerCtx'){
                 this.questionFunc('answer-answerCtx', ctx, id, aID)
+            } else if(type=='answerIsCurrect'){
+                this.questionFunc('answer-answerIsCurrect', ctx, id, aID)
             }
         },
 
@@ -433,6 +465,21 @@ export default {
                 this.answer.y = undefined
                 this.answer.x = undefined
             }
+        },
+
+        multipleAnswers(){
+            this.questionFunc('multipleAnswers', this.multipleAnswers, this.currentQuestion.id)
+
+            //if false сделать правильным только 1 ответ
+            if(!this.multipleAnswers){
+                this.answers.forEach(function(item, i, arr) {
+                    if(i!=0){
+                        arr[i].isCurrect = false
+                    }
+                })
+
+                this.questionFunc('answers',  this.answers, this.currentQuestion.id)
+            }
         }
     },
     components:{
@@ -480,5 +527,9 @@ export default {
     position: absolute;
     right:30px;
     top:-2px;
+}
+
+.v-input--selection-controls{
+    margin-top: 0;
 }
 </style>
