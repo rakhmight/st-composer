@@ -2,7 +2,9 @@
     <div class="wrapper">
         <div class="container">
             <div class="instruction">
-                <a @click="root">root</a>
+                <a
+                @click="$router.go(-1)"
+                >Назад</a>
             </div>
         </div>
     </div>
@@ -10,11 +12,6 @@
 
 <script>
 export default {
-    methods:{
-        root(){
-            this.$router.push('/')
-        }
-    }
 }
 </script>
 

@@ -86,6 +86,7 @@
           class="header__btn" 
           small color="#c8c7ce" 
           dark
+          @click="$router.push('/')"
           >
             <span style="color:red">Выйти</span>
           </v-btn>

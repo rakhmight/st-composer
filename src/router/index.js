@@ -6,17 +6,17 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/jb', //dashboard
+    path: '/dashboard', //dashboard
     name: 'dashboard',
     component: DashboardView
   },
   {
-    path: '/hh', //
+    path: '/', //
     name: 'auth',
     component: () => import('../views/AuthView.vue')
   },
   {
-    path: '/', //workspace
+    path: '/workspace', //workspace
     name: 'workspace',
     component: () => import('../views/WorkspaceView.vue')
   },

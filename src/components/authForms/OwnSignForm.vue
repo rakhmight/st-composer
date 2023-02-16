@@ -40,12 +40,12 @@
             elevation="2"
             dark
             class="mb-6"
+            @click="$router.push('/dashboard')"
             >
             <v-icon
             color="#fff"
             class="mr-2"
             size="20"
-            @click="goToDashboard"
             >
                 mdi-upload
             </v-icon>
@@ -90,10 +90,6 @@ export default {
     },
     methods: {
         ...mapMutations(['updateTab']),
-        
-        goToDashboard(){
-            this.$router.push('/dashboard')
-        }
     },
     components:{
         AuthSignInfo

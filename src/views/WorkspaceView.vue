@@ -106,6 +106,7 @@
                     color="#0d5fd8"
                     dark
                     class="mt-5"
+                    @click="$router.go(-1)"
                     >
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
                         Вернуться назад

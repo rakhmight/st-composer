@@ -14,7 +14,7 @@
             <v-divider vertical color="#ccc"></v-divider>
             <div class="dashboard__author-info ml-2">
               <h2>Author</h2>
-              <p style="color:#615f5f">Chair</p>
+              <p style="color:#615f5f">Кол-во тестов</p>
             </div>
           </div>
           <div class="dashboard__create-btn">
