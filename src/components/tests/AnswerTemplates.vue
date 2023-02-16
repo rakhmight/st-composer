@@ -105,7 +105,7 @@ export default {
         },
 
         isMultiple(){
-            if(!this.isMultiple){
+            if(!this.isMultiple && this.currentAnswer.id!=1){
                 this.isCurrect = false
             }
         }

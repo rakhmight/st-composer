@@ -88,7 +88,8 @@
                                                 <p
                                                 v-if="question.type=='question-with-field'"
                                                 >
-                                                    x: {{ question.answer.x }}<br>y: {{ question.answer.y }}
+                                                    <span v-if="question.answer[1].x" style="color: green">отмечено</span>
+                                                    <span v-else>не отмечено</span>
                                                 </p>
                                             </td>
                                         </tr>
@@ -199,7 +200,7 @@ export default {
 
             if(type=='question-with-field'){
                 // позже реализовать логику обнуления x и y если нет картинки
-                question.answer = {x:undefined, y:undefined, fault: 20}
+                question.answer = [{fault: 20},{x:undefined, y:undefined}]
             }
             else{
                 if(type=='question-with-images'){
@@ -286,8 +287,7 @@ export default {
                             isCurrect: false
                         })
                     }else if(type=='field-answer'){
-                        this.questions[index].answer.y = ctx.y
-                        this.questions[index].answer.x = ctx.x
+                        this.questions[index].answer = ctx
                     }else if(type=='multipleAnswers'){
                         this.questions[index].multipleAnswers = ctx
                     }else if(type=='answers'){

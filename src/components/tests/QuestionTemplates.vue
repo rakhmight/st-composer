@@ -125,7 +125,8 @@
                 small
                 dark
                 color="#4e4e4e"
-                v-if="currentQuestion.type=='question-with-field'"
+                v-if="currentQuestion.type=='question-with-field' && multipleAnswers"
+                @click="clearFields"
                 >
                 <v-icon
                 size="15"
@@ -183,7 +184,7 @@
         <div class="test__answers-box mt-3" v-else>
             <p style="color: #888">
                 <span style="font-style: italic;color:#0d5fd8">Рекомендуемое разрешение изображения 1920:1080px (либо соотношение 16:9)</span><br>
-                Отметьте нужный участок в области: X = {{ answer.x }} | Y = {{ answer.y }}
+                Отметьте нужный участок в области
             </p>
             <div class="mt-3" v-if="showPreview">
                 <v-img width="955" height="540" contain v-bind:src="imagePreview" v-show="showPreview" :class="`img_${currentQuestion.id}`" style="border: 3px solid #0d5fd8; margin:0 auto; position: relative;" @click="getPosition()"/>
@@ -193,11 +194,11 @@
             </div>
 
             <div v-if="showPreview" class="mt-5 pb-6">
-                <p style="color: #888">Приемлемый радиус погрешности ответа: <b>{{ answer.fault }}</b></p>
+                <p style="color: #888">Приемлемый радиус погрешности ответа: <b>{{ answer[0].fault }}</b></p>
                 
                 <vue-slider
                     ref="slider"
-                    v-model="answer.fault"
+                    v-model="answer[0].fault"
                     v-bind="faultOptions"
                     class="pr-3 pl-3"
                 ></vue-slider>
@@ -401,33 +402,86 @@ export default {
             let target = document.querySelector(`.img_${this.currentQuestion.id}`)
             let obj = this.getCoords(target)
 
-            this.answer.y = clickY - obj.top
-            this.answer.x = clickX - obj.left
+            if(!this.multipleAnswers){
+                this.answer[1].y = clickY - obj.top
+                this.answer[1].x = clickX - obj.left
 
-            this.summonField()
+                this.summonField()
+            }else{
+                if(this.answer[1]){
+                    if(this.answer[1].x){
+                        this.answer.push({
+                            y: clickY - obj.top,
+                            x: clickX - obj.left
+                        })
+                    } else{
+                        this.answer[1].y = clickY - obj.top
+                        this.answer[1].x = clickX - obj.left
+                    }
+                }else{
+                    this.answer.push({
+                        y: clickY - obj.top,
+                        x: clickX - obj.left
+                    })  
+                }
+
+                this.summonField()
+            }
         },
 
         summonField(){
-            let removeEl = document.querySelector(`#target-${this.currentQuestion.id}`)
-            if(removeEl){
-                removeEl.remove()
-            }
-
-            let field = document.createElement('div')
-            field.id=`target-${this.currentQuestion.id}`
-            field.style.padding = this.answer.fault+'px'
-            field.style.backgroundColor = 'red'
-            field.style.opacity = '0.5'
-            field.style.position = 'absolute'
-
             let target = document.querySelector(`.img_${this.currentQuestion.id}`)
-            let obj = this.getCoords(target)
 
-            field.style.left = this.answer.x-this.answer.fault+'px'
-            field.style.top =  this.answer.y-this.answer.fault+'px'
-            field.style.zIndex = 10  
+            if(!this.multipleAnswers){
+                let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                if(removeEl){
+                    for(let i = 0; i!=removeEl.length; i++){
+                        removeEl[i].remove()
+                    }
+                }
 
-            target.appendChild(field)
+                if(this.answer[1] && this.answer[1].x){
+                    let field = document.createElement('div')
+                    field.classList.add(`target-${this.currentQuestion.id}`)
+                    field.style.padding = this.answer[0].fault+'px'
+                    field.style.backgroundColor = 'red'
+                    field.style.opacity = '0.5'
+                    field.style.position = 'absolute'
+                    field.style.zIndex = 10
+                    field.style.left = this.answer[1].x-this.answer[0].fault+'px'
+                    field.style.top =  this.answer[1].y-this.answer[0].fault+'px'
+
+                    target.appendChild(field)
+                }
+            }else{
+                let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                if(removeEl){
+                    for(let i = 0; i!=removeEl.length; i++){
+                        removeEl[i].remove()
+                    }
+                }
+
+                this.answer.filter(el=>{
+                    if(el.hasOwnProperty('x') && el.x){
+                        let field = document.createElement('div')
+                        field.classList.add(`target-${this.currentQuestion.id}`)
+                        field.style.padding = this.answer[0].fault+'px'
+                        field.style.backgroundColor = 'red'
+                        field.style.opacity = '0.5'
+                        field.style.position = 'absolute'
+                        field.style.zIndex = 10
+                        field.style.left = el.x-this.answer[0].fault+'px'
+                        field.style.top =  el.y-this.answer[0].fault+'px'
+
+                        target.appendChild(field)
+                    }
+                })
+            }
+        },
+
+        clearFields(){
+            this.answer = [this.answer[0], {x: undefined, y:undefined}]
+            this.summonField()
         }
     },
     watch:{
@@ -445,10 +499,6 @@ export default {
         },
         answer(){
             this.questionFunc('field-answer', this.answer, this.currentQuestion.id)
-                let removeEl = document.querySelector(`#target-${this.currentQuestion.id}`)
-                if(removeEl){
-                    removeEl.remove()
-                }
         },
 
         allQuestions(){
@@ -468,17 +518,37 @@ export default {
         },
 
         multipleAnswers(){
-            this.questionFunc('multipleAnswers', this.multipleAnswers, this.currentQuestion.id)
+            if(this.currentQuestion.type!='question-with-field'){
+                this.questionFunc('multipleAnswers', this.multipleAnswers, this.currentQuestion.id)
 
-            //if false сделать правильным только 1 ответ
-            if(!this.multipleAnswers){
-                this.answers.forEach(function(item, i, arr) {
-                    if(i!=0){
-                        arr[i].isCurrect = false
+                //if false сделать правильным только 1 ответ
+                if(!this.multipleAnswers){
+                    this.answers.forEach(function(item, i, arr) {
+                        if(i!=0){
+                            arr[i].isCurrect = false
+                        }
+                    })
+
+                    this.questionFunc('answers',  this.answers, this.currentQuestion.id)
+                }
+            } else{
+                if(!this.multipleAnswers){
+                    // При переключении удалять все области кроме первой
+                    if(this.answer[1].x){
+                        this.answer = [
+                            this.answer[0],
+                            this.answer[1]
+                        ]
+                    } else{
+                        this.answer = [
+                            this.answer[0],
+                            {x: undefined, y:undefined}
+                        ]
                     }
-                })
+                    
+                    this.summonField()
+                }
 
-                this.questionFunc('answers',  this.answers, this.currentQuestion.id)
             }
         }
     },
