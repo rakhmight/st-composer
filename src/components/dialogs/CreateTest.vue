@@ -249,18 +249,6 @@ export default {
                     setTimeout(()=>{
                     this.showProgress = false
                     this.blockBtn = false
-                    this.subjectID = ''
-                    this.subjectThemes =''
-
-                    this.haveLevel = false
-                    this.haveBall =false
-                    this.minBall = '0.01'
-                    this.maxBall = '1'
-                    this.ballInterval = '0.01'
-
-                    this.ballIsCurrect = false
-                    this.subjectIsEmpty = false
-                    this.themesIsEmpty = false
 
                     this.$router.push(`/workspace?id=${test.id}`)
                     },1000)
