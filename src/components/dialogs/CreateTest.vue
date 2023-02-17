@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <div v-if="errors.length" class="test-errors-box">
+            <div class="test-errors-box">
                     <v-alert
                     color="red"
                     dense
@@ -78,6 +78,15 @@
                     v-for="(error, i) in errors"
                     :key="i"
                     >{{ error }}</v-alert>
+
+                    <v-alert
+                    dense
+                    dismissible
+                    elevation="3"
+                    type="success"
+                    class="subtitle-2"
+                    v-if="createSuccess"
+                    >Тест создан</v-alert>
             </div>
             
 
@@ -116,12 +125,16 @@ import getCurrentDate from '@/plugins/getCurrentDate'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
+    props:{
+        renderFunc: Function
+    },
     data() {
         return {
             dialog: false,
             errors:[],
             blockBtn: false,
             showProgress: false,
+            createSuccess: false,
 
             subjectID: undefined,
             subjectThemes:undefined,
@@ -205,7 +218,7 @@ export default {
                     id: this.currentTestsCounter+1,
                     creationDate: getCurrentDate(),
                     lastChange: '',
-                    author: this.currentSign.owner,
+                    author: {id: this.currentSign.owner, fullname: this.currentSign.fullname},
                     subjectID: subject,
                     themes: themes,
                     status: { inProcess: true, isSigned: false, isDeleted: false },
@@ -226,18 +239,14 @@ export default {
 
                 this.updateTestsCounter(this.currentTestsCounter+1)
                 //♦ положить в LS
-                let testsStore = JSON.parse(localStorage.getItem('tests'))
-                let tests = []
-
-                if(testsStore){
-                    tests = JSON.stringify([...testsStore, test])
-                    localStorage.setItem('tests', tests)
-                }else{
-                    tests = JSON.stringify([test])
-                    localStorage.setItem('tests', tests)
-                }
+                let testToStore = JSON.stringify(test)
+                localStorage.setItem(`test-${test.id}`,testToStore)
 
                 setTimeout(()=>{
+                    this.renderFunc()
+                    this.createSuccess = true
+
+                    setTimeout(()=>{
                     this.showProgress = false
                     this.blockBtn = false
                     this.subjectID = ''
@@ -254,6 +263,7 @@ export default {
                     this.themesIsEmpty = false
 
                     this.$router.push(`/workspace?id=${test.id}`)
+                    },1000)
                 },2000)
                 //♦ отключить прогресс
                 // вернуть всё к нач. значениям

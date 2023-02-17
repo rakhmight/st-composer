@@ -11,8 +11,18 @@ export default () => {
         month = '0'+month
     }
 
+    let hours = ''+date.getHours()
+    if(hours.length==1){
+        hours = '0'+hours
+    }
+
+    let minutes = ''+date.getMinutes()
+    if(minutes.length==1){
+        minutes = '0'+minutes
+    }
+
     let outputDate = `${day}.${month}.${date.getFullYear()}`
-    let outputTime = `${date.getHours()}:${date.getMinutes()}`
+    let outputTime = `${hours}:${minutes}`
 
     return {
         date: outputDate,

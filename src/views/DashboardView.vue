@@ -18,7 +18,7 @@
             </div>
           </div>
           <div class="dashboard__create-btn">
-            <create-test></create-test>
+            <create-test :renderFunc="loadTests"></create-test>
           </div>
         </div>
 
@@ -39,6 +39,9 @@
             :key="i"
             :id="test.id"
             :status="test.status"
+            :test="test"
+
+            :renderFunc="loadTests"
             />
 
           </div>
@@ -74,17 +77,20 @@ import { mapGetters } from 'vuex'
     },
     methods:{
       loadTests(){
-        let tests = JSON.parse(localStorage.getItem('tests'))
+        this.tests = []
+        let counter = +localStorage.getItem('testsCounter')
 
-        if(tests){
-          tests.forEach((item,i,arr)=>{
-            if(item.author == this.currentSign.owner){
-              this.tests.push(item)
+        if(counter){
+          for(let i=1; i<=counter; i++){
+            let test = JSON.parse(localStorage.getItem(`test-${i}`))
+
+            if(test && test.author.id==this.currentSign.owner && !test.status.isDeleted){
+              this.tests.push(test)
             }
-          })
-          //this.tests = [...tests]
+          }
         }
       }
+
     },
     mounted() {
       this.loadTests()

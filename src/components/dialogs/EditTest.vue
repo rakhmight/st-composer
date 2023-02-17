@@ -29,23 +29,25 @@
                 <div class="content__subject-box flex-column">
                     
                     <div class="d-flex flex-column">
-                        <label class="body-2">Изменение ID предмета: {{ oldID }} → {{ newID }}</label>
+                        <label class="body-2">Изменение ID предмета:</label>
                         <v-text-field
                         dense
                         outlined
                         prepend-icon="mdi-pound"
-                        v-model="newID"
+                        v-model="subjectID"
+                        :value="subjectID"
                         placeholder="ID предмета"
                         >
                         </v-text-field>
                     </div>
                     <div>
-                        <label class="body-2">Изменение тем: {{ oldThemes }} → {{ newThemes }}</label>
+                        <label class="body-2">Изменение тем:</label>
                         <v-text-field
                         dense
                         outlined
                         prepend-icon="mdi-alpha-t-box-outline"
-                        v-model="newThemes"
+                        v-model="themes"
+                        :value="themes.join(', ')"
                         placeholder="Укажите темы через запятую"
                         >
                         </v-text-field>
@@ -122,6 +124,10 @@
 import BallSettings from '@/components/dialogs/BallSettings.vue'
 
 export default {
+    props:{
+        test: Object,
+        renderFunc: Function
+    },
     data() {
         return {
             dialog: false,
@@ -130,17 +136,18 @@ export default {
             blockBtn: false,
             showProgress: false,
 
-            newID: undefined,
-            oldID: 'some',
-            newThemes: undefined,
-            oldThemes: 'some',
+            subjectID: this.test.subjectID,
+            themes: this.test.themes,
 
-            // д.б. старые значения
-            minBall: '0.1',
-            maxBall: '10',
-            ballInterval: '0.1',
-            haveLevel: true,
-            haveBall: true
+            minBall: '0.01',
+            maxBall: '1',
+            ballInterval: '0.01',
+            haveLevel: false,
+            haveBall: false,
+
+            ballIsCurrect: false,
+
+            changesCount: 0
         }
     },
     methods:{
@@ -151,7 +158,27 @@ export default {
                 this.maxBall = ctx
             }else if(type=='interval'){
                 this.ballInterval = ctx
+            }else if(type=='currect'){
+                this.ballIsCurrect = ctx
             }
+        }
+    },
+    watch:{
+        ballIsCurrect(){
+            if(this.ballIsCurrect && this.haveBall){
+                this.errors = []
+            }
+        }
+    },
+    mounted() {
+        if(this.test.ballSystem){
+            this.minBall =  this.test.ballSystem.min
+            this.maxBall =  this.test.ballSystem.max
+            this.ballInterval =  this.test.ballSystem.interval
+            this.haveBall =  true
+        }
+        if(this.test.considerDifficulty){
+            this.haveLevel =  true
         }
     },
     components:{

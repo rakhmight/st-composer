@@ -29,7 +29,7 @@
                 <div class="content__subject-box flex-column">
                     
                     <div class="d-flex flex-column">
-                            <label class="body-2">Напишите ID предмета: <b>#ID</b></label>
+                            <label class="body-2">Напишите ID предмета: <b>{{ test.subjectID }}</b></label>
                             <div class="d-flex flex-row">
                                 <v-icon class="mr-1">mdi-pound</v-icon>
                                 <input class="input" type="text" placeholder="ID предмета" v-model="subjectID">
@@ -71,6 +71,7 @@
                 width="200"
                 :disabled="blockBtn"
                 class="delete-btn"
+                @click="deleteTest"
             >
                 Удалить
             </v-btn>
@@ -89,6 +90,10 @@
 
 <script>
 export default {
+    props:{
+        test: Object,
+        renderFunc: Function
+    },
     data() {
         return {
             dialog: false,
@@ -96,9 +101,38 @@ export default {
             errors: [],
             blockBtn: false,
             showProgress: false,
-            subjectID: undefined
+            subjectID: ''
         }
     },
+    methods:{
+        deleteTest(){
+            if(this.subjectID == this.test.subjectID){
+                this.blockBtn = true
+                this.showProgress = true
+                //удаление
+                let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
+                localStorage.removeItem(`test-${this.test.id}`)
+                test.status.isDeleted = true
+
+                setTimeout(()=>{
+                    this.showProgress = false
+                    this.deleteSuccess = true
+                    setTimeout(()=>{
+                        this.dialog = false
+                        this.deleteSuccess = false
+                        this.blockBtn = false
+                        this.subjectID = ''
+                        this.renderFunc()
+                    },1000)
+                },2000)
+
+                let output = JSON.stringify(test)
+                localStorage.setItem(`test-${this.test.id}`, output)
+            } else{
+                this.errors.push('Введённое значение не совпадает с ID предмета')
+            }
+        }
+    }
 }
 </script>
 

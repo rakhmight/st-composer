@@ -35,24 +35,24 @@
           <table>
             <tr>
               <td>Предмет:</td>
-              <td style="color:#0167FF">02536</td>
+              <td style="color:#0167FF">{{ test.subjectID }}</td>
             </tr>
             <tr>
               <td style="opacity:0">space</td>
             </tr>
             <tr>
               <td>Создан:</td>
-              <td style="color:#0167FF">02.08.2023</td>
+              <td style="color:#0167FF">{{ test.creationDate.date }}</td>
             </tr>
             <tr v-if="!status.isSigned">
               <td>Изменён:</td>
-              <td style="color:#0167FF">02.08.2023</td>
+              <td style="color:#0167FF">{{ test.lastChange.date ? test.lastChange.date : '-' }}</td>
             </tr>
 
             <!-- isSigned -->
             <tr v-else>
               <td style="color:orangered">Завершён:</td>
-              <td style="color:orangered">02.08.2023</td>
+              <td style="color:orangered">{{ test.signedDate.date }}</td>
             </tr>
             <!--  -->
 
@@ -74,11 +74,11 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <info-test :id="testID"/>
+                  <info-test :id="testID" :test="currentTest"/>
                   <saved-tests/>
-                  <edit-test/>
+                  <edit-test :test="currentTest" :renderFunc="renderTests"/>
                   <test-history/>
-                  <delete-test/>
+                  <delete-test :test="currentTest" :renderFunc="renderTests" />
                 </v-list>
             </v-menu>
           </template>
@@ -114,12 +114,20 @@ import DeleteTest from '@/components/dialogs/DeleteTest.vue'
 export default {
   props:{
     id:Number,
-    status: Object
+    status: Object,
+    test: Object,
+    renderFunc: Function
   },
   data() {
     return {
       testID: this.id,
-      testStatus: this.status
+      testStatus: this.status,
+      currentTest: this.test
+    }
+  },
+  methods:{
+    renderTests(){
+      this.renderFunc()
     }
   },
   components:{

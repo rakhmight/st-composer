@@ -28,39 +28,39 @@
             <div class="main-info mb-3">
                 <div class="d-flex flex-column">
                     <div>Тест создан</div>
-                    <div>Последнее изменение внесено</div>
+                    <div v-if="test.lastChange">Последнее изменение внесено</div>
                     <div class="mb-3">Автор</div>
                     <div>ID предмета</div>
                     <div>Темы</div>
                 </div>
                 <div class="d-flex flex-column">
-                    <div class="text-end"><b style="color:#0167FF">19.02.2022 14:40</b></div>
-                    <div class="text-end"><b style="color:#444">19.02.2022 20:30</b></div>
-                    <div class="text-end mb-3"><b>Abdu Jabi</b></div>
-                    <div class="text-end"><b>20234</b></div>
-                    <div class="text-end"><b>123, 231, 213</b></div>
+                    <div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div>
+                    <div class="text-end"><b style="color:#444">{{ test.lastChange.date }} {{ test.lastChange.time }}</b></div>
+                    <div class="text-end mb-3"><b>{{ test.author.fullname }}</b></div>
+                    <div class="text-end"><b>{{ test.subjectID }}</b></div>
+                    <div class="text-end"><b>{{ test.themes.join(', ') }}</b></div>
                 </div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" v-if="test.considerDifficulty">
                 <v-icon color="green">mdi-check-circle</v-icon>
                 В тесте учитывается сложность вопросов
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" v-if="test.ballSystem">
                 <v-icon color="green">mdi-check-circle</v-icon>
                 Ответы оцениваются по балльной шкале
                 <div class="d-flex flex-row justify-space-between flex-wrap">
-                    <div><v-icon>mdi-minus</v-icon>Минимальный балл: <b>0.01</b></div>
-                    <div><v-icon>mdi-vector-line</v-icon>Интервал между баллами: <b>0.01</b></div>
-                    <div><v-icon>mdi-plus</v-icon>Максимальный балл: <b>1</b></div>
+                    <div><v-icon>mdi-minus</v-icon>Минимальный балл: <b>{{ test.ballSystem.min }}</b></div>
+                    <div><v-icon>mdi-vector-line</v-icon>Интервал между баллами: <b>{{ test.ballSystem.interval }}</b></div>
+                    <div><v-icon>mdi-plus</v-icon>Максимальный балл: <b>{{ test.ballSystem.max }}</b></div>
                 </div>
             </div>
 
             <div>
                 <v-icon>mdi-help-circle</v-icon>
-                Общее количество вопросов: <b>150</b>, из них:
-                <div class="question-info">
+                Общее количество вопросов: <b>{{ test.questions.length }}</b> <span v-if="test.questions.length">, из них:</span>
+                <div class="question-info" v-if="test.questions.length">
                     <div>
                         <div><span style="color:rgb(255, 99, 132)">►</span> текстовых вопросов: <b>100</b></div>
                         <div><span style="color:rgb(54, 162, 235)">►</span> вопросов с изображениями: <b>30</b></div>
@@ -82,7 +82,8 @@ import Chart from 'chart.js/auto'
 
 export default {
     props:{
-        id: Number
+        id: Number,
+        test: Object
     },
     data() {
         return {
@@ -91,10 +92,15 @@ export default {
             testID: this.id
         }
     },
-
+    mounted() {
+        // Расчитать вопросы по их виду
+        if(this.test.questions.length){
+            
+        }
+    },
     watch:{
         dialog(){
-            if(this.dialog && !this.chartAvaible){
+            if(this.dialog && !this.chartAvaible && this.test.questions.length){
                 setTimeout(()=> {
                     const ctx = document.querySelector(`#questionsChart-${this.testID}`)
                     new Chart(ctx, {
