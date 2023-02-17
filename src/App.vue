@@ -9,12 +9,27 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
 export default {
   name: 'App',
   components:{
     HeaderComponent
+  },
+  methods: {
+      ...mapMutations(['updateTestsCounter']),
+  },
+  mounted() {
+    let testsCounter = localStorage.getItem('testsCounter')
+
+    if(!testsCounter){
+      // создать в LS
+      localStorage.setItem('testsCounter', 0)
+    }else{
+      // обновить в стейте
+      this.updateTestsCounter(testsCounter)
+    }
   }
 }
 </script>

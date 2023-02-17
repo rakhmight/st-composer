@@ -4,8 +4,7 @@
             <v-text-field
             dense
             outlined
-            :value="editData ? editData.oldMinBall : getMinBall"
-            @change="updateMin"
+            v-model="minBall"
             :counter="4"
             :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
             prepend-icon="mdi-minus-thick"
@@ -14,8 +13,7 @@
             <v-text-field
             dense
             outlined
-            :value="editData ? editData.oldMaxBall : getMaxBall"
-            change="updateMax"
+            v-model="maxBall"
             :counter="4"
             :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
             prepend-icon="mdi-plus-thick"
@@ -26,68 +24,147 @@
         <v-text-field
         dense
         outlined
-        :value="editData ? editData.oldInterval : getBallInterval"
-        change="updateInterval"
+        v-model="ballInterval"
         :counter="4"
-            :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
+        :rules="[rules.emptyValue, rules.valueLength, rules.invalidValue, rules.valueIsNumber, rules.valueNotZero]"
         label="интервал между баллами"
         ></v-text-field>
     </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
-
 export default {
     props:{
-        toEdit: Object,
-        mode: String
+        min: String,
+        max: String,
+        interval: String,
+        settingsFunc: Function,
+
+        currect: Boolean
     },
     data() {
         return {
             rules: {
                 valueIsNumber: v => {
                     const pattern = /^[0-9]*\.?[0-9]*$/
-                    return pattern.test(v) || 'Введённое значение должно быть числом'
+                    if(pattern.test(v)){
+                        this.valueIsNumber = true
+                        return true
+                    } else{
+                        this.valueIsNumber = false
+                        return 'Введённое значение должно быть числом'
+                    }
                 },
                 valueNotZero: v => {
-                    return v!=0 || 'Введённое значение должно быть больше 0'
+                    if(v!=0){
+                        this.valueNotZero = true
+                        return true
+                    } else{
+                        this.valueNotZero = false
+                        return 'Введённое значение должно быть больше 0'
+                    }
                 },
 
                 valueLength: v => {
-                    return v.length <= 4 || 'Значение не может быть больше 4-ёх значного числа (включая дробь)'
+                    if(v.length <= 4){
+                        this.valueLength = true
+                        return true
+                    } else{
+                        this.valueLength = false
+                        return 'Значение не может быть больше 4-ёх значного числа (включая дробь)'
+                    }
                 },
                 invalidValue: v => {
                     const start = /^0[0-9]+/
-                    const pattern = /^0(?=\.)/
                     if(v.match(start)){
+                        this.invalidValue = false
                         return 'Указано не валидное число'
+                    } else{
+                        this.invalidValue = true
+                        return true
                     }
-                    return true
                 },
                 emptyValue: v => {
-                    return v.length!=0 || 'Обязательное поле для заполнения'
+                    if(v.length!=0){
+                        this.emptyValue = true
+                        return true
+                    } else{
+                        this.emptyValue = false
+                        return 'Обязательное поле для заполнения'
+                    }
                 }
             },
 
-            editData: this.toEdit
+            minBall: this.min,
+            maxBall: this.max,
+            ballInterval: this.interval,
+
+            valueIsNumber: false,
+            valueNotZero: false,
+            valueLength: false,
+            invalidValue: false,
+            emptyValue: false,
+
+            ballIsCurrect: this.currect
         }
     },
-    computed: {
-        ...mapGetters(['getMinBall', 'getMaxBall', 'getBallInterval']),
-    },
-    methods: {
-        ...mapMutations(['updateMin', 'updateMax', 'updateInterval'])
-    },
-    mounted() {
-        if(this.mode=='create'){
-            this.$store.commit('updateMin', '0.01')
-            this.editData = null
+    watch:{
+        minBall(){
+            this.settingsFunc('min', this.minBall)
+        },
+        maxBall(){
+            this.settingsFunc('max', this.maxBall)
+        },
+        ballInterval(){
+            this.settingsFunc('interval', this.ballInterval)
+        },
+
+        valueIsNumber(){
+            if(this.valueIsNumber && this.valueNotZero && this.valueLength && this.invalidValue && this.emptyValue){
+                this.ballIsCurrect = true
+            } else{
+                this.ballIsCurrect = false
+            }
+        },
+        valueNotZero(){
+            if(this.valueIsNumber && this.valueNotZero && this.valueLength && this.invalidValue && this.emptyValue){
+                this.ballIsCurrect = true
+            } else{
+                this.ballIsCurrect = false
+            }
+        },
+        valueLength(){
+            if(this.valueIsNumber && this.valueNotZero && this.valueLength && this.invalidValue && this.emptyValue){
+                this.ballIsCurrect = true
+            } else{
+                this.ballIsCurrect = false
+            }
+        },
+        invalidValue(){
+            if(this.valueIsNumber && this.valueNotZero && this.valueLength && this.invalidValue && this.emptyValue){
+                this.ballIsCurrect = true
+            } else{
+                this.ballIsCurrect = false
+            }
+        },
+        emptyValue(){
+            if(this.valueIsNumber && this.valueNotZero && this.valueLength && this.invalidValue && this.emptyValue){
+                this.ballIsCurrect = true
+            } else{
+                this.ballIsCurrect = false
+            }
+        },
+
+        ballIsCurrect(){
+            this.settingsFunc('currect', this.ballIsCurrect)
         }
-        else if(this.mode == 'edit'){
-            this.$store.commit('updateMin', this.toEdit.oldMinBall)
-        }
-    }, 
+        // valueIsNumber(){
+        //     console.log(this.valueIsNumber)
+        // }
+    },
+    // mounted() {
+    //     console.log(this.valueIsNumber)
+    // },
 }
 </script>
 

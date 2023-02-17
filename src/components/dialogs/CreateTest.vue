@@ -34,6 +34,7 @@
                         prepend-icon="mdi-pound"
                         v-model="subjectID"
                         placeholder="ID предмета"
+                        :error="subjectIsEmpty"
                         >
                         </v-text-field>
                     </div>
@@ -44,6 +45,7 @@
                         prepend-icon="mdi-alpha-t-box-outline"
                         v-model="subjectThemes"
                         placeholder="Укажите темы через запятую"
+                        :error="themesIsEmpty"
                         >
                         </v-text-field>
                     </div>
@@ -60,77 +62,38 @@
                     </div>
 
                     <div v-if="haveBall" class="pb-2 pt-2">
-                        <ball-settings :mode="'create'"></ball-settings>
+                        <ball-settings :min="minBall" :max="maxBall" :interval="ballInterval" :settingsFunc="changeSettings" :currect="ballIsCurrect" />
                     </div>
-                </div>
-
-                <v-divider width="100%"></v-divider>
-
-                <div class="content__template-box">
-                    
-                    <v-checkbox
-                    v-model="useTemplate"
-                    label="Использовать шаблон?"
-                    ></v-checkbox>
-
-                    <div v-if="useTemplate" class="pb-8">
-                        <h4 style="text-align: center">Параметры шаблона</h4>
-                        <div class="content__template-inputs d-flex flex-column justify-space-around mt-3">
-                            <div class="d-flex flex-column" style="margin-bottom:40px">
-                                <div>
-                                    <v-icon class="mr-1">mdi-help</v-icon>
-                                    <label for="questions-count" class="body-2">Количество простых вопросов</label>
-                                </div>
-                                <vue-slider
-                                    ref="slider"
-                                    v-model="questionsCount"
-                                    v-bind="questionsOptions"
-                                ></vue-slider>
-                            </div>
-                            <div class="d-flex flex-column">
-                                <div>
-                                    <v-icon class="mr-1">mdi-lightbulb-auto</v-icon>
-                                    <label for="questions-count" class="body-2">Количество ответов на вопрос</label>
-                                </div>
-                                <vue-slider
-                                    ref="slider"
-                                    v-model="answersCount"
-                                    v-bind="answersOptions"
-                                ></vue-slider>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
             </div>
+
+            <div v-if="errors.length" class="test-errors-box">
+                    <v-alert
+                    color="red"
+                    dense
+                    dismissible
+                    elevation="3"
+                    type="error"
+                    class="subtitle-2"
+                    v-for="(error, i) in errors"
+                    :key="i"
+                    >{{ error }}</v-alert>
+            </div>
+            
 
             <v-divider></v-divider>
             <v-card-actions class="d-flex align-items-center flex-column">
-                
-            <div class="test-errors-box">
-                <v-alert
-                color="red"
-                dense
-                dismissible
-                elevation="3"
-                type="error"
-                class="subtitle-2"
-                v-for="error in errors"
-                >{{ error }}</v-alert>
-            </div>
-
-            <v-spacer></v-spacer>
-            <v-btn
-                color="#0167FF"
-                small
-                justify="center"
-                width="200"
-                :disabled="blockBtn"
-                class="add-btn"
-                @click="LOG"
-            >
-                Создать
-            </v-btn>
+                <v-btn
+                    color="#0167FF"
+                    small
+                    justify="center"
+                    width="200"
+                    :disabled="blockBtn"
+                    class="add-btn"
+                    @click="createTest"
+                >
+                    Создать
+                </v-btn>
             </v-card-actions>
 
             <v-progress-linear
@@ -146,10 +109,11 @@
 
 <script> 
 // import { ValidationProvider} from 'vee-validate'
-import { mapGetters } from 'vuex'
 import VueSlider from 'vue-slider-component'
 import BallSettings from '@/components/dialogs/BallSettings.vue'
 import 'vue-slider-component/theme/default.css'
+import getCurrentDate from '@/plugins/getCurrentDate'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
     data() {
@@ -158,72 +122,163 @@ export default {
             errors:[],
             blockBtn: false,
             showProgress: false,
+
             subjectID: undefined,
             subjectThemes:undefined,
+
             haveLevel: false,
             haveBall:false,
-            useTemplate: false,
+            minBall: '0.01',
+            maxBall: '1',
+            ballInterval: '0.01',
 
-            questionsCount: 10,
-            answersCount: 3,
-            questionsOptions: {
-                dotSize: 14,
-                width: 'auto',
-                height: 4,
-                contained: false,
-                direction: 'ltr',
-                dataLabel: 'label',
-                dataValue: 'value',
-                min: 10,
-                max: 1000,
-                interval: 10,
-                disabled: false,
-                clickable: true,
-                duration: 0.2,
-                adsorb: false,
-                lazy: false,
-                tooltip: 'active',
-                tooltipPlacement: 'top',
-                useKeyboard: false,
-                dragOnClick: false,
-                enableCross: true,
-                fixed: false,
-                order: true,
-                marks: [10,100,200,300,400,500,600,700,800,900,1000]
-            },
-            answersOptions: {
-                dotSize: 14,
-                width: 'auto',
-                height: 4,
-                contained: false,
-                direction: 'ltr',
-                dataLabel: 'label',
-                dataValue: 'value',
-                min: 3,
-                max: 6,
-                interval: 1,
-                disabled: false,
-                clickable: true,
-                duration: 0.2,
-                adsorb: false,
-                lazy: false,
-                tooltip: 'active',
-                tooltipPlacement: 'top',
-                useKeyboard: false,
-                dragOnClick: false,
-                enableCross: true,
-                fixed: false,
-                order: true,
-                marks: [3,4,5,6]
+            ballIsCurrect: false,
+            subjectIsEmpty: false,
+            themesIsEmpty: false
+        }
+    },
+    methods: {
+        ...mapMutations(['updateTestsCounter']),
+
+        changeSettings(type, ctx){
+            if(type=='min'){
+                this.minBall = ctx
+            }else if(type=='max'){
+                this.maxBall = ctx
+            }else if(type=='interval'){
+                this.ballInterval = ctx
+            }else if(type=='currect'){
+                this.ballIsCurrect = ctx
+            }
+        },
+
+        createTest(){
+            // уровень валидаторов
+            if(!this.subjectID){
+                this.subjectIsEmpty = true
+                return this.errors.push('Укажите ID предмета')
+            }
+
+            // проверка предмета
+            let subject = +this.subjectID.trim()
+            if(!subject){
+                this.subjectIsEmpty = true
+                this.errors.push('Указан некорректный ID предмета')
+                return
+            }
+                        
+            // проверка тем
+            let themes = (''+this.subjectThemes).trim()
+            themes = themes.split(',')
+            themes.forEach((item, i, arr)=>{
+                arr[i] = item.replace(' ', '')
+                arr[i] = +item
+
+                if(!arr[i]){
+                    this.themesIsEmpty = true
+                    return this.errors.push('Указаны некорректные ID тем')
+                }
+            })
+            if(this.themesIsEmpty){
+                return
+            }
+
+            if(!this.subjectThemes){
+                this.themesIsEmpty = true
+                return this.errors.push('Укажите темы по их ID через запятую')
+            }
+            if(!this.ballIsCurrect && this.haveBall){
+                return this.errors.push('Введены некорректные значения баллов') 
+            }
+
+            // уровень сохранения в LS и перехода к тестам
+            if(!this.errors.length){
+                // показать прогресс
+                this.showProgress = true
+                this.blockBtn = true
+
+                //♦ выдача даты
+                //♦ получение id
+                //♦ развёртывание subjectID
+
+                let test = {
+                    id: this.currentTestsCounter+1,
+                    creationDate: getCurrentDate(),
+                    lastChange: '',
+                    author: this.currentSign.owner,
+                    subjectID: subject,
+                    themes: themes,
+                    status: { inProcess: true, isSigned: false, isDeleted: false },
+                    history:[{date: getCurrentDate(), type: 'create', des: undefined}],
+                    signedDate: '',
+                    questions:[]
+                }
+                if(this.haveBall){
+                    test.ballSystem = {
+                        min: this.minBall,
+                        max: this.maxBall,
+                        interval: this.ballInterval
+                    }
+                }
+                if(this.haveLevel){
+                    test.considerDifficulty = true
+                }
+
+                this.updateTestsCounter(this.currentTestsCounter+1)
+                //♦ положить в LS
+                let testsStore = JSON.parse(localStorage.getItem('tests'))
+                let tests = []
+
+                if(testsStore){
+                    tests = JSON.stringify([...testsStore, test])
+                    localStorage.setItem('tests', tests)
+                }else{
+                    tests = JSON.stringify([test])
+                    localStorage.setItem('tests', tests)
+                }
+
+                setTimeout(()=>{
+                    this.showProgress = false
+                    this.blockBtn = false
+                    this.subjectID = ''
+                    this.subjectThemes =''
+
+                    this.haveLevel = false
+                    this.haveBall =false
+                    this.minBall = '0.01'
+                    this.maxBall = '1'
+                    this.ballInterval = '0.01'
+
+                    this.ballIsCurrect = false
+                    this.subjectIsEmpty = false
+                    this.themesIsEmpty = false
+
+                    this.$router.push(`/workspace?id=${test.id}`)
+                },2000)
+                //♦ отключить прогресс
+                // вернуть всё к нач. значениям
+                // перейти к созданным тестам
             }
         }
     },
-    computed: mapGetters(['getMinBall', 'getMaxBall', 'getBallInterval']), // скоро понадобится
-    methods: {
-        LOG(){
-            console.log(this.$store.getters.getMinBall)
-
-            this.$store.commit('updateMin', '0.01')
+    computed: mapGetters(['currentTestsCounter', 'currentSign']),
+    watch:{
+        subjectID(){
+            if(this.subjectID.length){
+                this.subjectIsEmpty = false
+                this.errors = []
+            }
+        },
+        subjectThemes(){
+            if(this.subjectThemes.length){
+                this.themesIsEmpty = false
+                this.errors = []
+            }
+        },
+        ballIsCurrect(){
+            if(this.ballIsCurrect && this.haveBall){
+                this.errors = []
+            }
         }
     },
     components: {
@@ -250,10 +305,10 @@ export default {
     width: 100%;
     display: flex;
 }
-.content__template-box{
+/* .content__template-box{
     padding: 0 30px;
     width: 100%;
-}
+} */
 
 .v-dialog > .v-card > .v-card__action{
     padding: 15px;
@@ -267,5 +322,10 @@ export default {
 }
 .v-application--is-ltr .v-list-group--sub-group .v-list-group__header {
     padding-left: 0;
+}
+
+.test-errors-box{
+    width: 100%;
+    padding: 0 15px;
 }
 </style>

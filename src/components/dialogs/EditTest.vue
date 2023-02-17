@@ -63,7 +63,7 @@
                     </div>
 
                     <div v-if="haveBall" class="pb-2 pt-2">
-                        <ball-settings :toEdit="{oldMinBall,oldMaxBall,oldInterval}" :mode="'edit'"></ball-settings>
+                        <ball-settings :min="minBall" :max="maxBall" :interval="ballInterval" :settingsFunc="changeSettings" />
                     </div>
                 </div>
                 
@@ -80,7 +80,8 @@
                 elevation="3"
                 type="error"
                 class="subtitle-2"
-                v-for="error in errors"
+                v-for="(error, i) in errors"
+                :key="i"
                 >{{ error }}</v-alert>
 
                 <v-alert
@@ -101,7 +102,6 @@
                 width="200"
                 :disabled="blockBtn"
                 class="edit-btn"
-                @click="LOG"
             >
                 Сохранить изменения
             </v-btn>
@@ -134,29 +134,26 @@ export default {
             oldID: 'some',
             newThemes: undefined,
             oldThemes: 'some',
-            newMinBall: undefined,
 
-            oldMinBall: '0.1',
-            oldMaxBall: '10',
-            oldInterval: '0.1',
+            // д.б. старые значения
+            minBall: '0.1',
+            maxBall: '10',
+            ballInterval: '0.1',
             haveLevel: true,
             haveBall: true
         }
     },
-    methods: {
-        LOG(){
-            if(this.$store.getters.getMinBall == this.oldMinBall){
-                return this.errors.push('Новое значение совпадает со старым')
+    methods:{
+        changeSettings(type, ctx){
+            if(type=='min'){
+                this.minBall = ctx
+            }else if(type=='max'){
+                this.maxBall = ctx
+            }else if(type=='interval'){
+                this.ballInterval = ctx
             }
-
-            console.log(this.$store.getters.getMinBall)
-
-            this.$store.commit('updateMin', this.$store.getters.getMinBall)
         }
     },
-    mounted() {
-        this.$store.commit('updateMin', this.oldMinBall)
-    }, 
     components:{
         BallSettings
     }

@@ -13,8 +13,8 @@
             </v-icon>
             <v-divider vertical color="#ccc"></v-divider>
             <div class="dashboard__author-info ml-2">
-              <h2>Author</h2>
-              <p style="color:#615f5f">Кол-во тестов</p>
+              <h2>{{ currentSign.fullname }}</h2>
+              <p style="color:#615f5f">Кол-во тестов: {{ tests.length }}</p>
             </div>
           </div>
           <div class="dashboard__create-btn">
@@ -33,11 +33,27 @@
 
           </div>
 
-          <div class="dashboard__saved">
-
-            <work-card v-for="card in cards" :id="card.id" :status="card.status"/>
+          <div class="dashboard__saved" v-if="tests.length">
+            <work-card
+            v-for="(test, i) in tests"
+            :key="i"
+            :id="test.id"
+            :status="test.status"
+            />
 
           </div>
+
+          <div v-else class="dashboard__empty mt-5">
+            <v-img
+            max-height="250"
+            max-width="250"
+            src="@/assets/media/spider-web.png"
+            contain
+            transition="scale-transition"
+            ></v-img>
+              <h2 style="color:#888" class="mt-5">СОХРАНЕНИЙ ПОКА НЕТ</h2>
+          </div>
+
         </div>
       </div>
     </div>
@@ -48,20 +64,32 @@
 import WorkCard from '@/components/WorkCard.vue'
 import ToInstruction from '@/components/ToInstruction.vue'
 import CreateTest from '@/components/dialogs/CreateTest.vue'
+import { mapGetters } from 'vuex'
 
   export default {
     data() {
       return {
-        cards:[
-          {id:1, status:{ inProcess: true, isSigned: false, isDeleted: false }},
-          {id:2, status:{ inProcess: true, isSigned: true, isDeleted: false }},
-          {id:3, status:{ inProcess: true, isSigned: false, isDeleted: false }},
-          {id:4, status:{ inProcess: true, isSigned: true, isDeleted: false }},
-          {id:5, status:{ inProcess: true, isSigned: false, isDeleted: false }},
-          {id:6, status:{ inProcess: true, isSigned: true, isDeleted: true }}
-        ]
+        tests: [],
       }
     },
+    methods:{
+      loadTests(){
+        let tests = JSON.parse(localStorage.getItem('tests'))
+
+        if(tests){
+          tests.forEach((item,i,arr)=>{
+            if(item.author == this.currentSign.owner){
+              this.tests.push(item)
+            }
+          })
+          //this.tests = [...tests]
+        }
+      }
+    },
+    mounted() {
+      this.loadTests()
+    },
+    computed: mapGetters(['currentSign']),
     components:{
       WorkCard,
       ToInstruction,
@@ -84,6 +112,15 @@ import CreateTest from '@/components/dialogs/CreateTest.vue'
   gap: 20px;
   grid-template-columns: repeat(auto-fill, 250px);
   justify-content: space-between;
+}
+
+.dashboard__empty{
+  width: 100%;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .dialog-errors-box{

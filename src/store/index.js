@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import authTabs from '@/store/modules/authTabs'
-import ballSettings from '@/store/modules/ballSettings'
+import sign from '@/store/modules/sign'
+import envTests from '@/store/modules/envTests'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   modules: {
     authTabs,
-    ballSettings
+    sign,
+    envTests
   }
 })
