@@ -83,7 +83,7 @@ import Chart from 'chart.js/auto'
 export default {
     props:{
         id: Number,
-        test: Object
+        test: Object,
     },
     data() {
         return {

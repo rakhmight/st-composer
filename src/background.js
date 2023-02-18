@@ -1,9 +1,10 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, Menu } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
+import VueRouter from 'vue-router'
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -16,13 +17,15 @@ async function createWindow() {
     width: 1500,
     height: 850,
     webPreferences: {
-      
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
+      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
     }
   })
+
+const menu = Menu.buildFromTemplate(exampleMenuTemplate())
+Menu.setApplicationMenu(menu)
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -34,7 +37,6 @@ async function createWindow() {
     win.loadURL('app://./index.html')
   }
 }
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -79,3 +81,39 @@ if (isDevelopment) {
     })
   }
 }
+
+
+const exampleMenuTemplate = () => [
+  {
+    label: "Window",
+    submenu: [
+      {
+        label: "Zoom In",
+        role: "zoomIn"
+      },
+      {
+        label: "Zoom Out",
+        role: "zoomOut"
+      },
+      {
+        label: "Actual size",
+        role: "resetZoom"
+      },
+      { type: "separator" },
+      {
+        label: "Close app",
+        click: () => app.quit()
+      }
+    ]
+  },
+  {
+    label: "&View",
+    submenu: [
+      { role: "reload" },
+      { role: "forceReload" },
+      { type: "separator" },
+      isDevelopment ? { type: "separator" } : {},
+      isDevelopment ? { role: "toggleDevTools" } : {}
+    ],
+  }
+];

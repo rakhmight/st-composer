@@ -74,7 +74,7 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <info-test :id="testID" :test="currentTest"/>
+                  <info-test :id="testID" :test="currentTest" />
                   <saved-tests/>
                   <edit-test :test="currentTest" :renderFunc="renderTests"/>
                   <test-history/>
@@ -116,7 +116,7 @@ export default {
     id:Number,
     status: Object,
     test: Object,
-    renderFunc: Function
+    renderFunc: Function,
   },
   data() {
     return {
@@ -126,8 +126,9 @@ export default {
     }
   },
   methods:{
-    renderTests(){
+    renderTests(ctx){
       this.renderFunc()
+      this.currentTest = ctx
     }
   },
   components:{

@@ -37,6 +37,7 @@
                         v-model="subjectID"
                         :value="subjectID"
                         placeholder="ID предмета"
+                        :error="subjectEr"
                         >
                         </v-text-field>
                     </div>
@@ -47,8 +48,9 @@
                         outlined
                         prepend-icon="mdi-alpha-t-box-outline"
                         v-model="themes"
-                        :value="themes.join(', ')"
+                        :value="themes"
                         placeholder="Укажите темы через запятую"
+                        :error="themesEr"
                         >
                         </v-text-field>
                     </div>
@@ -104,6 +106,7 @@
                 width="200"
                 :disabled="blockBtn"
                 class="edit-btn"
+                @click="saveChanges"
             >
                 Сохранить изменения
             </v-btn>
@@ -137,17 +140,26 @@ export default {
             showProgress: false,
 
             subjectID: this.test.subjectID,
-            themes: this.test.themes,
+            themes: this.test.themes.join(', '),
 
             minBall: '0.01',
             maxBall: '1',
             ballInterval: '0.01',
-            haveLevel: false,
-            haveBall: false,
+            haveLevel: this.test.considerDifficulty,
+            haveBall: undefined,
+
+            subjectEr: false,
+            themesEr: false,
 
             ballIsCurrect: false,
 
-            changesCount: 0
+            oldSubjectID: this.test.subjectID,
+            oldThemes: this.test.themes,
+            oldLevel: this.test.considerDifficulty,
+            oldMinBall: undefined,
+            oldMaxBall: undefined,
+            oldInterval: undefined,
+            oldBallSystem: undefined
         }
     },
     methods:{
@@ -161,6 +173,139 @@ export default {
             }else if(type=='currect'){
                 this.ballIsCurrect = ctx
             }
+        },
+
+        saveChanges(){
+            let counter = 0
+            let output = {}
+            // валидаторы
+            if(!this.subjectID){
+                this.subjectEr = true
+                return this.errors.push('Не указан ID предмета')
+            }
+            let subject = +((''+this.subjectID).trim())
+            if(!subject){
+                this.subjectEr = true
+                return this.errors.push('Указан некорректный ID предмета')
+            }
+            if(!this.themes){
+                this.themesEr = true
+                return this.errors.push('Не указаны ID тем')
+            }
+            let themes = (''+this.themes).trim()
+            themes = themes.split(',')
+            themes.forEach((item, i, arr)=>{
+                arr[i] = item.replace(' ', '')
+                arr[i] = +arr[i]
+
+                if(!arr[i]){
+                    this.themesEr = true
+                    return this.errors.push('Указаны некорректные ID тем')
+                }
+            })
+
+            if(this.haveBall){
+                if(!this.ballIsCurrect){
+                    return this.errors.push('Не верно указаны параметры баллов')
+                }
+            }
+
+            // наблюдатели изменений и counter
+            if(this.subjectID != this.oldSubjectID){
+                counter++
+                output.subjectID = +this.subjectID
+            }
+            if(this.themes != this.oldThemes.join(', ')){
+                counter++
+                output.themes = themes
+            }
+            if(this.themesEr){
+                return
+            }
+
+            if(this.oldLevel!=this.haveLevel){
+                output.considerDifficulty = this.haveLevel
+                counter++
+            }
+
+            if(this.haveBall && this.oldMinBall!=this.minBall){
+                output.ballSystem={}
+                output.ballSystem.min = this.minBall
+                output.ballSystem.max = this.maxBall
+                output.ballSystem.interval = this.ballInterval
+                counter++
+            }
+            if(this.haveBall && this.oldMaxBall!=this.maxBall){
+                output.ballSystem={}
+                output.ballSystem.min = this.minBall
+                output.ballSystem.max = this.maxBall
+                output.ballSystem.interval = this.ballInterval
+                counter++
+            }
+
+            if(this.haveBall && this.oldInterval!=this.ballInterval){
+                output.ballSystem={}
+                output.ballSystem.min = this.minBall
+                output.ballSystem.max = this.maxBall
+                output.ballSystem.interval = this.ballInterval
+                counter++
+            }
+            // Ошибка тут
+            if(this.haveBall && this.haveBall!=this.oldBallSystem){
+                output.ballSystem={}
+                output.ballSystem.min = this.minBall
+                output.ballSystem.max = this.maxBall
+                output.ballSystem.interval = this.ballInterval
+                
+                counter++
+            }
+            if(!this.haveBall && this.haveBall!=this.oldBallSystem){
+                output.ballSystem = undefined
+                counter++
+                this.minBall = '0.01'
+                this.maxBall = '1'
+                this.ballInterval = '0.01'
+            }
+
+            // сохранение
+            if(counter){
+                this.showProgress = true
+                this.blockBtn = true
+
+                let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
+                let toSave = {
+                    ...test,
+                    ...output
+                }
+
+                console.log(toSave)
+                localStorage.removeItem(`test-${this.test.id}`)
+                localStorage.setItem(`test-${this.test.id}`, JSON.stringify(toSave))
+
+                setTimeout(()=>{
+                    this.editSuccess = true
+                    this.showProgress = false
+                    this.renderFunc(toSave)
+                    
+                    this.oldSubjectID = this.subjectID
+                    this.oldThemes = themes
+                    this.oldLevel = this.haveLevel
+                    this.oldBallSystem = this.haveBall
+
+                    if(this.oldBallSystem){
+                        this.oldMinBall = this.minBall
+                        this.oldMaxBall = this.maxBall
+                        this.oldInterval = this.ballInterval
+                    }
+
+                    setTimeout(()=>{
+                        this.blockBtn = false
+                        this.editSuccess = false
+                    },2000)
+                },2000)
+            }else{
+                return this.errors.push('Не были введены изменения для текущего теста')
+            }
         }
     },
     watch:{
@@ -168,17 +313,44 @@ export default {
             if(this.ballIsCurrect && this.haveBall){
                 this.errors = []
             }
+        },
+
+        subjectID(){
+            this.subjectEr = false
+            this.errors = []
+        },
+        themes(){
+            this.themesEr = false
+            this.errors = []
+        },
+        haveLevel(){
+            this.errors = []
+        },
+        haveBall(){
+            this.errors = []
+        },
+
+        dialog(){
+            if(!this.dialog){
+                this.subjectID = this.oldSubjectID
+                this.themes = this.oldThemes
+            }
         }
     },
     mounted() {
-        if(this.test.ballSystem){
-            this.minBall =  this.test.ballSystem.min
-            this.maxBall =  this.test.ballSystem.max
-            this.ballInterval =  this.test.ballSystem.interval
-            this.haveBall =  true
-        }
         if(this.test.considerDifficulty){
             this.haveLevel =  true
+        }
+
+        if(this.test.ballSystem){
+            this.oldMinBall,this.minBall = this.test.ballSystem.min
+            this.oldMaxBall,this.maxBall = this.test.ballSystem.max
+            this.oldInterval,this.ballInterval = this.test.ballSystem.interval
+            this.haveBall = true
+            this.oldBallSystem = true
+        }else{
+            this.haveBall = false
+            this.oldBallSystem = false
         }
     },
     components:{

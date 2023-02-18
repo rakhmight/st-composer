@@ -173,7 +173,7 @@ export default {
             }
 
             // проверка предмета
-            let subject = +this.subjectID.trim()
+            let subject = +(this.subjectID.trim())
             if(!subject){
                 this.subjectIsEmpty = true
                 this.errors.push('Указан некорректный ID предмета')
