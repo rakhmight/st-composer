@@ -28,14 +28,14 @@
             <div class="main-info mb-3">
                 <div class="d-flex flex-column">
                     <div>Тест создан</div>
-                    <div v-if="test.lastChange">Последнее изменение внесено</div>
+                    <div v-if="test.lastModified">Последнее изменение внесено</div>
                     <div class="mb-3">Автор</div>
                     <div>ID предмета</div>
                     <div>Темы</div>
                 </div>
                 <div class="d-flex flex-column">
                     <div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div>
-                    <div class="text-end"><b style="color:#444">{{ test.lastChange.date }} {{ test.lastChange.time }}</b></div>
+                    <div class="text-end" v-if="test.lastModified"><b style="color:#444">{{ test.lastModified.date }} {{ test.lastModified.time }}</b></div>
                     <div class="text-end mb-3"><b>{{ test.author.fullname }}</b></div>
                     <div class="text-end"><b>{{ test.subjectID }}</b></div>
                     <div class="text-end"><b>{{ test.themes.join(', ') }}</b></div>

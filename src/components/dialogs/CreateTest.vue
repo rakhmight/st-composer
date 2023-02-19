@@ -123,6 +123,7 @@ import BallSettings from '@/components/dialogs/BallSettings.vue'
 import 'vue-slider-component/theme/default.css'
 import getCurrentDate from '@/plugins/getCurrentDate'
 import { mapGetters, mapMutations } from 'vuex'
+import putToHistory from '@/services/putToHistory'
 
 export default {
     props:{
@@ -217,13 +218,13 @@ export default {
                 let test = {
                     id: this.currentTestsCounter+1,
                     creationDate: getCurrentDate(),
-                    lastChange: '',
+                    lastModified: undefined,
                     author: {id: this.currentSign.owner, fullname: this.currentSign.fullname},
                     subjectID: subject,
                     themes: themes,
                     status: { inProcess: true, isSigned: false, isDeleted: false },
-                    history:[{date: getCurrentDate(), type: 'create', des: undefined}],
-                    signedDate: '',
+                    history:[putToHistory('create', undefined)],
+                    signedDate: undefined,
                     questions:[]
                 }
                 if(this.haveBall){

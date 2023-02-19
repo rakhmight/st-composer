@@ -31,8 +31,15 @@
                     <div class="d-flex flex-column">
                             <label class="body-2">Напишите ID предмета: <b>{{ test.subjectID }}</b></label>
                             <div class="d-flex flex-row">
-                                <v-icon class="mr-1">mdi-pound</v-icon>
-                                <input class="input" type="text" placeholder="ID предмета" v-model="subjectID">
+                                <v-text-field
+                                dense
+                                outlined
+                                prepend-icon="mdi-pound"
+                                v-model="subjectID"
+                                placeholder="ID предмета"
+                                :error="deleteEr"
+                                >
+                                </v-text-field>
                             </div>
                         </div>
                 </div>
@@ -50,7 +57,8 @@
                 elevation="3"
                 type="error"
                 class="subtitle-2"
-                v-for="error in errors"
+                v-for="(error, i) in errors"
+                :key="i"
                 >{{ error }}</v-alert>
 
                 <v-alert
@@ -89,6 +97,8 @@
 </template>
 
 <script>
+import putToHistory from '@/services/putToHistory'
+
 export default {
     props:{
         test: Object,
@@ -101,7 +111,8 @@ export default {
             errors: [],
             blockBtn: false,
             showProgress: false,
-            subjectID: ''
+            subjectID: '',
+            deleteEr: false
         }
     },
     methods:{
@@ -113,6 +124,12 @@ export default {
                 let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
                 localStorage.removeItem(`test-${this.test.id}`)
                 test.status.isDeleted = true
+
+                let history = [
+                    ...test.history,
+                    putToHistory('delete', undefined)
+                ]
+
 
                 setTimeout(()=>{
                     this.showProgress = false
@@ -126,11 +143,18 @@ export default {
                     },1000)
                 },2000)
 
-                let output = JSON.stringify(test)
-                localStorage.setItem(`test-${this.test.id}`, output)
+                test.history = history
+                localStorage.setItem(`test-${this.test.id}`, JSON.stringify(test))
             } else{
                 this.errors.push('Введённое значение не совпадает с ID предмета')
+                this.deleteEr = true
             }
+        }
+    },
+    watch:{
+        subjectID(){
+            this.errors = []
+            this.deleteEr = false
         }
     }
 }

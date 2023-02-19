@@ -49,12 +49,16 @@
                         </thead>
                         <tbody>
                             <tr
-                            v-for="action in actions"
-                            :key="action.date"
+                            v-for="(action, i) in actions"
+                            :key="i"
                             >
                             <td v-if="action.type=='change' && action.des=='ballInterval'"><span style="color:blueviolet"><b>► </b></span>Интервал между баллами: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='minBall'"><span style="color:blueviolet"><b>► </b></span>Минимальный балл: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='maxBall'"><span style="color:blueviolet"><b>► </b></span>Максимальный балл: <b>{{ action.oldData }}</b></td>
+                            <td v-if="action.type=='change' && action.des=='ball-dissabled'"><span style="color:blueviolet"><b>► </b></span>Система баллов отключена</td>
+                            <td v-if="action.type=='change' && action.des=='ball-enabled'"><span style="color:blueviolet"><b>► </b></span>Система баллов включена</td>
+                            <td v-if="action.type=='change' && action.des=='difficulty-dissabled'"><span style="color:blueviolet"><b>► </b></span>Учитывание сложности отключено</td>
+                            <td v-if="action.type=='change' && action.des=='difficulty-enabled'"><span style="color:blueviolet"><b>► </b></span>Учитывание сложности включено</td>
                             <td v-if="action.type=='change' && action.des=='themes'"><span style="color:blueviolet"><b>► </b></span>Темы: <b>{{ action.oldData.join(', ') }}</b></td>
                             <td v-if="action.type=='change' && action.des=='subject'"><span style="color:blueviolet"><b>► </b></span>Предмет: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='create'"><span style="color:#0167FF"><b>► Тест создан</b></span></td>
@@ -62,8 +66,8 @@
                             <td v-if="action.type=='sign'"><span style="color:#27900dfa"><b>► Тест подписан</b></span></td>
                             <td v-if="action.type=='delete'"><span style="color:#ff4500"><b>► Тест удалён</b></span></td>
 
-                            <td v-if="action.type=='change'" class="text-center">→<br>{{ action.date }}</td>
-                            <td v-if="action.type!='change'" class="text-center">{{ action.date }}</td>
+                            <td v-if="action.type=='change' && action.des!='difficulty-dissabled' && action.des!='difficulty-enabled' && action.des!='ball-dissabled' && action.des!='ball-enabled'" class="text-center">→<br>{{ action.date.date }} {{ action.date.time }}</td>
+                            <td v-else class="text-center">{{ action.date.date }} {{ action.date.time }}</td>
 
                             <td v-if="action.type=='change' && action.des!='themes'"><b>{{ action.newData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='themes'"><b>{{ action.newData.join(', ') }}</b></td>
@@ -80,75 +84,14 @@
 
 <script>
 export default {
+    props:{
+        test: Object
+    },
     data() {
         return {
             dialog: false,
             
-            actions: [
-                {
-                    oldData: undefined,
-                    newData: undefined,
-                    type: 'create', 
-                    des: undefined, 
-                    date: '10.06.2022 12:30',
-                },
-                {
-                    oldData: 0.01,
-                    newData: 0.1,
-                    type: 'change', 
-                    des: 'ballInterval',
-                    date: '12.06.2022 12:30',
-                },
-                {
-                    oldData: 0.01,
-                    newData: 0.1,
-                    type: 'change', // change, delete, create, save, sign
-                    des: 'minBall', // ballInterval, minBall, maxBall, themes, subject
-                    date: '13.06.2022 12:30',
-                },
-                {
-                    oldData: 1,
-                    newData: 10,
-                    type: 'change',
-                    des: 'maxBall',
-                    date: '14.06.2022 12:31',
-                },
-                {
-                    oldData: [123,213,312],
-                    newData: [789,879,978],
-                    type: 'change',
-                    des: 'themes',
-                    date: '15.06.2022 12:31',
-                },
-                {
-                    oldData: 12345,
-                    newData: 98760,
-                    type: 'change',
-                    des: 'subject',
-                    date: '16.06.2022 12:31',
-                },
-                {
-                    oldData: undefined,
-                    newData: undefined,
-                    type: 'save',
-                    des: undefined,
-                    date: '17.06.2022 12:32',
-                },
-                {
-                    oldData: undefined,
-                    newData: undefined,
-                    type: 'sign',
-                    des: undefined,
-                    date: '20.06.2022 12:30',
-                },
-                {
-                    oldData: undefined,
-                    newData: undefined,
-                    type: 'delete',
-                    des: undefined,
-                    date: '21.06.2022 12:30',
-                },
-            ],
+            actions: this.test.history
         }
     },
 }

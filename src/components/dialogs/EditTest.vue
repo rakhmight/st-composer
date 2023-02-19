@@ -125,6 +125,7 @@
 
 <script>
 import BallSettings from '@/components/dialogs/BallSettings.vue'
+import putToHistory from '@/services/putToHistory'
 
 export default {
     props:{
@@ -176,8 +177,11 @@ export default {
         },
 
         saveChanges(){
+            let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
             let counter = 0
             let output = {}
+            let history = [...test.history]
+
             // валидаторы
             if(!this.subjectID){
                 this.subjectEr = true
@@ -214,10 +218,12 @@ export default {
             if(this.subjectID != this.oldSubjectID){
                 counter++
                 output.subjectID = +this.subjectID
+                history.push(putToHistory('change', 'subject', +this.oldSubjectID, +this.subjectID))
             }
             if(this.themes != this.oldThemes.join(', ')){
                 counter++
                 output.themes = themes
+                history.push(putToHistory('change', 'themes', this.oldThemes, themes))
             }
             if(this.themesEr){
                 return
@@ -226,6 +232,11 @@ export default {
             if(this.oldLevel!=this.haveLevel){
                 output.considerDifficulty = this.haveLevel
                 counter++
+                if(this.haveLevel){
+                    history.push(putToHistory('change', 'difficulty-enabled'))
+                }else{
+                    history.push(putToHistory('change', 'difficulty-dissabled'))
+                }
             }
 
             if(this.haveBall && this.oldMinBall!=this.minBall){
@@ -234,6 +245,7 @@ export default {
                 output.ballSystem.max = this.maxBall
                 output.ballSystem.interval = this.ballInterval
                 counter++
+                history.push(putToHistory('change', 'minBall', this.oldMinBall, this.minBall))
             }
             if(this.haveBall && this.oldMaxBall!=this.maxBall){
                 output.ballSystem={}
@@ -241,6 +253,7 @@ export default {
                 output.ballSystem.max = this.maxBall
                 output.ballSystem.interval = this.ballInterval
                 counter++
+                history.push(putToHistory('change', 'maxBall', this.oldMaxBall, this.maxBall))
             }
 
             if(this.haveBall && this.oldInterval!=this.ballInterval){
@@ -249,8 +262,9 @@ export default {
                 output.ballSystem.max = this.maxBall
                 output.ballSystem.interval = this.ballInterval
                 counter++
+                history.push(putToHistory('change', 'ballInterval', this.oldInterval, this.ballInterval))
             }
-            // Ошибка тут
+
             if(this.haveBall && this.haveBall!=this.oldBallSystem){
                 output.ballSystem={}
                 output.ballSystem.min = this.minBall
@@ -258,6 +272,7 @@ export default {
                 output.ballSystem.interval = this.ballInterval
                 
                 counter++
+                history.push(putToHistory('change', 'ball-enabled'))
             }
             if(!this.haveBall && this.haveBall!=this.oldBallSystem){
                 output.ballSystem = undefined
@@ -265,6 +280,7 @@ export default {
                 this.minBall = '0.01'
                 this.maxBall = '1'
                 this.ballInterval = '0.01'
+                history.push(putToHistory('change', 'ball-dissabled'))
             }
 
             // сохранение
@@ -272,10 +288,10 @@ export default {
                 this.showProgress = true
                 this.blockBtn = true
 
-                let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
                 let toSave = {
                     ...test,
-                    ...output
+                    ...output,
+                    history
                 }
 
                 console.log(toSave)

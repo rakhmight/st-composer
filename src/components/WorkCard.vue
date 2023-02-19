@@ -46,7 +46,7 @@
             </tr>
             <tr v-if="!status.isSigned">
               <td>Изменён:</td>
-              <td style="color:#0167FF">{{ test.lastChange.date ? test.lastChange.date : '-' }}</td>
+              <td style="color:#0167FF">{{ test.lastModified ? `${test.lastModified.date} ${test.lastModified.time}` : '-' }}</td>
             </tr>
 
             <!-- isSigned -->
@@ -77,7 +77,7 @@
                   <info-test :id="testID" :test="currentTest" />
                   <saved-tests/>
                   <edit-test :test="currentTest" :renderFunc="renderTests"/>
-                  <test-history/>
+                  <test-history :test="currentTest"/>
                   <delete-test :test="currentTest" :renderFunc="renderTests" />
                 </v-list>
             </v-menu>
