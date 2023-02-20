@@ -379,7 +379,7 @@ export default {
         this.mapOriented()
 
         if(!this.getTestID){
-            this.$router.push('/')
+            this.$router.push('/dashboard')
         }
         this.currentTest = JSON.parse(localStorage.getItem(`test-${this.getTestID}`))
 
