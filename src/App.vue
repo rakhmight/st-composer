@@ -18,7 +18,7 @@ export default {
     HeaderComponent
   },
   methods: {
-      ...mapMutations(['updateTestsCounter']),
+      ...mapMutations(['updateTestsCounter', 'updateWorkStatus']),
   },
   mounted() {
     let testsCounter = localStorage.getItem('testsCounter')
@@ -29,6 +29,15 @@ export default {
     }else{
       // обновить в стейте
       this.updateTestsCounter(testsCounter)
+    }
+  },
+  watch:{
+    $route(to, from) {
+      if(this.$route.path == '/workspace'){
+        this.updateWorkStatus(true)
+      }else{
+        this.updateWorkStatus(false)
+      }
     }
   }
 }

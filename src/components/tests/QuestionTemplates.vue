@@ -11,7 +11,7 @@
             </div>
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
-                <p style="color: #888">Последнее изменение: 00.00.0000 в 00:00</p>
+                <p style="color: #888">Последнее изменение: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
                 
                 <v-tooltip bottom color="error">
                 <template v-slot:activator="{ on, attrs }">
@@ -229,7 +229,7 @@ export default {
             ],
 			file: '',
             showPreview: false,
-            imagePreview: '',
+            imagePreview: this.question.imagePreview,
             errors:[],
             themes:[123,231,312],
             difficultys:[
@@ -328,6 +328,8 @@ export default {
 			reader.addEventListener("load", function () {
 				this.showPreview = true
 				this.imagePreview = reader.result
+
+                console.log(reader.result)
 			}.bind(this), false)
 
 			if( this.file ){

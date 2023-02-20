@@ -77,6 +77,9 @@
 
 <script>
 export default {
+    props:{
+        saveFunction: Function
+    },
     data() {
         return {
             currentRoute: this.$route.name
@@ -84,6 +87,9 @@ export default {
     },
     methods:{
         goToInstruction(){
+            if(this.saveFunction){
+                this.saveFunction()
+            }
             this.$router.push('/instruction')
         }
     }

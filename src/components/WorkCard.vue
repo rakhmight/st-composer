@@ -46,7 +46,7 @@
             </tr>
             <tr v-if="!status.isSigned">
               <td>Изменён:</td>
-              <td style="color:#0167FF">{{ test.lastModified ? `${test.lastModified.date} ${test.lastModified.time}` : '-' }}</td>
+              <td style="color:#0167FF">{{ test.lastModified ? `${test.lastModified.date}` : '-' }}</td>
             </tr>
 
             <!-- isSigned -->
@@ -93,7 +93,7 @@
               height="31"
               text
               body-2
-              @click="$router.push('/workspace')"
+              @click="$router.push(`/workspace?id=${testID}`)"
               >
               <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
             </v-btn>

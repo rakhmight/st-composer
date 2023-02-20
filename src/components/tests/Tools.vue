@@ -1,5 +1,17 @@
 <template>
     <div class="workspace__tools">
+        <div class="autosave">
+            <v-tooltip right color="#00000073">
+            <template v-slot:activator="{ on, attrs }">
+                <div v-bind="attrs" v-on="on" class="d-flex flex-row align-center">
+                    <v-progress-circular color="primary" indeterminate size="15" width="2"></v-progress-circular>
+                    <p style="color: #888" class="ml-2">Автосохранение</p>
+                </div>
+            </template>
+            <span>Автоматическиое сохранение тестов каждые 5 секунд</span>
+            </v-tooltip>
+        </div>
+
         <div>
             <v-btn
                 small
@@ -65,7 +77,7 @@
         </div> 
 
         <!-- INSTRUCTION -->
-        <to-instruction></to-instruction>
+        <to-instruction :saveFunction="saveProcess"></to-instruction>
 
     </div>
 </template>
@@ -76,7 +88,8 @@ import ToInstruction from '@/components/ToInstruction.vue'
 export default {
     props:{
         allTasks: Array,
-        createFunc: Function
+        createFunc: Function,
+        saveFunction: Function
     },
     data() {
         return {
@@ -86,6 +99,9 @@ export default {
     methods:{
         createQuestion(type){
             this.createFunc(type)
+        },
+        saveProcess(){
+            this.saveFunction()
         }
     },
     components:{
@@ -95,5 +111,13 @@ export default {
 </script>
 
 <style>
-    
+    .workspace__tools{
+        position: relative;
+    }
+
+    .autosave{
+        position: absolute;
+        top: -50px;
+        left: 0;
+    }
 </style>

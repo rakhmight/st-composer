@@ -106,7 +106,7 @@
                     color="#0d5fd8"
                     dark
                     class="mt-5"
-                    @click="$router.go(-1)"
+                    @click="goToBack"
                     >
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
                         Вернуться назад
@@ -152,7 +152,7 @@
                 <div class="workspace__tools-box">
                     
                         <!-- TOOLS -->
-                        <tools :allTasks="tasks" :createFunc="createQuestion"/>
+                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess"/>
 
                 </div>
             </div>
@@ -164,27 +164,26 @@
 import Question from '@/components/tests/QuestionTemplates.vue'
 import Tools from '@/components/tests/Tools.vue'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
+import getUrlParams from '@/plugins/getUrlParams'
+import { mapGetters } from 'vuex'
+import getCurrentDate from '@/plugins/getCurrentDate'
 
 export default {
     data() {
         return {
+            currentTest: undefined,
             tasks:[
                 {name:'вопрос с картинками', isDisabled: false, type: 'question-with-images'},
                 {name:'выбор области на картинке', isDisabled: false, type: 'question-with-field'},
                 {name:'скоро', isDisabled: true,}
             ],
-            questions:[
-                // basic-question, question-with-images, question-with-field
-                // {id:1, type: 'basic-question'}, 
-                // {id:2, type: 'question-with-images'},
-                // {id:3, type: 'basic-question'},
-            ],
+            questions: [],
             questionsCounter: 0,
             questionsDeleted: true,
 
             showFullMap: false,
             
-            visibleQuestions:[1,2,3,4,5,6,7,8,9,10]
+            visibleQuestions:[1,2,3,4,5,6,7,8,9,10],
         }
     },
     methods:{
@@ -196,16 +195,19 @@ export default {
                 theme: undefined,
                 difficulty: undefined,
                 ball:0.01,
-                multipleAnswers: false
+                multipleAnswers: false,
+                lastModified: getCurrentDate(),
             }
 
             if(type=='question-with-field'){
                 // позже реализовать логику обнуления x и y если нет картинки
+                question.imagePreview = ''
                 question.answer = [{fault: 20},{x:undefined, y:undefined}]
             }
             else{
                 if(type=='question-with-images'){
-                    question.answers = [{id:1, img:'', isCurrect:true}, {id:2, img:'', isCurrect:false}, {id:3, img:'', isCurrect:false}]
+                    question.imagePreview = ''
+                    question.answers = [{id:1, imagePreview:'', isCurrect:true}, {id:2, imagePreview:'', isCurrect:false}, {id:3, imagePreview:'', isCurrect:false}]
                 } else{
                     question.answers = [{id:1, answerCtx:'', isCurrect:true}, {id:2, answerCtx:'', isCurrect:false}, {id:3, answerCtx:'', isCurrect:false}, {id:4, answerCtx:'', isCurrect:false}]
                 }
@@ -261,12 +263,16 @@ export default {
 
                     if(type=='questionCtx'){
                         this.questions[index].questionCtx = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='ball'){
                         this.questions[index].ball = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='theme'){
                         this.questions[index].theme = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='difficulty'){
                         this.questions[index].difficulty = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answer-answerCtx'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -274,6 +280,7 @@ export default {
                                 this.questions[index].answers[aIndex].answerCtx = ctx
                             }
                         })
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answer-delete'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -281,18 +288,23 @@ export default {
                                 this.questions[index].answers.splice(aIndex, 1)
                             }
                         })
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answer-add'){
                         this.questions[index].answers.push({
                             id: aID,
                             answerCtx: '',
                             isCurrect: false
                         })
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='field-answer'){
                         this.questions[index].answer = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='multipleAnswers'){
                         this.questions[index].multipleAnswers = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answers'){
                         this.questions[index].answers = ctx
+                        this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answer-answerIsCurrect'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -300,6 +312,7 @@ export default {
                                 this.questions[index].answers[aIndex].isCurrect = ctx
                             }
                         })
+                        this.questions[index].lastModified = getCurrentDate()
                     }
                 }
             })
@@ -331,9 +344,51 @@ export default {
                 })
             }
         },
+
+        saveProcess(){
+            if(this.onWorkProcess){
+                let urlParams = getUrlParams()
+
+                this.currentTest.lastModified = getCurrentDate()
+                let output = {
+                    ...this.currentTest,
+                    questions: this.questions
+                }
+
+                localStorage.setItem(`test-${urlParams.id}`, JSON.stringify(output))
+                console.info('(i) process is saved')
+            }
+        },
+
+        goToBack(){
+            this.saveProcess()
+            this.$router.go(-1)
+        }
     },
+    computed: mapGetters(['onWorkProcess']),
     mounted(){
         this.mapOriented()
+
+        let urlParams = getUrlParams()
+        this.currentTest = JSON.parse(localStorage.getItem(`test-${urlParams.id}`))
+
+        this.questions = this.currentTest.questions
+
+        if(this.questions.length){
+            this.questionsCounter = this.questions[this.questions.length-1].id
+        }
+        
+
+        // Процесс сохранения тестов каждые 5 сек
+        let savingInterval = setInterval(()=>{
+            if(!this.onWorkProcess){
+                clearInterval(savingInterval)
+            }
+
+            
+            this.saveProcess()
+            
+        }, 5000)
     },
     watch:{
         questions(){
@@ -379,7 +434,7 @@ export default {
 .workspace__map{
     min-width: 100%;
     min-height: 30vh;
-    max-height: 67vh;
+    max-height: 60vh;
     background-color: aliceblue;
     border-radius: 0 0 5px 5px;
     overflow-y: scroll;

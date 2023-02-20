@@ -62,9 +62,9 @@
                 Общее количество вопросов: <b>{{ test.questions.length }}</b> <span v-if="test.questions.length">, из них:</span>
                 <div class="question-info" v-if="test.questions.length">
                     <div>
-                        <div><span style="color:rgb(255, 99, 132)">►</span> текстовых вопросов: <b>100</b></div>
-                        <div><span style="color:rgb(54, 162, 235)">►</span> вопросов с изображениями: <b>30</b></div>
-                        <div><span style="color:rgb(255, 205, 86)">►</span> вопросов с выбранной областью: <b>20</b></div>
+                        <div><span style="color:rgb(255, 99, 132)">►</span> текстовых вопросов: <b>{{ basicQuestions }}</b></div>
+                        <div><span style="color:rgb(54, 162, 235)">►</span> вопросов с изображениями: <b>{{ questionsWithImages }}</b></div>
+                        <div><span style="color:rgb(255, 205, 86)">►</span> вопросов с выбранной областью: <b>{{ questionWithField }}</b></div>
                     </div>
                     <div class="canvas-box">
                         <!-- Нужно создавать canvas с помощью скрипта -->
@@ -89,13 +89,25 @@ export default {
         return {
             dialog: false,
             chartAvaible:false,
-            testID: this.id
+            testID: this.id,
+
+            questionsWithImages: 0,
+            questionWithField: 0,
+            basicQuestions: 0
         }
     },
     mounted() {
-        // Расчитать вопросы по их виду
+        //Расчитать вопросы по их виду
         if(this.test.questions.length){
-            
+            for(let i =0; i!=this.test.questions.length; i++){
+                if(this.test.questions[i].type=='basic-question'){
+                    this.basicQuestions++                    
+                }else if(this.test.questions[i].type=='question-with-images'){
+                    this.questionsWithImages++
+                }else if(this.test.questions[i].type=='question-with-field'){
+                    this.questionWithField++
+                }
+            }
         }
     },
     watch:{
@@ -112,7 +124,7 @@ export default {
                             'с выбранной областью'
                         ],
                         datasets: [{
-                            data: [100, 30, 20],
+                            data: [this.basicQuestions, this.questionsWithImages, this.questionWithField],
                             backgroundColor: [
                             'rgb(255, 99, 132)',
                             'rgb(54, 162, 235)',
