@@ -356,7 +356,7 @@ export default {
         },
 
         saveProcess(){
-            if(this.onWorkProcess){
+            if(this.onWorkProcess && this.$route.path == '/workspace'){
 
                 this.currentTest.lastModified = getCurrentDate()
                 let output = {

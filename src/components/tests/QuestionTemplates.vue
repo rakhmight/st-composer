@@ -318,6 +318,10 @@ export default {
 
         if(this.currentQuestion.type != 'question-with-field'){
             this.answersCounter = this.question.answers.length
+        }else{
+            if(this.question.answer.length>=3){
+                this.multipleAnswers = true
+            }
         }
 
         if(this.imagePreview){
@@ -517,13 +521,27 @@ export default {
                 this.showPreview = false
                 
                 if(this.currentQuestion.type=='question-with-field'){
-                    let removeEl = document.querySelector(`.target-${this.currentQuestion.id}`)
-                    if(removeEl){
-                        removeEl.remove()
-                    }
+                    if(!this.multipleAnswers){
+                        let removeEl = document.querySelector(`.target-${this.currentQuestion.id}`)
+                        if(removeEl){
+                            removeEl.remove()
+                        }
 
-                    this.answer.y = undefined
-                    this.answer.x = undefined
+                        [1].y = undefined
+                        this.answer[1].x = undefined
+                    } else{
+                        let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                        if(removeEl){
+                            for(let i = 0; i!=removeEl.length; i++){
+                                removeEl[i].remove()
+                            }
+                        }
+
+                        this.answer = [
+                            {fault:20},
+                            {x: undefined, y: undefined}
+                        ]
+                    }
 
                     // прописать и для multi
                 }
