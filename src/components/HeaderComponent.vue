@@ -4,7 +4,7 @@
       color="#0d5fd8"
       height="70"
       class="header-flex"
-      style="z-index: 6;"
+      style="z-index: 10;"
     >
       <div class="d-flex align-center">
         <v-img

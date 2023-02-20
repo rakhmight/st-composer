@@ -93,7 +93,7 @@
               height="31"
               text
               body-2
-              @click="$router.push(`/workspace?id=${testID}`)"
+              @click="goToWorkspace"
               >
               <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
             </v-btn>
@@ -110,6 +110,7 @@ import SavedTests from './dialogs/SavedTests.vue'
 import EditTest from './dialogs/EditTest.vue'
 import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
+import { mapMutations } from 'vuex'
 
 export default {
   props:{
@@ -126,9 +127,15 @@ export default {
     }
   },
   methods:{
+    ...mapMutations(['updateTestID']),
     renderTests(ctx){
       this.renderFunc()
       this.currentTest = ctx
+    },
+
+    goToWorkspace(){
+      this.updateTestID(this.testID)
+      this.$router.push(`/workspace`)
     }
   },
   components:{

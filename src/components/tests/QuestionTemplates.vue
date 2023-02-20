@@ -85,8 +85,8 @@
                 min-width="100%"
                 prepend-icon="mdi-camera"
                 @change="handleFileUpload( $event )"
-                @click:clear="showPreview=false"
-                @click="showPreview=false"
+                @click:clear="imagePreview=''"
+                @click="imagePreview=''"
                 ></v-file-input>
 
                 <v-select
@@ -107,7 +107,10 @@
                 :success="difficulty!=undefined"
                 ></v-select>
             </div>
-            <div class="d-flex justify-center">
+            <div class="d-flex justify-center" style="position: relative;">
+                <div class="delete-pic" v-show="showPreview" v-if="currentQuestion.type=='question-with-images'">
+                    <v-icon color="red" @click="imagePreview=''" size="25" v-show="showPreview">mdi-close-circle</v-icon>
+                </div>
                 <v-img v-if="currentQuestion.type=='question-with-images'" width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview" class="mb-3"/>
             </div>
 
@@ -181,11 +184,14 @@
             </div>
         </div>
         
-        <div class="test__answers-box mt-3" v-else>
+        <div class="test__answers-box mt-3" v-else style="position: relative;">
             <p style="color: #888">
                 <span style="font-style: italic;color:#0d5fd8">Рекомендуемое разрешение изображения 1920:1080px (либо соотношение 16:9)</span><br>
                 Отметьте нужный участок в области
             </p>
+            <div class="delete-pic" v-show="showPreview" v-if="currentQuestion.type=='question-with-field'">
+                <v-icon color="red" @click="imagePreview=''" size="25" v-show="showPreview">mdi-close-circle</v-icon>
+            </div>
             <div class="mt-3" v-if="showPreview">
                 <v-img width="955" height="540" contain v-bind:src="imagePreview" v-show="showPreview" :class="`img_${currentQuestion.id}`" style="border: 3px solid #0d5fd8; margin:0 auto; position: relative;" @click="getPosition()"/>
             </div>
@@ -310,14 +316,18 @@ export default {
     mounted() {
         this.checkIndex()
 
-        if(this.answer){
-            if(this.answer.x){
-                this.summonField()
-            }
-        }
-
         if(this.currentQuestion.type != 'question-with-field'){
             this.answersCounter = this.question.answers.length
+        }
+
+        if(this.imagePreview){
+            this.showPreview = true
+        
+            setTimeout(()=>{
+                if(this.answer){
+                    this.summonField()
+                }
+            },2000)
         }
     },
     methods: {
@@ -328,8 +338,6 @@ export default {
 			reader.addEventListener("load", function () {
 				this.showPreview = true
 				this.imagePreview = reader.result
-
-                console.log(reader.result)
 			}.bind(this), false)
 
 			if( this.file ){
@@ -361,6 +369,8 @@ export default {
                 this.questionFunc('answer-answerCtx', ctx, id, aID)
             } else if(type=='answerIsCurrect'){
                 this.questionFunc('answer-answerIsCurrect', ctx, id, aID)
+            } else if(type=='answer-imagePreview'){
+                this.questionFunc('answer-imagePreview', ctx, id, aID)
             }
         },
 
@@ -502,21 +512,29 @@ export default {
         answer(){
             this.questionFunc('field-answer', this.answer, this.currentQuestion.id)
         },
+        imagePreview(){
+            if(!this.imagePreview){
+                this.showPreview = false
+                
+                if(this.currentQuestion.type=='question-with-field'){
+                    let removeEl = document.querySelector(`.target-${this.currentQuestion.id}`)
+                    if(removeEl){
+                        removeEl.remove()
+                    }
+
+                    this.answer.y = undefined
+                    this.answer.x = undefined
+
+                    // прописать и для multi
+                }
+            }else{
+                this.showPreview = true
+            }
+            this.questionFunc('imagePreview', this.imagePreview, this.currentQuestion.id)
+        },
 
         allQuestions(){
             this.checkIndex()
-        },
-
-        showPreview(){
-            if(!this.showPreview){
-                let removeEl = document.querySelector(`#target-${this.currentQuestion.id}`)
-                if(removeEl){
-                    removeEl.remove()
-                }
-
-                this.answer.y = undefined
-                this.answer.x = undefined
-            }
         },
 
         multipleAnswers(){
@@ -603,5 +621,12 @@ export default {
 
 .v-input--selection-controls{
     margin-top: 0;
+}
+
+.delete-pic{
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+    z-index: 9;
 }
 </style>

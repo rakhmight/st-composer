@@ -34,8 +34,8 @@
                         min-width="100%"
                         prepend-icon="mdi-camera"
                         @change="handleFileUpload( $event )"
-                        @click:clear="showPreview=false"
-                        @click="showPreview=false"
+                        @click:clear="imagePreview=''"
+                        @click="imagePreview=''"
                     ></v-file-input>
                 </div>
             </div>
@@ -44,7 +44,10 @@
                 <v-icon v-if="currentAnswer.id!=1 && currentAnswer.id!=2 && currentAnswer.id!=3" color="red" @click="deleteAnswer" size="25" class="mt-5">mdi-close-circle</v-icon>
             </div>
         </div>
-        <div class="d-flex justify-center" v-if="questionType=='question-with-images'">
+        <div class="d-flex justify-center" v-if="questionType=='question-with-images'"  style="position: relative;">
+            <div class="delete-pic" v-show="showPreview">
+                <v-icon color="red" @click="imagePreview=''" size="25" v-show="showPreview">mdi-close-circle</v-icon>
+            </div>
             <v-img width="300" height="150" contain v-bind:src="imagePreview" v-show="showPreview"/>
         </div>
     </div>
@@ -66,7 +69,7 @@ export default {
             ],
 			file: '',
             showPreview: false,
-            imagePreview: '',
+            imagePreview: this.answer.imagePreview,
 
             questionType: this.type,
             answerCtx: this.answer.answerCtx,
@@ -108,6 +111,20 @@ export default {
             if(!this.isMultiple && this.currentAnswer.id!=1){
                 this.isCurrect = false
             }
+        },
+        imagePreview(){
+            if(!this.imagePreview){
+                this.showPreview = false
+            }else{
+                this.showPreview = true
+            }
+
+            this.answerFunc('answer-imagePreview', this.imagePreview, this.questionID, this.currentAnswer.id)
+        },
+    },
+    mounted() {
+        if(this.imagePreview){
+            this.showPreview = true
         }
     },
 }
@@ -117,5 +134,12 @@ export default {
 .answer{
     display: flex;
     flex-direction: column;
-}    
+}
+
+.delete-pic{
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+    z-index: 9;
+}
 </style>

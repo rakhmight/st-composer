@@ -164,7 +164,6 @@
 import Question from '@/components/tests/QuestionTemplates.vue'
 import Tools from '@/components/tests/Tools.vue'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
-import getUrlParams from '@/plugins/getUrlParams'
 import { mapGetters } from 'vuex'
 import getCurrentDate from '@/plugins/getCurrentDate'
 
@@ -313,6 +312,17 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
+                    }else if(type=='imagePreview'){
+                        this.questions[index].imagePreview = ctx
+                        this.questions[index].lastModified = getCurrentDate()
+                    }else if(type=='answer-imagePreview'){
+                        this.questions[index].answers.filter(el => {
+                            if(el.id == aID){
+                                let aIndex = this.questions[index].answers.indexOf(el)
+                                this.questions[index].answers[aIndex].imagePreview = ctx
+                            }
+                        })
+                        this.questions[index].lastModified = getCurrentDate()
                     }
                 }
             })
@@ -347,7 +357,6 @@ export default {
 
         saveProcess(){
             if(this.onWorkProcess){
-                let urlParams = getUrlParams()
 
                 this.currentTest.lastModified = getCurrentDate()
                 let output = {
@@ -355,7 +364,7 @@ export default {
                     questions: this.questions
                 }
 
-                localStorage.setItem(`test-${urlParams.id}`, JSON.stringify(output))
+                localStorage.setItem(`test-${this.getTestID}`, JSON.stringify(output))
                 console.info('(i) process is saved')
             }
         },
@@ -365,12 +374,14 @@ export default {
             this.$router.go(-1)
         }
     },
-    computed: mapGetters(['onWorkProcess']),
+    computed: mapGetters(['onWorkProcess','getTestID']),
     mounted(){
         this.mapOriented()
 
-        let urlParams = getUrlParams()
-        this.currentTest = JSON.parse(localStorage.getItem(`test-${urlParams.id}`))
+        if(!this.getTestID){
+            this.$router.push('/')
+        }
+        this.currentTest = JSON.parse(localStorage.getItem(`test-${this.getTestID}`))
 
         this.questions = this.currentTest.questions
 
