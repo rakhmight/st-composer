@@ -350,6 +350,7 @@ export default {
             if(!this.dialog){
                 this.subjectID = this.oldSubjectID
                 this.themes = this.oldThemes
+                this.errors = []
             }
         }
     },

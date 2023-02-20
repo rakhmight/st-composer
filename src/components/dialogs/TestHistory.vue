@@ -49,16 +49,16 @@
                         </thead>
                         <tbody>
                             <tr
-                            v-for="(action, i) in actions"
+                            v-for="(action, i) in test.history"
                             :key="i"
                             >
                             <td v-if="action.type=='change' && action.des=='ballInterval'"><span style="color:blueviolet"><b>► </b></span>Интервал между баллами: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='minBall'"><span style="color:blueviolet"><b>► </b></span>Минимальный балл: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='maxBall'"><span style="color:blueviolet"><b>► </b></span>Максимальный балл: <b>{{ action.oldData }}</b></td>
-                            <td v-if="action.type=='change' && action.des=='ball-dissabled'"><span style="color:blueviolet"><b>► </b></span>Система баллов отключена</td>
-                            <td v-if="action.type=='change' && action.des=='ball-enabled'"><span style="color:blueviolet"><b>► </b></span>Система баллов включена</td>
-                            <td v-if="action.type=='change' && action.des=='difficulty-dissabled'"><span style="color:blueviolet"><b>► </b></span>Учитывание сложности отключено</td>
-                            <td v-if="action.type=='change' && action.des=='difficulty-enabled'"><span style="color:blueviolet"><b>► </b></span>Учитывание сложности включено</td>
+                            <td v-if="action.type=='change' && action.des=='ball-dissabled'"><span style="color:blueviolet"><b>► </b></span>Система баллов <span style="color: red">отключена</span></td>
+                            <td v-if="action.type=='change' && action.des=='ball-enabled'"><span style="color:blueviolet"><b>► </b></span>Система баллов <span style="color: green">включена</span></td>
+                            <td v-if="action.type=='change' && action.des=='difficulty-dissabled'"><span style="color:blueviolet"><b>► </b></span>Учитывание сложности <span style="color: red">отключено</span></td>
+                            <td v-if="action.type=='change' && action.des=='difficulty-enabled'"><span style="color:blueviolet"><b>► </b></span>Учитывание сложности <span style="color: green">включено</span></td>
                             <td v-if="action.type=='change' && action.des=='themes'"><span style="color:blueviolet"><b>► </b></span>Темы: <b>{{ action.oldData.join(', ') }}</b></td>
                             <td v-if="action.type=='change' && action.des=='subject'"><span style="color:blueviolet"><b>► </b></span>Предмет: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='create'"><span style="color:#0167FF"><b>► Тест создан</b></span></td>
@@ -89,9 +89,7 @@ export default {
     },
     data() {
         return {
-            dialog: false,
-            
-            actions: this.test.history
+            dialog: false
         }
     },
 }
