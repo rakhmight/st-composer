@@ -331,7 +331,7 @@ export default {
                 if(this.answer){
                     this.summonField()
                 }
-            },2000)
+            },500)
         }
     },
     methods: {
@@ -605,6 +605,7 @@ export default {
     padding: 15px;
     box-shadow: 0px 0px 5px 5px #4444441c;
     scroll-margin-top:90px;
+    min-width: 1020px;
 }
 
 .test__answers{

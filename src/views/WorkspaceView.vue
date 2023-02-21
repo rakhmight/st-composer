@@ -67,7 +67,7 @@
                                         class="map-orient"
                                         >
                                             <td style="width:20px">
-                                                <test-type-icons :type="question.type" :questionID="question.id" :questions="questions" :visible="visibleQuestions"/>
+                                                <test-type-icons :type="question.type" :questionID="question.id" :questions="questions"/>
                                             </td>
                                             <td :style="question.id==visibleQuestions[0] || question.id==visibleQuestions[1] || question.id==visibleQuestions[2] || question.id==visibleQuestions[3] || question.id==visibleQuestions[4] || question.id==visibleQuestions[5] || question.id==visibleQuestions[6] || question.id==visibleQuestions[7] || question.id==visibleQuestions[8] || question.id==visibleQuestions[9] ? 'color:#0d5fd8;font-weight: bolder' : 'color:#000'">{{ i+1 }}</td>
                                             <td>
@@ -343,15 +343,41 @@ export default {
                                 block: 'start',
                             })
                         }
-                    } else{
-                        // поменять visibleQuestions
-                        for(let j = 0; j<=10; j++){
-                            this.visibleQuestions[j] = +questionID + j
-                        }
-                        this.visibleQuestions.push()
-                        this.visibleQuestions.pop()
+                    }
+                    else{
+
+                        this.countMap(questionID)
+                        // погрешность
+                        this.questions.push('')
+                        this.questions.pop()
+
                     }
                 })
+            }
+        },
+
+        countMap(number){
+            this.visibleQuestions = []
+
+            let counter = number
+            for(let j = 0; j!=this.questions.length; j++){
+                if(this.visibleQuestions.length!=10){
+                    this.questions.filter(el=>{
+                        if(el.id==counter){
+                            this.visibleQuestions.push(el.id)
+                        }
+                    })
+                    counter++
+                }
+            }
+
+
+            if(this.visibleQuestions.length!=10){
+                counter = this.visibleQuestions[this.visibleQuestions.length-1]
+                while(this.visibleQuestions.length!=10){
+                    this.visibleQuestions.push(counter)
+                    counter++
+                }
             }
         },
 
@@ -376,8 +402,7 @@ export default {
     },
     computed: mapGetters(['onWorkProcess','getTestID']),
     mounted(){
-        this.mapOriented()
-
+        // текущий ID теста
         if(!this.getTestID){
             this.$router.push('/dashboard')
         }
@@ -388,7 +413,14 @@ export default {
         if(this.questions.length){
             this.questionsCounter = this.questions[this.questions.length-1].id
         }
-        
+
+        // установление map
+        if(this.questions.length){
+            this.countMap(1)
+        }
+
+        // событие MAP
+        this.mapOriented()
 
         // Процесс сохранения тестов каждые 5 сек
         let savingInterval = setInterval(()=>{
@@ -398,7 +430,7 @@ export default {
 
             this.saveProcess()
             
-        }, 5000)
+        }, 10000)
     },
     watch:{
         questions(){

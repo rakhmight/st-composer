@@ -42,14 +42,12 @@
 </template>
 
 <script>
-import { doc } from 'prettier'
 
 export default {
     props:{
         type: String,
         questionID: Number,
         questions: Array,
-        visible: Array
     },
     data() {
         return {
@@ -57,7 +55,6 @@ export default {
             allQuestions: this.questions,
             thisQuestion: this.questionID,
             currentMap: 0,
-            visibleQuestions: this.visible
         }
     },
     methods: {
@@ -92,44 +89,10 @@ export default {
                 // current map
                 this.watchMap()
             }, 300)
-        },
-
-        visibleQuestions(){
-            setTimeout(() => {
-                // current map
-                this.watchMap()
-            }, 300)
         }
-
-        // currentMap(){
-        // },
-
-        // visibleQuestions(){
-        //     if(this.visibleQuestions){
-        //         this.changeVisibleFunc(prev, current, next)
-        //     }
-        // }
     },
     mounted() {
         this.watchMap()
-
-        // if( this.visibleQuestionsSwitch!= this.switch){
-        //     console.log(1);
-        //     // this.watchMap()
-        //     // this.visibleQuestionsSwitch = this.switch
-        // }
-        // document.addEventListener('scroll',(event)=>{
-
-        //     if(this.visibleMap){
-        //         this.visibleQuestions.prev = this.currentMap-1
-        //         this.visibleQuestions.current = this.currentMap
-        //         this.visibleQuestions.next = this.currentMap+1
-
-        //         console.log(this.visibleQuestions);
-
-        //         // Вынести в workspace и сделать проверку отдельную на скролл проверяя currentMap
-        //     }
-        // })
     },
 }
 </script>
