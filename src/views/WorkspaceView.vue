@@ -130,6 +130,7 @@
                     :deleteFunc="deleteQuestion"
 
                     :questionFunc="changeQuestion"
+                    :params="testParams"
                     />
 
                     <div v-if="questions.length">
@@ -181,8 +182,10 @@ export default {
             questionsDeleted: true,
 
             showFullMap: false,
+            testParams: {},
             
             visibleQuestions:[1,2,3,4,5,6,7,8,9,10],
+            savingInterval: undefined
         }
     },
     methods:{
@@ -360,7 +363,7 @@ export default {
             this.visibleQuestions = []
 
             let counter = number
-            for(let j = 0; j!=this.questions.length; j++){
+            for(let j = 0; j!=this.questions[this.questions.length-1].id; j++){
                 if(this.visibleQuestions.length!=10){
                     this.questions.filter(el=>{
                         if(el.id==counter){
@@ -373,7 +376,11 @@ export default {
 
 
             if(this.visibleQuestions.length!=10){
-                counter = this.visibleQuestions[this.visibleQuestions.length-1]
+                if(this.questions.length==1){
+                    counter = this.questions[0].id+1
+                }else{
+                    counter = this.visibleQuestions[this.visibleQuestions.length-1]
+                }
                 while(this.visibleQuestions.length!=10){
                     this.visibleQuestions.push(counter)
                     counter++
@@ -409,6 +416,12 @@ export default {
         this.currentTest = JSON.parse(localStorage.getItem(`test-${this.getTestID}`))
 
         this.questions = this.currentTest.questions
+        this.testParams = {
+            id: this.currentTest.id,
+            themes: this.currentTest.themes,
+            considerDifficulty: this.currentTest.considerDifficulty,
+            ballSystem: this.currentTest.ballSystem
+        }
 
         if(this.questions.length){
             this.questionsCounter = this.questions[this.questions.length-1].id
@@ -416,18 +429,16 @@ export default {
 
         // установление map
         if(this.questions.length){
-            this.countMap(1)
+            this.countMap(this.questions[0].id)
         }
 
         // событие MAP
         this.mapOriented()
 
-        // Процесс сохранения тестов каждые 5 сек
-        let savingInterval = setInterval(()=>{
-            if(!this.onWorkProcess && this.$route.path != '/workspace'){
-                clearInterval(savingInterval)
-            }
+        
 
+        // Авто сохранение каждые 10 сек.
+        this.savingInterval = setInterval(()=>{
             this.saveProcess()
             
         }, 10000)
@@ -448,6 +459,9 @@ export default {
                 })
             },300)
         }
+    },
+    beforeDestroy(){
+        clearInterval(this.savingInterval)
     },
     components:{
         Question,

@@ -58,7 +58,7 @@
                 </div>
             </div>
 
-            <div class="mb-10 pl-3 pr-3">
+            <div class="mb-10 pl-3 pr-3" v-if="params.ballSystem">
                 <!-- range -->
                 <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
                 <vue-slider
@@ -99,6 +99,7 @@
                 ></v-select>
 
                 <v-select
+                v-if="params.ballSystem"
                 :items="difficultys"
                 placeholder="Сложность"
                 outlined
@@ -226,6 +227,7 @@ export default {
         questions: Array,
 
         questionFunc: Function,
+        params: Object
     },
     data() {
         return {
@@ -237,7 +239,7 @@ export default {
             showPreview: false,
             imagePreview: this.question.imagePreview,
             errors:[],
-            themes:[123,231,312],
+            themes:this.params.themes,
             difficultys:[
                 {value:1, text:'Лёгкий'},
                 {value:2, text:'Средний'},
@@ -252,7 +254,7 @@ export default {
                 dataLabel: 'label',
                 dataValue: 'value',
                 min: 0.01,
-                max: 1,
+                max: 100,
                 interval: 0.01,
                 disabled: false,
                 clickable: true,
@@ -265,7 +267,6 @@ export default {
                 enableCross: true,
                 fixed: false,
                 order: true,
-                marks: [0.01,1],
                 process: true,
             },
             faultOptions: {
@@ -332,6 +333,33 @@ export default {
                     this.summonField()
                 }
             },500)
+        }
+
+        // балловая система
+        if(this.params.ballSystem){
+            this.options.min = +this.params.ballSystem.min
+            this.options.max = +this.params.ballSystem.max
+            this.options.interval = +this.params.ballSystem.interval
+            this.options.marks = [+this.params.ballSystem.min, +this.params.ballSystem.max]
+
+            if(this.ball<+this.params.ballSystem.min){
+                this.ball = +this.params.ballSystem.min
+            }
+            if(this.ball>+this.params.ballSystem.max){
+                this.ball = +this.params.ballSystem.max
+            }
+        }
+
+        // проверка темы
+        let themesCounter = 0
+        this.params.themes.filter(el=>{
+            if(el==this.theme){
+                themesCounter++
+            }
+        })
+
+        if(!themesCounter){
+            this.theme = undefined
         }
     },
     methods: {
@@ -508,10 +536,10 @@ export default {
             this.questionFunc('ball', this.ball, this.currentQuestion.id)
         },
         theme(){
-            this.questionFunc('theme', this.ball, this.currentQuestion.id)
+            this.questionFunc('theme', this.theme, this.currentQuestion.id)
         },
         difficulty(){
-            this.questionFunc('difficulty', this.ball, this.currentQuestion.id)
+            this.questionFunc('difficulty', this.difficulty, this.currentQuestion.id)
         },
         answer(){
             this.questionFunc('field-answer', this.answer, this.currentQuestion.id)
