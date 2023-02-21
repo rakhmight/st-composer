@@ -371,7 +371,7 @@ export default {
 
         goToBack(){
             this.saveProcess()
-            this.$router.go(-1)
+            this.$router.push('/dashboard')
         }
     },
     computed: mapGetters(['onWorkProcess','getTestID']),
@@ -392,11 +392,10 @@ export default {
 
         // Процесс сохранения тестов каждые 5 сек
         let savingInterval = setInterval(()=>{
-            if(!this.onWorkProcess){
+            if(!this.onWorkProcess && this.$route.path != '/workspace'){
                 clearInterval(savingInterval)
             }
 
-            
             this.saveProcess()
             
         }, 5000)

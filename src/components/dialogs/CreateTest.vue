@@ -152,7 +152,7 @@ export default {
         }
     },
     methods: {
-        ...mapMutations(['updateTestsCounter']),
+        ...mapMutations(['updateTestsCounter', 'updateTestID']),
 
         changeSettings(type, ctx){
             if(type=='min'){
@@ -243,6 +243,9 @@ export default {
                 let testToStore = JSON.stringify(test)
                 localStorage.setItem(`test-${test.id}`,testToStore)
 
+                // устанавливаем новый стейт текущего теста для workspace
+                this.updateTestID(test.id)
+
                 setTimeout(()=>{
                     this.renderFunc()
                     this.createSuccess = true
@@ -251,7 +254,7 @@ export default {
                     this.showProgress = false
                     this.blockBtn = false
 
-                    this.$router.push(`/workspace?id=${test.id}`)
+                    this.$router.push(`/workspace`)
                     },1000)
                 },2000)
                 //♦ отключить прогресс

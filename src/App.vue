@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations,mapGetters } from 'vuex'
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
 export default {
@@ -18,9 +18,11 @@ export default {
     HeaderComponent
   },
   methods: {
-      ...mapMutations(['updateTestsCounter', 'updateWorkStatus']),
+      ...mapMutations(['updateTestsCounter', 'updateWorkStatus', 'updateTestID']),
   },
+  computed: mapGetters(['getTestID']),
   mounted() {
+    // testCounter в LS
     let testsCounter = localStorage.getItem('testsCounter')
 
     if(!testsCounter){
@@ -29,6 +31,13 @@ export default {
     }else{
       // обновить в стейте
       this.updateTestsCounter(testsCounter)
+    }
+
+
+    // currentTestInProcess в LS
+    let localID = localStorage.getItem('currentTestInProcess')
+    if(localID){
+      this.updateTestID(localID)
     }
   },
   watch:{
