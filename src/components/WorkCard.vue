@@ -75,7 +75,7 @@
                 </template>
                 <v-list>
                   <info-test :id="testID" :test="currentTest" />
-                  <saved-tests/>
+                  <saved-tests :id="testID"/>
                   <edit-test :test="currentTest" :renderFunc="renderTests"/>
                   <test-history :test="currentTest"/>
                   <delete-test :test="currentTest" :renderFunc="renderTests" />

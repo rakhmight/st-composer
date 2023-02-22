@@ -25,11 +25,11 @@
         <v-divider></v-divider>
 
         <div class="dialog-content">
-            <v-simple-table class="mt-3">
+            <v-simple-table  v-if="saves.length">
                 <template v-slot:default>
                 <thead>
                     <tr>
-                    <th class="text-left">
+                    <th class="text-left" width="350px">
                         Описание
                     </th>
                     <th class="text-left">
@@ -43,10 +43,10 @@
                 <tbody>
                     <tr
                     v-for="saved in saves"
-                    :key="saved.date"
+                    :key="saved.id"
                     >
-                    <td>{{ saved.des }}</td>
-                    <td>{{ saved.date }}</td>
+                    <td width="350px">{{ saved.comment }}</td>
+                    <td>{{ saved.date.date }} {{ saved.date.time }}</td>
                     <td>
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -56,6 +56,7 @@
                             small
                             v-bind="attrs"
                             v-on="on"
+                            @click="goToSaved(saved.id)"
                             >
                                 <v-icon color="#444">
                                     mdi-eye-outline
@@ -86,46 +87,58 @@
                 </tbody>
                 </template>
             </v-simple-table>
+
+            <div v-else class="d-flex flex-column align-center">
+                <v-img
+                max-height="120"
+                max-width="120"
+                src="@/assets/media/spider-web.png"
+                contain
+                transition="scale-transition"
+                ></v-img>
+                <h3 style="color: #888" class="mt-2">Сохранений пока нет</h3>
+            </div>
         </div>
     </v-card>
 </v-dialog>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
+    props:{
+        id: Number
+    },
     data() {
         return {
             dialog: false,
 
-            saves: [
-                {
-                    des: 'Тесты на темы 123, 213, 312',
-                    date: '12.03.2022 20:30',
-                    test:{} //отсюда id предмета для определения принадлежности
-                },
-                {
-                    des: 'Подготовил 50 фундаментальных вопросов',
-                    date: '15.03.2022 14:40',
-                    test:{}
-                },
-                {
-                    des: 'Имеются не согласованные вопросы',
-                    date: '06.04.2022 09:30',
-                    test:{}
-                },
-                {
-                    des: 'Возможно ошибся с темами',
-                    date: '21.04.2022 17:30',
-                    test:{}
-                },
-            ]
+            saves: []
         }
     },
+    methods: {
+        ...mapMutations(['updateTestID']),
+
+        goToSaved(id){
+            this.updateTestID(JSON.stringify({testID: this.id, savingID: id}))
+            this.$router.push(`/saved`)
+        }
+    },
+    mounted(){
+        let store = localStorage.getItem(`saving-${this.id}`)
+
+        if(store){
+            this.saves = JSON.parse(store)
+        }
+    }
 }
 </script>
 
 <style scoped>
+
 .dialog-content{
     width: 100%;
+    padding: 30px;
 }
 </style>

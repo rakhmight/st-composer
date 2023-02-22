@@ -24,6 +24,11 @@ const routes = [
     path: '/instruction', //instruction
     name: 'instruction',
     component: () => import('../views/InstructionView.vue')
+  },
+  {
+    path: '/saved', //saving
+    name: 'saved',
+    component: () => import('../views/SavedTestView.vue')
   }
 ]
 

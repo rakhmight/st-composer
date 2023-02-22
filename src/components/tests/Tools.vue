@@ -65,7 +65,7 @@
                 </v-list>
             </v-menu>
 
-            <v-btn
+            <!-- <v-btn
                 small
                 dark
                 color="#656565"
@@ -73,7 +73,8 @@
                 >
                     <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
                     Сохранить как экземпляр
-            </v-btn>
+            </v-btn> -->
+            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveProcess"/>
         </div> 
 
         <!-- INSTRUCTION -->
@@ -84,12 +85,17 @@
 
 <script>
 import ToInstruction from '@/components/ToInstruction.vue'
+import SavingQuestions from '@/components/dialogs/SavingQuestions.vue'
+
 
 export default {
     props:{
         allTasks: Array,
         createFunc: Function,
-        saveFunction: Function
+        saveFunction: Function,
+        
+        allQuestions: Array,
+        currentTestID: Number
     },
     data() {
         return {
@@ -106,6 +112,7 @@ export default {
     },
     components:{
         ToInstruction,
+        SavingQuestions
     }
 }
 </script>

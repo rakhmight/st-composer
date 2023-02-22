@@ -153,7 +153,7 @@
                 <div class="workspace__tools-box">
                     
                         <!-- TOOLS -->
-                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess"/>
+                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions"/>
 
                 </div>
             </div>
