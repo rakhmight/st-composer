@@ -99,7 +99,7 @@
                 ></v-select>
 
                 <v-select
-                v-if="params.ballSystem"
+                v-if="params.considerDifficulty"
                 :items="difficultys"
                 placeholder="Сложность"
                 outlined

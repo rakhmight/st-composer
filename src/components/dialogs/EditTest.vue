@@ -196,6 +196,7 @@ export default {
                 this.themesEr = true
                 return this.errors.push('Не указаны ID тем')
             }
+
             let themes = (''+this.themes).trim()
             themes = themes.split(',')
             themes.forEach((item, i, arr)=>{
@@ -207,6 +208,20 @@ export default {
                     return this.errors.push('Указаны некорректные ID тем')
                 }
             })
+            // повторяющиеся темы
+            let themesCounter = 0
+            for(let i = 0; i!=themes.length; i++){
+                for(let j =0; j!=themes.length; j++){
+                    if(themes[i]==themes[j]){
+                        themesCounter++
+                    }
+                    if(themes[i]==themes[j] && themesCounter==2){
+                        this.themesEr = true
+                        return this.errors.push('Указаны повторяющиеся ID тем')  
+                    }
+                }
+                themesCounter=0
+            }
 
             if(this.haveBall){
                 if(!this.ballIsCurrect){
@@ -214,21 +229,41 @@ export default {
                 }
             }
 
+
             // наблюдатели изменений и counter
             if(this.subjectID != this.oldSubjectID){
                 counter++
                 output.subjectID = +this.subjectID
                 history.push(putToHistory('change', 'subject', +this.oldSubjectID, +this.subjectID))
             }
-            if(this.themes != this.oldThemes.join(', ')){
+
+            // темы
+            let checkThemes = this.themes
+            function arrayToString(arr){
+                let output = (''+arr).trim()
+                output = output.split(',')
+                output.forEach((item,i,arr)=>{
+                    arr[i] = item.replace(' ', '')
+                    arr[i] = +arr[i]
+                })
+
+                return output
+            }
+            
+            if(typeof checkThemes==='string'){
+                checkThemes = arrayToString(checkThemes)
+            }
+            if(checkThemes.join(',') != (this.oldThemes.join(',')).replace(' ','')){
                 counter++
                 output.themes = themes
                 history.push(putToHistory('change', 'themes', this.oldThemes, themes))
             }
+
             if(this.themesEr){
                 return
             }
 
+            // проверка уровней
             if(this.oldLevel!=this.haveLevel){
                 output.considerDifficulty = this.haveLevel
                 counter++
@@ -293,8 +328,6 @@ export default {
                     ...output,
                     history
                 }
-
-                console.log(toSave)
                 localStorage.removeItem(`test-${this.test.id}`)
                 localStorage.setItem(`test-${this.test.id}`, JSON.stringify(toSave))
 

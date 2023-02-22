@@ -193,6 +193,20 @@ export default {
                     return this.errors.push('Указаны некорректные ID тем')
                 }
             })
+            //повторяющиеся темы
+            let themesCounter = 0
+            for(let i = 0; i!=themes.length; i++){
+                for(let j =0; j!=themes.length; j++){
+                    if(themes[i]==themes[j]){
+                        themesCounter++
+                    }
+                    if(themes[i]==themes[j] && themesCounter==2){
+                        this.themesIsEmpty = true
+                        return this.errors.push('Указаны повторяющиеся ID тем')  
+                    }
+                }
+                themesCounter=0
+            }
             if(this.themesIsEmpty){
                 return
             }
