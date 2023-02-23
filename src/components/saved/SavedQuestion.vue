@@ -132,8 +132,36 @@
             </div>
         </div>
         
-        <div class="test__answers-box mt-3" v-else style="position: relative;">
+        <div class="mt-3 d-flex flex-column justify-center" v-else style="position: relative;">
             <!-- Картинка с областью выделения -->
+            <div class="d-flex flex-row mb-2">
+                <v-icon class="mr-2" :color="question.imagePreview ? '#0d5fd8' : ''">mdi-focus-field</v-icon>
+                <div>
+                    Приемлемый радиус погрешности ответа:
+                    <span style="color:#0d5fd8">{{ question.answer[0].fault }}</span>
+                    <span v-if="!question.imagePreview" style="color:#888"> (не установлена картинка)</span>
+                    <span v-if="question.imagePreview && !question.answer[1].x" style="color:#888"> (не установлены координаты)</span>
+                </div>
+            </div>
+            <div v-if="question.imagePreview">
+                <v-img
+                width="955"
+                height="540"
+                contain
+                v-bind:src="question.imagePreview"
+                :class="`img_${question.id}`"
+                style="border: 3px solid #0d5fd8;margin:0 auto; position: relative;"
+                />
+            </div>
+
+            <div class="fieldEmpty" v-else>
+                <v-img
+                width="500"
+                height="300"
+                contain
+                src="@/assets/media/spider-web.png"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -147,6 +175,43 @@ export default {
         serialNumber: Number,
         testParams: Object,
         questions: Array,
+    },
+    mounted() {
+        if(this.question.type=='question-with-field' && this.question.imagePreview){
+            let target = document.querySelector(`.img_${this.question.id}`)
+
+            if(this.question.answer.length==2){
+                if(this.question.answer[1] && this.question.answer[1].x){
+                    let field = document.createElement('div')
+                    field.classList.add(`target-${this.question.id}`)
+                    field.style.padding = this.question.answer[0].fault+'px'
+                    field.style.backgroundColor = 'red'
+                    field.style.opacity = '0.5'
+                    field.style.position = 'absolute'
+                    field.style.zIndex = 10
+                    field.style.left = this.question.answer[1].x-this.question.answer[0].fault+'px'
+                    field.style.top =  this.question.answer[1].y-this.question.answer[0].fault+'px'
+
+                    target.appendChild(field)
+                }
+            }else{
+                this.question.answer.filter(el=>{
+                    if(el.hasOwnProperty('x') && el.x){
+                        let field = document.createElement('div')
+                        field.classList.add(`target-${this.question.id}`)
+                        field.style.padding = this.question.answer[0].fault+'px'
+                        field.style.backgroundColor = 'red'
+                        field.style.opacity = '0.5'
+                        field.style.position = 'absolute'
+                        field.style.zIndex = 10
+                        field.style.left = el.x-this.question.answer[0].fault+'px'
+                        field.style.top =  el.y-this.question.answer[0].fault+'px'
+
+                        target.appendChild(field)
+                    }
+                })
+            }
+        }
     },
     components:{
         TestTypeIcons
@@ -180,7 +245,7 @@ export default {
 
 .imgEmpty{
     border: 1px solid #888;
-    width: 400px;
+    width: 200px;
     height: 200px;
     border-radius: 5px;
     display: flex;
@@ -207,5 +272,17 @@ export default {
     width: 100%;
     border: 1px solid #888;
     color: #888;
+}
+
+.fieldEmpty{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    width: 955px;
+    height: 540px;
+    border: 1px solid #888;
+    color: #888;
+    margin: 0 auto;
 }
 </style>

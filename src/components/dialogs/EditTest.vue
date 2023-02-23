@@ -68,6 +68,12 @@
 
                     <div v-if="haveBall" class="pb-2 pt-2">
                         <ball-settings :min="minBall" :max="maxBall" :interval="ballInterval" :settingsFunc="changeSettings" />
+
+                        <!-- Использовать для ошибки -->
+                        <div class="d-flex flex-row mt-3 align-start">
+                            <v-icon color="error" class="mr-2 mt-1">mdi-alert-circle-outline</v-icon>
+                            <div style="font-size: 0.9em;">Помните, что если в вопросах текущих тестов балл меньше чем указываемое минимальное значение, то в этих вопросах балл будет изменён на указываемое минимальное значение. Если же в вопросах текущих тестов балл больше чем указываемое максимальное значение, то в этих вопросах балл будет изменён на указываемое максимальное значение</div>
+                        </div>
                     </div>
                 </div>
                 
@@ -385,7 +391,16 @@ export default {
                 this.themes = this.oldThemes
                 this.errors = []
             }
-        }
+        },
+
+        // Будущая валидация мин, макс, интервал
+        // minBall(){
+        //     if(!isNaN(+this.minBall)){
+        //         this.test.questions.filter(el=>{
+                    
+        //         })
+        //     }
+        // }
     },
     mounted() {
         if(this.test.considerDifficulty){

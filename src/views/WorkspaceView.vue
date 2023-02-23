@@ -3,7 +3,7 @@
         <div class="container">
             <div class="workspace">
                 <div class="workspace__sidebar">
-                    <div :class="{'full-map':showFullMap}">
+                    <div :class="{'full-map':showFullMap}" :style="showFullMap ? 'width: 90vw' : 'width: 270px'" style="transition: width 0.3s ease-in-out;">
                         <div class="d-flex flex-row align-center justify-space-between" style="background-color: #0d5fd8;padding:7px 5px;border-radius: 5px 5px 0 0;">
                             <div class="d-flex flex-row align-center">
                                 <v-icon size="20" color="#fff" class="mr-1">
@@ -479,6 +479,8 @@ export default {
     display: grid;
     grid-template-columns: 270px auto;
     position: relative;
+    left: 0;
+    top:0;
 }
 
 
@@ -486,6 +488,7 @@ export default {
     width: 270px;
     position:fixed;
     z-index: 9;
+    transition: width 0.4s ease-in-out;
 }
 .workspace__map{
     min-width: 100%;
@@ -559,7 +562,6 @@ export default {
 }
 
 .full-map{
-    width: 90vw;
     z-index: 9;
     overflow:hidden
 }
