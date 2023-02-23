@@ -29,7 +29,7 @@
                 <template v-slot:default>
                 <thead>
                     <tr>
-                    <th class="text-left" width="350px">
+                    <th class="text-left pt1 pb1" width="350px" max-width="350px">
                         Описание
                     </th>
                     <th class="text-left">
@@ -45,7 +45,7 @@
                     v-for="saved in saves"
                     :key="saved.id"
                     >
-                    <td width="350px">{{ saved.comment }}</td>
+                    <td width="350px" max-width="350px" class="pt1 pb1">{{ saved.comment }}</td>
                     <td>{{ saved.date.date }} {{ saved.date.time }}</td>
                     <td>
                         <v-tooltip bottom>
@@ -63,24 +63,7 @@
                                 </v-icon>
                             </v-btn>
                         </template>
-                        <span>Посмотреть</span>
-                        </v-tooltip>
-                        |
-                        <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                            fab
-                            text
-                            small
-                            v-bind="attrs"
-                            v-on="on"
-                            >
-                                <v-icon color="#0167FF">
-                                    mdi-arrow-u-down-right
-                                </v-icon>
-                            </v-btn>
-                        </template>
-                        <span>Использовать как текущий</span>
+                        <span>Перейти к сохранению</span>
                         </v-tooltip>
                     </td>
                     </tr>

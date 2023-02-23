@@ -66,6 +66,9 @@
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
                         Вернуться назад
                     </v-btn>
+
+                   <!--  -->
+                   <presave-test :state="initPresave" :testID="params.testID" :saving="saving"/>
                 </div>
 
                 <div class="saved__sidebar-box"></div>
@@ -201,12 +204,16 @@
 import { mapGetters } from 'vuex'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import SavedQuestion from '@/components/saved/SavedQuestion.vue'
+import PresaveTest from '@/components/dialogs/PresaveTest.vue'
 
 export default {
     data() {
         return {
+            initPresave: false,
             questions: [],
-            params: undefined,
+            params: {
+                testID: undefined
+            },
             testParams: {
                 subjectID: undefined,
                 themes: undefined
@@ -220,7 +227,9 @@ export default {
 
             questionsWithImages: 0,
             questionWithField: 0,
-            basicQuestions: 0
+            basicQuestions: 0,
+
+            saving: undefined
         }
     },
     computed: mapGetters(['getTestID']),
@@ -259,11 +268,12 @@ export default {
             }
         })
 
+        this.saving = saving
+
         this.questions = saving.questions
         this.testParams = saving.params
         this.savingComment = saving.comment
         this.savingDate = saving.date
-        console.log(saving)
 
         // Параметры теста
 
@@ -288,7 +298,8 @@ export default {
     },
     components:{
         TestTypeIcons,
-        SavedQuestion
+        SavedQuestion,
+        PresaveTest
     }
 }
 </script>
