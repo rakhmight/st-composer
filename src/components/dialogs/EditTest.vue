@@ -393,9 +393,9 @@ export default {
         }
 
         if(this.test.ballSystem){
-            this.oldMinBall,this.minBall = this.test.ballSystem.min
-            this.oldMaxBall,this.maxBall = this.test.ballSystem.max
-            this.oldInterval,this.ballInterval = this.test.ballSystem.interval
+            this.oldMinBall=this.minBall = this.test.ballSystem.min
+            this.oldMaxBall=this.maxBall = this.test.ballSystem.max
+            this.oldInterval=this.ballInterval = this.test.ballSystem.interval
             this.haveBall = true
             this.oldBallSystem = true
         }else{

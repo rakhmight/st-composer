@@ -58,10 +58,14 @@
                 </div>
             </div>
 
-            <div class="mb-10 pl-3 pr-3" v-if="params.ballSystem">
+            <div class="mb-10" v-if="params.ballSystem">
                 <!-- range -->
-                <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
+                <div class="d-flex flex-row mb-1">
+                    <v-icon class="mr-2">mdi-circle-double</v-icon>
+                    <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
+                </div>
                 <vue-slider
+                class="pl-3 pr-3"
                     ref="slider"
                     v-model="ball"
                     v-bind="options"
@@ -95,7 +99,7 @@
                 outlined
                 dense
                 v-model="theme"
-                :success="theme!=undefined"
+                prepend-icon="mdi-alpha-t-box-outline"
                 ></v-select>
 
                 <v-select
@@ -105,7 +109,7 @@
                 outlined
                 dense
                 v-model="difficulty"
-                :success="difficulty!=undefined"
+                prepend-icon="mdi-chart-line"
                 ></v-select>
             </div>
             <div class="d-flex justify-center" style="position: relative;">
