@@ -132,6 +132,7 @@
 <script>
 import BallSettings from '@/components/dialogs/BallSettings.vue'
 import putToHistory from '@/services/putToHistory'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
@@ -183,10 +184,9 @@ export default {
         },
 
         saveChanges(){
-            let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
             let counter = 0
             let output = {}
-            let history = [...test.history]
+            let history = []
 
             // валидаторы
             if(!this.subjectID){
@@ -326,21 +326,31 @@ export default {
 
             // сохранение
             if(counter){
+                let test
+                operationFromStore('getByTestID',{id: this.test.id})
+                .then(result=>{
+                    let historyToPut = [
+                        ...result.history,
+                        ...history
+                    ]
+                    test = {
+                        ...result,
+                        ...output,
+                        history:historyToPut
+                    }
+                })
+                .then(()=>{
+                    operationFromStore('deleteTest',{id: this.test.id})
+                    operationFromStore('addTest',{data:test})
+                })
+
                 this.showProgress = true
                 this.blockBtn = true
-
-                let toSave = {
-                    ...test,
-                    ...output,
-                    history
-                }
-                localStorage.removeItem(`test-${this.test.id}`)
-                localStorage.setItem(`test-${this.test.id}`, JSON.stringify(toSave))
 
                 setTimeout(()=>{
                     this.editSuccess = true
                     this.showProgress = false
-                    this.renderFunc(toSave)
+                    this.renderFunc(test)
                     
                     this.oldSubjectID = this.subjectID
                     this.oldThemes = themes

@@ -124,6 +124,7 @@ import 'vue-slider-component/theme/default.css'
 import getCurrentDate from '@/plugins/getCurrentDate'
 import { mapGetters, mapMutations } from 'vuex'
 import putToHistory from '@/services/putToHistory'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
@@ -253,9 +254,9 @@ export default {
                 }
 
                 this.updateTestsCounter(this.currentTestsCounter+1)
-                //♦ положить в LS
-                let testToStore = JSON.stringify(test)
-                localStorage.setItem(`test-${test.id}`,testToStore)
+
+                // положить в DB
+                operationFromStore('addTest', {data: test})
 
                 // устанавливаем новый стейт текущего теста для workspace
                 this.updateTestID(test.id)
@@ -265,10 +266,10 @@ export default {
                     this.createSuccess = true
 
                     setTimeout(()=>{
-                    this.showProgress = false
-                    this.blockBtn = false
+                        this.showProgress = false
+                        this.blockBtn = false
 
-                    this.$router.push(`/workspace`)
+                        this.$router.push(`/workspace`)
                     },1000)
                 },2000)
                 //♦ отключить прогресс

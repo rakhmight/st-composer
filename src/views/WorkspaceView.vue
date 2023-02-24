@@ -116,6 +116,17 @@
                 <div class="workspace__sidebar-box"></div>
                 
                 <div class="workspace__content">
+                    <div class="d-flex justify-center" style="margin-top:200px" v-if="loader">
+                        <v-progress-circular
+                        :rotate="360"
+                        :size="100"
+                        :width="10"
+                        :model-value="loaderValue"
+                        color="#0167ff"
+                        >
+                        {{ loaderValue }}
+                        </v-progress-circular>
+                    </div>
 
                     <!--  -->
                     <question
@@ -133,11 +144,11 @@
                     :params="testParams"
                     />
 
-                    <div v-if="questions.length">
+                    <div v-if="questions.length && !loader">
                         <p style="color:#444; text-align: center;">В целях оптимизации отображаются выбранные 10 вопросов. Для их переключения используйте панель содержания слева. Отображаемые вопросы подсвечаны</p>
                     </div>
 
-                    <div v-if="questions.length==0" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
+                    <div v-if="questions.length==0 && !loader" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
                         <v-img
                         max-height="200"
                         max-width="200"
@@ -167,6 +178,7 @@ import Tools from '@/components/tests/Tools.vue'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import { mapGetters } from 'vuex'
 import getCurrentDate from '@/plugins/getCurrentDate'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     data() {
@@ -185,7 +197,11 @@ export default {
             testParams: {},
             
             visibleQuestions:[1,2,3,4,5,6,7,8,9,10],
-            savingInterval: undefined
+            savingInterval: undefined,
+
+            loader: true,
+            loaderValue: 0,
+            loaderInterval: {}
         }
     },
     methods:{
@@ -388,7 +404,7 @@ export default {
             }
         },
 
-        saveProcess(){
+        saveProcess(params){
             if(this.onWorkProcess && this.$route.path == '/workspace'){
 
                 this.currentTest.lastModified = getCurrentDate()
@@ -397,31 +413,57 @@ export default {
                     questions: this.questions
                 }
 
-                localStorage.setItem(`test-${this.getTestID}`, JSON.stringify(output))
+                
+                operationFromStore('deleteTest',{id: +this.getTestID})
+                .then(()=>{
+                    operationFromStore('addTest',{data: output})
+                })
+                .then(()=>{
+                    if(params){
+                        if(params.route){
+                            this.$router.push('/dashboard')
+                        }
+                    }
+                })
                 console.info('(i) process is saved')
             }
         },
 
         goToBack(){
-            this.saveProcess()
-            this.$router.push('/dashboard')
+            this.saveProcess({route: true})
         }
     },
     computed: mapGetters(['onWorkProcess','getTestID']),
     mounted(){
+        
+        // Loader
+        this.loaderInterval = setInterval(() => {
+            if (this.loaderValue === 100) {
+                return (this.loaderValue = 0)
+            }
+            this.loaderValue += 10
+        }, 500)
+
         // текущий ID теста
         if(!this.getTestID){
             this.$router.push('/dashboard')
         }
-        this.currentTest = JSON.parse(localStorage.getItem(`test-${this.getTestID}`))
+        
+        operationFromStore('getByTestID',{id:+this.getTestID})
+        .then(result=>{            
+            this.currentTest = result
 
-        this.questions = this.currentTest.questions
-        this.testParams = {
-            id: this.currentTest.id,
-            themes: this.currentTest.themes,
-            considerDifficulty: this.currentTest.considerDifficulty,
-            ballSystem: this.currentTest.ballSystem
-        }
+            this.questions = this.currentTest.questions
+            this.testParams = {
+                id: this.currentTest.id,
+                themes: this.currentTest.themes,
+                considerDifficulty: this.currentTest.considerDifficulty,
+                ballSystem: this.currentTest.ballSystem
+            }
+
+            this.loader = false
+            clearInterval(this.loaderInterval)
+        })
 
         if(this.questions.length){
             this.questionsCounter = this.questions[this.questions.length-1].id
@@ -434,8 +476,6 @@ export default {
 
         // событие MAP
         this.mapOriented()
-
-        
 
         // Авто сохранение каждые 10 сек.
         this.savingInterval = setInterval(()=>{
@@ -462,6 +502,7 @@ export default {
     },
     beforeDestroy(){
         clearInterval(this.savingInterval)
+        clearInterval(this.loaderInterval)
     },
     components:{
         Question,

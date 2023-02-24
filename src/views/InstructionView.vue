@@ -5,6 +5,10 @@
                 <a
                 @click="$router.go(-1)"
                 >Назад</a>
+                <br>
+                <div>
+                    Developed with <v-icon color="red">mdi-heart</v-icon> by Diyor Rakhimov
+                </div>
             </div>
         </div>
     </div>

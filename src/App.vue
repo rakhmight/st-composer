@@ -10,7 +10,8 @@
 
 <script>
 import { mapMutations,mapGetters } from 'vuex'
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import HeaderComponent from "@/components/HeaderComponent.vue"
+import { initDB } from '@/services/localDB'
 
 export default {
   name: 'App',
@@ -22,12 +23,16 @@ export default {
   },
   computed: mapGetters(['getTestID']),
   mounted() {
+    // инициализация DB
+    initDB()
+
     // testCounter в LS
     let testsCounter = localStorage.getItem('testsCounter')
 
     if(!testsCounter){
       // создать в LS
       localStorage.setItem('testsCounter', 0)
+      this.updateTestsCounter(0)
     }else{
       // обновить в стейте
       this.updateTestsCounter(testsCounter)
@@ -39,6 +44,7 @@ export default {
     if(localID){
       this.updateTestID(localID)
     }
+    
   },
   watch:{
     $route(to, from) {

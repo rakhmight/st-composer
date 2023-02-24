@@ -68,12 +68,24 @@
                     </v-btn>
 
                    <!--  -->
-                   <presave-test :state="initPresave" :testID="params.testID" :saving="saving"/>
+                   <presave-test :state="initPresave" :saving="saving"/>
                 </div>
 
                 <div class="saved__sidebar-box"></div>
                 
                 <div class="saved__content">
+
+                    <div class="d-flex justify-center" style="margin-top:200px" v-if="loader">
+                        <v-progress-circular
+                        :rotate="360"
+                        :size="100"
+                        :width="10"
+                        :model-value="loaderValue"
+                        color="#0167ff"
+                        >
+                        {{ loaderValue }}
+                        </v-progress-circular>
+                    </div>
 
                     <!-- ШАБЛОН ВОПРОСА -->
                     <saved-question
@@ -205,6 +217,7 @@ import { mapGetters } from 'vuex'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import SavedQuestion from '@/components/saved/SavedQuestion.vue'
 import PresaveTest from '@/components/dialogs/PresaveTest.vue'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     data() {
@@ -229,7 +242,11 @@ export default {
             questionWithField: 0,
             basicQuestions: 0,
 
-            saving: undefined
+            saving: undefined,
+
+            loader: true,
+            loaderValue: 0,
+            loaderInterval: {}
         }
     },
     computed: mapGetters(['getTestID']),
@@ -257,44 +274,49 @@ export default {
         },
     },
     mounted() {
-        this.params = JSON.parse(this.getTestID)
-
-        let savings = JSON.parse(localStorage.getItem(`saving-${this.params.testID}`))
-        let saving
-
-        savings.filter(el=>{
-            if(el.id==this.params.savingID){
-                saving = el
+        
+        // Loader
+        this.loaderInterval = setInterval(() => {
+            if (this.loaderValue === 100) {
+                return (this.loaderValue = 0)
             }
-        })
-
-        this.saving = saving
-
-        this.questions = saving.questions
-        this.testParams = saving.params
-        this.savingComment = saving.comment
-        this.savingDate = saving.date
-
-        // Параметры теста
-
-        // MAP
-        setTimeout(()=>{
-            this.mapOriented()
+            this.loaderValue += 10
         }, 500)
 
-        //Расчитать вопросы по их виду
-        if(this.questions.length){
-            for(let i =0; i!=this.questions.length; i++){
-                if(this.questions[i].type=='basic-question'){
-                    this.basicQuestions++                    
-                }else if(this.questions[i].type=='question-with-images'){
-                    this.questionsWithImages++
-                }else if(this.questions[i].type=='question-with-field'){
-                    this.questionWithField++
+        operationFromStore('getBySavingID', {id: +this.getTestID})
+        .then(result=>{
+            this.saving = result
+            this.questions = this.saving.questions
+            this.testParams = this.saving.params
+            this.savingComment = this.saving.comment
+            this.savingDate = this.saving.date
+
+            if(this.saving.questions.length){
+                // MAP
+                setTimeout(()=>{
+                    this.mapOriented()
+                }, 500)
+
+                //Расчитать вопросы по их виду
+                if(this.questions.length){
+                    for(let i =0; i!=this.questions.length; i++){
+                        if(this.questions[i].type=='basic-question'){
+                            this.basicQuestions++                    
+                        }else if(this.questions[i].type=='question-with-images'){
+                            this.questionsWithImages++
+                        }else if(this.questions[i].type=='question-with-field'){
+                            this.questionWithField++
+                        }
+                    }
                 }
             }
-        }
-        
+
+            this.loader = false
+            clearInterval(this.loaderInterval)
+        }) 
+    },
+    beforeDestroy(){
+        clearInterval(this.loaderInterval)
     },
     components:{
         TestTypeIcons,

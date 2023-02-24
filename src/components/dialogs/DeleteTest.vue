@@ -98,6 +98,7 @@
 
 <script>
 import putToHistory from '@/services/putToHistory'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
@@ -120,16 +121,25 @@ export default {
             if(this.subjectID == this.test.subjectID){
                 this.blockBtn = true
                 this.showProgress = true
-                //удаление
-                let test = JSON.parse(localStorage.getItem(`test-${this.test.id}`))
-                localStorage.removeItem(`test-${this.test.id}`)
-                test.status.isDeleted = true
 
-                let history = [
-                    ...test.history,
-                    putToHistory('delete', undefined)
-                ]
+                let test
+                operationFromStore('getByTestID',{id: this.test.id})
+                .then(result=>{
+                    result.status.isDeleted = true
+                    let history = [
+                        ...result.history,
+                        putToHistory('delete', undefined)
+                    ]
 
+                    test = {
+                        ...result,
+                        history
+                    }
+                })
+                .then(()=>{
+                    operationFromStore('deleteTest',{id: this.test.id})
+                    operationFromStore('addTest',{data:test})
+                })
 
                 setTimeout(()=>{
                     this.showProgress = false
@@ -139,12 +149,11 @@ export default {
                         this.deleteSuccess = false
                         this.blockBtn = false
                         this.subjectID = ''
-                        this.renderFunc()
+                        this.renderFunc(test)
                     },1000)
                 },2000)
+                
 
-                test.history = history
-                localStorage.setItem(`test-${this.test.id}`, JSON.stringify(test))
             } else{
                 this.errors.push('Введённое значение не совпадает с ID предмета')
                 this.deleteEr = true

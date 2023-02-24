@@ -123,11 +123,11 @@
 <script>
 import getCurrentDate from '@/plugins/getCurrentDate'
 import restoreSaved from '@/services/restoreSaved'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
         saving: Object,
-        testID: Number,
         questions: Array
     },
     data() {
@@ -173,40 +173,40 @@ export default {
             ];
 
             let _id = _components.join("")
+            
+            let test, params, output
+            operationFromStore('getByTestID', {id: +this.saving.testID})
+            .then(result=>{
+                // Параметры текущего теста: учитывание баллов, темы, сложность, id предмета
+                test = result
+                console.log(test);
+                
+                params = {
+                    subjectID: test.subjectID,
+                    themes: test.themes
+                }
+                if(test.ballSystem){
+                    params.ballSystem = test.ballSystem
+                }
+                if(test.considerDifficulty){
+                    params.considerDifficulty = test.considerDifficulty
+                }
 
-            // Параметры текущего теста: учитывание баллов, темы, сложность, id предмета
-            let test = JSON.parse(localStorage.getItem(`test-${this.testID}`))
-            let params = {
-                subjectID: test.subjectID,
-                themes: test.themes
-            }
-            if(test.ballSystem){
-                params.ballSystem = test.ballSystem
-            }
-            if(test.considerDifficulty){
-                params.considerDifficulty = test.considerDifficulty
-            }
-
-
-            let output={
-                id: +_id,
-                questions: undefined, // Реализовать логику получения questions ТЕКУЩИХ тестов
-                comment: this.comment,
-                date: getCurrentDate(),
-                params
-            }
-
-            // работа с LS
-            let store = localStorage.getItem(`saving-${this.testID}`)
-
-            if(store){
-                localStorage.removeItem(`saving-${this.testID}`)
-                let localSavings = JSON.parse(store)
-                localSavings.push(output)
-                localStorage.setItem(`saving-${this.testID}`, JSON.stringify(localSavings))
-            }else{
-                localStorage.setItem(`saving-${this.testID}`, JSON.stringify([output]))
-            }
+                output={
+                    id: +_id,
+                    questions: test.questions,
+                    comment: this.comment,
+                    date: getCurrentDate(),
+                    params
+                }
+            })
+            .then(()=>{
+                operationFromStore('addSaving', {data: output})
+            })
+            .then(()=>{
+                //подстановка
+                restoreSaved(+this.saving.testID, this.saving)
+            })
 
             // завершение
             setTimeout(()=>{
@@ -220,15 +220,12 @@ export default {
                 },2000)
             },2000)
 
-            //подстановка
-            restoreSaved(this.testID, this.saving)
-
             //перенаправление
         },
 
         replaceTests(){
             //подстановка
-            restoreSaved(this.testID, this.saving)
+            restoreSaved(+this.saving.testID, this.saving)
 
             // сохранение
             this.blockBtn = true

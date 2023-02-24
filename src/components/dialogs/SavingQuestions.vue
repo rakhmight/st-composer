@@ -102,6 +102,7 @@
 
 <script>
 import getCurrentDate from '@/plugins/getCurrentDate'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
@@ -153,39 +154,35 @@ export default {
 
             let _id = _components.join("")
 
-            // Параметры текущего теста: учитывание баллов, темы, сложность, id предмета
-            let test = JSON.parse(localStorage.getItem(`test-${this.testID}`))
-            let params = {
-                subjectID: test.subjectID,
-                themes: test.themes
-            }
-            if(test.ballSystem){
-                params.ballSystem = test.ballSystem
-            }
-            if(test.considerDifficulty){
-                params.considerDifficulty = test.considerDifficulty
-            }
+            let test, params, output
+            operationFromStore('getByTestID', {id: +this.testID})
+            .then(result=>{
+                // Параметры текущего теста: учитывание баллов, темы, сложность, id предмета
+                test = result
+                
+                params = {
+                    subjectID: test.subjectID,
+                    themes: test.themes
+                }
+                if(test.ballSystem){
+                    params.ballSystem = test.ballSystem
+                }
+                if(test.considerDifficulty){
+                    params.considerDifficulty = test.considerDifficulty
+                }
 
-
-            let output={
-                id: +_id,
-                questions: this.questions,
-                comment: this.comment,
-                date: getCurrentDate(),
-                params
-            }
-
-            // работа с LS
-            let store = localStorage.getItem(`saving-${this.testID}`)
-
-            if(store){
-                localStorage.removeItem(`saving-${this.testID}`)
-                let localSavings = JSON.parse(store)
-                localSavings.push(output)
-                localStorage.setItem(`saving-${this.testID}`, JSON.stringify(localSavings))
-            }else{
-                localStorage.setItem(`saving-${this.testID}`, JSON.stringify([output]))
-            }
+                output={
+                    id: +_id,
+                    testID: +this.testID,
+                    questions: this.questions,
+                    comment: this.comment,
+                    date: getCurrentDate(),
+                    params
+                }
+            })
+            .then(()=>{
+                operationFromStore('addSaving', {data: output})
+            })
 
             // завершение
             setTimeout(()=>{
@@ -196,11 +193,8 @@ export default {
                     this.savingSuccess = false
                     this.blockBtn = false
                     this.comment = ''
-                },2000)
+                },3000)
             },2000)
-
-            
-            //console.log(output)
         }
     },
     watch:{

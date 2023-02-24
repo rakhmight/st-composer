@@ -33,7 +33,16 @@
 
           </div>
 
-          <div class="dashboard__saved" v-if="tests.length">
+          <div class="d-flex justify-center mt-10" v-if="loader">
+            <v-progress-circular
+            :size="40"
+            :width="3"
+            color="#0167ff"
+            indeterminate
+            ></v-progress-circular>
+          </div>
+
+          <div class="dashboard__saved" v-if="tests.length && !loader">
             <work-card
             v-for="(test, i) in tests"
             :key="i"
@@ -46,7 +55,7 @@
 
           </div>
 
-          <div v-else class="dashboard__empty mt-5">
+          <div v-if="!tests.length && !loader" class="dashboard__empty mt-5">
             <v-img
             max-height="250"
             max-width="250"
@@ -68,32 +77,28 @@ import WorkCard from '@/components/WorkCard.vue'
 import ToInstruction from '@/components/ToInstruction.vue'
 import CreateTest from '@/components/dialogs/CreateTest.vue'
 import { mapGetters } from 'vuex'
+import { operationFromStore } from '@/services/localDB'
 
   export default {
     data() {
       return {
         tests: [],
+        loader: true
       }
     },
     methods:{
       loadTests(){
-        this.tests = []
-        let counter = +localStorage.getItem('testsCounter')
-
-        if(counter){
-          for(let i=1; i<=counter; i++){
-            let test = JSON.parse(localStorage.getItem(`test-${i}`))
-
-            if(test && test.author.id==this.currentSign.owner && !test.status.isDeleted){
-              this.tests.push(test)
-            }
-          }
-        }
+        operationFromStore('getAllTests', {sort:{author:this.currentSign.owner, isDeleted:false}})
+        .then(result=>{
+          this.tests = result
+          this.loader=false
+        })
       }
 
     },
     mounted() {
-      this.loadTests()
+        this.loadTests()
+      
     },
     computed: mapGetters(['currentSign']),
     components:{

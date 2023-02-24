@@ -25,7 +25,7 @@
         <v-divider></v-divider>
 
         <div class="dialog-content">
-            <v-simple-table  v-if="saves.length">
+            <v-simple-table  v-if="saves.length && !loader">
                 <template v-slot:default>
                 <thead>
                     <tr>
@@ -71,7 +71,7 @@
                 </template>
             </v-simple-table>
 
-            <div v-else class="d-flex flex-column align-center">
+            <div v-if="!saves.length && !loader" class="d-flex flex-column align-center">
                 <v-img
                 max-height="120"
                 max-width="120"
@@ -81,6 +81,15 @@
                 ></v-img>
                 <h3 style="color: #888" class="mt-2">Сохранений пока нет</h3>
             </div>
+
+            <div class="d-flex justify-center mt-10" v-if="loader">
+                <v-progress-circular
+                :size="40"
+                :width="3"
+                color="#0167ff"
+                indeterminate
+                ></v-progress-circular>
+          </div>
         </div>
     </v-card>
 </v-dialog>
@@ -88,6 +97,7 @@
 
 <script>
 import { mapMutations } from 'vuex'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
@@ -96,6 +106,7 @@ export default {
     data() {
         return {
             dialog: false,
+            loader: true,
 
             saves: []
         }
@@ -104,16 +115,17 @@ export default {
         ...mapMutations(['updateTestID']),
 
         goToSaved(id){
-            this.updateTestID(JSON.stringify({testID: this.id, savingID: id}))
+            this.updateTestID(id)
             this.$router.push(`/saved`)
         }
     },
     mounted(){
-        let store = localStorage.getItem(`saving-${this.id}`)
 
-        if(store){
-            this.saves = JSON.parse(store)
-        }
+        operationFromStore('getAllSavings')
+        .then(result=>{
+          this.saves = result
+          this.loader=false
+        })
     }
 }
 </script>
