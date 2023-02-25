@@ -171,7 +171,7 @@
                 <div class="workspace__tools-box">
                     
                         <!-- TOOLS -->
-                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate"/>
+                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate" :blockAddQBtn="blockAddQBtn"/>
 
                 </div>
             </div>
@@ -212,11 +212,13 @@ export default {
 
             // util
             allowToSaveTheme: false,
-            asyncComplate: false
+            asyncComplate: false,
+            blockAddQBtn: false
         }
     },
     methods:{
         createQuestion(type){
+            this.blockAddQBtn = true
             let question = {
                 id: this.questionsCounter+1,
                 type,
@@ -431,7 +433,7 @@ export default {
         },
 
         saveProcess(params){
-            if(this.onWorkProcess && this.$route.path == '/workspace'){
+            if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn){
 
                 this.currentTest.lastModified = getCurrentDate()
                 let output = {
@@ -439,10 +441,12 @@ export default {
                     questions: this.questions
                 }
 
-                
                 operationFromStore('deleteTest',{id: +this.getTestID})
                 .then(()=>{
                     operationFromStore('addTest',{data: output})
+                    .then(()=>{
+                        this.blockAddQBtn = false
+                    })
                 })
                 .then(()=>{
                     if(params){
@@ -459,6 +463,7 @@ export default {
         },
 
         goToBack(){
+            this.blockAddQBtn = true
             this.saveProcess({route: true})
         }
     },
@@ -475,10 +480,6 @@ export default {
         // текущий ID теста
         if(!this.getTestID){
             this.$router.push('/dashboard')
-        }
-
-        if(this.questions.length){
-            this.questionsCounter = this.questions[this.questions.length-1].id
         }
 
         // установление map
@@ -517,6 +518,10 @@ export default {
                     }, 1000)
 
                     this.asyncComplate = true
+
+                    if(this.questions.length){
+                        this.questionsCounter = this.questions[this.questions.length-1].id
+                    }
                 })
                 .catch(e=>{
                 console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)

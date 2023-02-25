@@ -19,7 +19,7 @@
                 color="#0d5fd8"
                 class="mr-8"
                 @click="createQuestion('basic-question')"
-                :disabled="!asyncComplate"
+                :disabled="!asyncComplate || blockAddQBtn"
                 >
                     <v-icon size="20">mdi-plus</v-icon>
                     Добавить вопрос
@@ -59,7 +59,7 @@
                 v-for="(task, i) in tasks"
                 @click="createQuestion(task.type)"
                 :key="i"
-                :disabled="task.isDisabled"
+                :disabled="task.isDisabled || blockAddQBtn"
                 >
                     <span v-if="!task.isDisabled" style="color:#0167FF">{{task.name}}</span>
                     <span v-else style="color:#888">{{task.name}}</span>
@@ -99,7 +99,8 @@ export default {
         allQuestions: Array,
         currentTestID: Number,
 
-        asyncComplate: Boolean
+        asyncComplate: Boolean,
+        blockAddQBtn: Boolean
     },
     data() {
         return {
