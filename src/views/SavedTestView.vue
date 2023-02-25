@@ -166,32 +166,61 @@
                             Подробная информация о сохранённом экземпляре теста
                         </div>
                         
-                        <v-tooltip left>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                            v-if="!showFullInfo"
-                            v-bind="attrs"
-                            v-on="on"
-                            color="#fff"
-                            size="30"
-                            @click="showFullInfo=!showFullInfo"
+                        <div class="d-flex flex-row align-center">
+                            <v-btn
+                            small
+                            class="mr-2"
+                            color="error"
+                            v-if="showDeleteBtn"
+                            @click="deleteSaving"
                             >
-                            mdi-chevron-up
-                            </v-icon>
-                            <v-icon
-                            v-else
-                            v-bind="attrs"
-                            v-on="on"
-                            color="#fff"
-                            size="30"
-                            @click="showFullInfo=!showFullInfo"
-                            >
-                            mdi-chevron-down
-                            </v-icon>
-                        </template>
-                        <span v-if="!showFullInfo">Подробнее</span>
-                        <span v-else>Скрыть</span>
-                        </v-tooltip>
+                                Уверены?
+                            </v-btn>
+
+                            <div class="mr-10" v-if="asyncComplate">
+                                <v-tooltip top color="error">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    color="error"
+                                    size="25"
+                                    @click="showDeleteBtn=true"
+                                    >
+                                    mdi-delete-outline
+                                    </v-icon>
+                                </template>
+                                <span>Удалить сохранение</span>
+                                </v-tooltip>
+                            </div>
+
+                            <v-tooltip top>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                v-if="!showFullInfo"
+                                v-bind="attrs"
+                                v-on="on"
+                                color="#fff"
+                                size="30"
+                                @click="showFullInfo=!showFullInfo"
+                                >
+                                mdi-chevron-up
+                                </v-icon>
+                                <v-icon
+                                v-else
+                                v-bind="attrs"
+                                v-on="on"
+                                color="#fff"
+                                size="30"
+                                @click="showFullInfo=!showFullInfo"
+                                >
+                                mdi-chevron-down
+                                </v-icon>
+                            </template>
+                            <span v-if="!showFullInfo">Подробнее</span>
+                            <span v-else>Скрыть</span>
+                            </v-tooltip>
+                        </div>
                     </div>
 
                     <!-- Подробно -->
@@ -305,7 +334,9 @@ export default {
             loaderValue: 0,
             loaderInterval: {},
 
-            asyncComplate: false
+            asyncComplate: false,
+
+            showDeleteBtn: false
         }
     },
     computed: mapGetters(['getTestID']),
@@ -331,6 +362,13 @@ export default {
                 })
             }
         },
+
+        deleteSaving(){
+            operationFromStore('deleteSaving', {id: +this.getTestID})
+            .then(()=>{
+                this.$router.push('/dashboard')
+            })
+        }
     },
     mounted() {
         // Loader
@@ -381,6 +419,14 @@ export default {
                 console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
                 this.$router.push('/')
                 })
+            }
+        },
+
+        showDeleteBtn(){
+            if(this.showDeleteBtn){
+                setTimeout(()=>{
+                    this.showDeleteBtn = false
+                },2000)
             }
         }
     },
