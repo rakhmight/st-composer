@@ -475,6 +475,9 @@ export default {
 
                 this.summonField()
             }
+
+            this.answer.push('')
+            this.answer.pop()
         },
 
         summonField(){

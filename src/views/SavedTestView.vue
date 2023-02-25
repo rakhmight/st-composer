@@ -12,7 +12,17 @@
                                 <h4 style="color:#fff">Содержание</h4>
                             </div>
                         </div>
-                        <div class="saved__map">
+                        <div v-if="questions.length==0 && !loader" class="saved__map-empty d-flex flex-column justify-center align-center" style="border-radius: 0 0 5px 5px;">
+                            <v-img
+                            max-height="120"
+                            max-width="120"
+                            src="@/assets/media/no-questions.png"
+                            contain
+                            transition="scale-transition"
+                            style="opacity: 0.5;"
+                            ></v-img>
+                        </div>
+                        <div class="saved__map" v-if="questions.length && !loader">
                             <div class="map-elem"
                             > 
                                 <v-simple-table dense>
@@ -53,6 +63,14 @@
                                 </v-simple-table>
                             </div>
                         </div>
+                        <div style="height: 237px; background-color: #aaaaaa80; border-radius: 0 0 5px 5px;" v-if="loader" class="d-flex justify-center align-center">
+                            <v-progress-circular
+                            :size="50"
+                            :width="5"
+                            color="#888"
+                            indeterminate
+                            ></v-progress-circular>
+                        </div>
                     </div>
 
                     <v-btn
@@ -83,7 +101,7 @@
                         :model-value="loaderValue"
                         color="#0167ff"
                         >
-                        {{ loaderValue }}
+                        {{ loaderValue }} %
                         </v-progress-circular>
                     </div>
 
@@ -98,6 +116,18 @@
                     />
                     <!--  -->
 
+                    <div v-if="questions.length==0 && !loader" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
+                        <v-img
+                        max-height="200"
+                        max-width="200"
+                        src="@/assets/media/spider-web.png"
+                        contain
+                        transition="scale-transition"
+                        ></v-img>
+                        <h2 style="color:#888" class="mt-5">ВОПРОСОВ НЕТ</h2>
+                        <h4 style="color:#888">Сохранение выполнено без написанных вопросов</h4>
+                    </div>
+
                 </div>
 
                 <div class="saved__tools-box" :style="!showFullInfo ? 'height: 64px' : 'height: 300px'">
@@ -105,11 +135,29 @@
                         <div style="width: 100%" v-if="!showFullInfo">
                             <div class="d-flex flex-row">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-comment-outline</v-icon>
-                                <div class="small-comment"><span style="color:#bbb">Комментарий к сохранению:</span> {{ savingComment }}</div>
+                                <div class="small-comment"><span style="color:#bbb">Комментарий к сохранению: </span>
+                                    {{ savingComment }}
+                                    <v-progress-circular
+                                    v-if="loader"
+                                    :size="18"
+                                    :width="1"
+                                    color="#fff"
+                                    indeterminate
+                                    ></v-progress-circular>
+                                    </div>
                             </div>
                             <div class="d-flex flex-row">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-calendar-range</v-icon>
-                                <div><span style="color:#bbb">Дата сохранения:</span> {{ savingDate.date }} {{ savingDate.time }}</div>
+                                <div><span style="color:#bbb">Дата сохранения: </span>
+                                    {{ savingDate.date }} {{ savingDate.time }}
+                                    <v-progress-circular
+                                    v-if="loader"
+                                    :size="18"
+                                    :width="1"
+                                    color="#fff"
+                                    indeterminate
+                                    ></v-progress-circular>
+                                </div>
                             </div>
                         </div>
 
@@ -148,8 +196,17 @@
 
                     <!-- Подробно -->
                     <v-divider color="#fff" class="mt-2"></v-divider>
+                    
+                    <div v-if="loader" class="d-flex justify-center align-center" style="width: 100%; height: 100%;">
+                        <v-progress-circular
+                        :size="50"
+                        :width="3"
+                        color="#fff"
+                        indeterminate
+                        ></v-progress-circular>
+                    </div>
 
-                    <div class="mt-3 info-content">
+                    <div class="mt-3 info-content" v-if="!loader">
                         <div>
                             <div class="d-flex flex-row align-start">
                                 <v-icon color="#fff" class="mr-1 mt-1" size="19">mdi-comment-outline</v-icon>
@@ -274,46 +331,54 @@ export default {
         },
     },
     mounted() {
-        
         // Loader
         this.loaderInterval = setInterval(() => {
             if (this.loaderValue === 100) {
                 return (this.loaderValue = 0)
             }
-            this.loaderValue += 10
-        }, 500)
+            this.loaderValue += 5
+        }, 100)
+    },
+    watch:{
+        loaderValue(){
+            if(this.loaderValue==100){
+                operationFromStore('getBySavingID', {id: +this.getTestID})
+                .then(result=>{
+                        this.saving = result
+                        this.questions = this.saving.questions
+                        this.testParams = this.saving.params
+                        this.savingComment = this.saving.comment
+                        this.savingDate = this.saving.date
 
-        operationFromStore('getBySavingID', {id: +this.getTestID})
-        .then(result=>{
-            this.saving = result
-            this.questions = this.saving.questions
-            this.testParams = this.saving.params
-            this.savingComment = this.saving.comment
-            this.savingDate = this.saving.date
+                        if(this.saving.questions){
+                            // MAP
+                            setTimeout(()=>{
+                                this.mapOriented()
+                            }, 500)
 
-            if(this.saving.questions.length){
-                // MAP
-                setTimeout(()=>{
-                    this.mapOriented()
-                }, 500)
-
-                //Расчитать вопросы по их виду
-                if(this.questions.length){
-                    for(let i =0; i!=this.questions.length; i++){
-                        if(this.questions[i].type=='basic-question'){
-                            this.basicQuestions++                    
-                        }else if(this.questions[i].type=='question-with-images'){
-                            this.questionsWithImages++
-                        }else if(this.questions[i].type=='question-with-field'){
-                            this.questionWithField++
+                            //Расчитать вопросы по их виду
+                            if(this.questions.length){
+                                for(let i =0; i!=this.questions.length; i++){
+                                    if(this.questions[i].type=='basic-question'){
+                                        this.basicQuestions++                    
+                                    }else if(this.questions[i].type=='question-with-images'){
+                                        this.questionsWithImages++
+                                    }else if(this.questions[i].type=='question-with-field'){
+                                        this.questionWithField++
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-            }
 
-            this.loader = false
-            clearInterval(this.loaderInterval)
-        }) 
+                        this.loader = false
+                        clearInterval(this.loaderInterval)
+                })
+                .catch(e=>{
+                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                this.$router.push('/')
+                })
+            }
+        }
     },
     beforeDestroy(){
         clearInterval(this.loaderInterval)
@@ -327,6 +392,9 @@ export default {
 </script>
 
 <style scoped>
+.v-progress-circular {
+  margin: 1rem;
+}
 .saved{
     width: 100%;
     height: 100%;
@@ -365,7 +433,7 @@ export default {
     padding: 0 5px;
 }
 .map-small{
-    width: 185px;
+    width: 175px;
     white-space: pre-wrap;
     text-overflow: ellipsis;
     display: -moz-box;
@@ -414,5 +482,14 @@ export default {
     display: grid;
     grid-template-columns: 1fr 3px 1fr;
     gap: 15px;
+}
+.saved__map-empty{
+    height: 30vh;
+    background-color: #aaaaaa80;
+    border-radius: 5px;
+}
+
+.v-progress-circular[data-v-55fbcf34]{
+    margin: 0
 }
 </style>

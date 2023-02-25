@@ -1,7 +1,41 @@
-export default function restoreSaved(id, saving){
-    // после всех предупреждений сохраняется текущий процесс
+import { operationFromStore } from '@/services/localDB'
+import getCurrentDate from '@/plugins/getCurrentDate'
+import putToHistory from '@/services/putToHistory'
 
-    // происходить процесс замены существующих тестов на сохранённые
-    console.log(`ID изменяемого: ${id}`)
-    console.log(saving)
+export default function restoreSaved(id, saving){
+    let test
+
+    operationFromStore('getByTestID', {id})
+    .then(result=>{
+        test = result
+
+        test.subjectID = saving.params.subjectID
+        test.themes = saving.params.themes
+
+        if(saving.params.ballSystem){
+            test.ballSystem = saving.params.ballSystem
+        }else{
+            test.ballSystem = undefined
+        }
+
+        if(saving.params.considerDifficulty){
+            test.considerDifficulty = saving.params.considerDifficulty
+        }else{
+            test.considerDifficulty = undefined
+        }
+
+        test.questions = saving.questions
+        test.lastModified = getCurrentDate()
+        test.history.push(putToHistory('restore', saving.date.date))
+    })
+    .then(()=>{
+        operationFromStore('deleteTest', {id})
+        .then(()=>{
+            operationFromStore('addTest', {data: test})
+        })
+    })
+    .catch(e=>{
+        console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+        this.$router.push('/')
+    })
 }

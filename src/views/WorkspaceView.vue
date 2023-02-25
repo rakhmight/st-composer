@@ -28,7 +28,7 @@
                             </v-tooltip>
 
                         </div>
-                        <div v-if="questions.length==0" class="workspace__map-empty d-flex flex-column justify-center align-center" style="border-radius: 0 0 5px 5px;">
+                        <div v-if="questions.length==0 && !loader" class="workspace__map-empty d-flex flex-column justify-center align-center" style="border-radius: 0 0 5px 5px;">
                             <v-img
                             max-height="120"
                             max-width="120"
@@ -38,9 +38,8 @@
                             style="opacity: 0.5;"
                             ></v-img>
                         </div>
-                        <div v-else class="workspace__map" :class="{'.workspace__map-full': showFullMap}">
-                            <div class="map-elem"
-                            > 
+                        <div class="workspace__map" v-if="questions.length && !loader" :class="{'.workspace__map-full': showFullMap}">
+                            <div class="map-elem"> 
                                 <v-simple-table dense>
                                     <template v-slot:default>
                                     <thead>
@@ -98,6 +97,14 @@
                                 </v-simple-table>
                             </div>
                         </div>
+                        <div style="height: 237px; background-color: #aaaaaa80; border-radius: 0 0 5px 5px;" v-if="loader" class="d-flex justify-center align-center">
+                            <v-progress-circular
+                            :size="50"
+                            :width="5"
+                            color="#888"
+                            indeterminate
+                            ></v-progress-circular>
+                        </div>
                     </div>
 
                     <v-btn
@@ -124,7 +131,7 @@
                         :model-value="loaderValue"
                         color="#0167ff"
                         >
-                        {{ loaderValue }}
+                        {{ loaderValue }} %
                         </v-progress-circular>
                     </div>
 
@@ -201,7 +208,10 @@ export default {
 
             loader: true,
             loaderValue: 0,
-            loaderInterval: {}
+            loaderInterval: {},
+
+            // util
+            allowToSaveTheme: false
         }
     },
     methods:{
@@ -233,6 +243,7 @@ export default {
 
             this.questions.push(question)
             this.questionsCounter++
+            this.saveProcess()
         },
 
         deleteQuestion(id){
@@ -272,6 +283,9 @@ export default {
                     }
                 }
             })
+
+            
+            this.saveProcess()
         },
 
         changeQuestion(type, ctx, id, aID){
@@ -288,9 +302,13 @@ export default {
                     }else if(type=='theme'){
                         this.questions[index].theme = ctx
                         this.questions[index].lastModified = getCurrentDate()
+                        if(this.allowToSaveTheme){
+                            this.saveProcess()
+                        }
                     }else if(type=='difficulty'){
                         this.questions[index].difficulty = ctx
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='answer-answerCtx'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -307,6 +325,7 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='answer-add'){
                         this.questions[index].answers.push({
                             id: aID,
@@ -314,15 +333,18 @@ export default {
                             isCurrect: false
                         })
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='field-answer'){
                         this.questions[index].answer = ctx
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='multipleAnswers'){
                         this.questions[index].multipleAnswers = ctx
                         this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answers'){
                         this.questions[index].answers = ctx
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='answer-answerIsCurrect'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -331,9 +353,11 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='imagePreview'){
                         this.questions[index].imagePreview = ctx
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }else if(type=='answer-imagePreview'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -342,6 +366,7 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
+                        this.saveProcess()
                     }
                 }
             })
@@ -425,6 +450,9 @@ export default {
                         }
                     }
                 })
+                .catch(e=>{
+                    console.error('(DB) Не удалось сохранить процесс. Подробнее: ',e)
+                })
                 console.info('(i) process is saved')
             }
         },
@@ -435,35 +463,18 @@ export default {
     },
     computed: mapGetters(['onWorkProcess','getTestID']),
     mounted(){
-        
         // Loader
         this.loaderInterval = setInterval(() => {
             if (this.loaderValue === 100) {
                 return (this.loaderValue = 0)
             }
-            this.loaderValue += 10
-        }, 500)
+            this.loaderValue += 5
+        }, 100)
 
         // текущий ID теста
         if(!this.getTestID){
             this.$router.push('/dashboard')
         }
-        
-        operationFromStore('getByTestID',{id:+this.getTestID})
-        .then(result=>{            
-            this.currentTest = result
-
-            this.questions = this.currentTest.questions
-            this.testParams = {
-                id: this.currentTest.id,
-                themes: this.currentTest.themes,
-                considerDifficulty: this.currentTest.considerDifficulty,
-                ballSystem: this.currentTest.ballSystem
-            }
-
-            this.loader = false
-            clearInterval(this.loaderInterval)
-        })
 
         if(this.questions.length){
             this.questionsCounter = this.questions[this.questions.length-1].id
@@ -480,10 +491,37 @@ export default {
         // Авто сохранение каждые 10 сек.
         this.savingInterval = setInterval(()=>{
             this.saveProcess()
-            
         }, 10000)
     },
     watch:{
+        loaderValue(){
+            if(this.loaderValue==100){
+                operationFromStore('getByTestID',{id:+this.getTestID})
+                .then(result=>{            
+                    this.currentTest = result
+
+                    this.questions = this.currentTest.questions
+                    this.testParams = {
+                        id: this.currentTest.id,
+                        themes: this.currentTest.themes,
+                        considerDifficulty: this.currentTest.considerDifficulty,
+                        ballSystem: this.currentTest.ballSystem
+                    }
+
+                    this.loader = false
+                    clearInterval(this.loaderInterval)
+                    
+                    setTimeout(()=>{
+                        this.allowToSaveTheme = true
+                    }, 1000)
+                })
+                .catch(e=>{
+                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                this.$router.push('/')
+                })
+            }
+        },
+
         questions(){
             setTimeout(()=>{
                 this.mapOriented()

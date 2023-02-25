@@ -37,20 +37,28 @@
                     </div>
                     
                     <div class="d-flex flex-column">
-                            <label class="body-2">Напишите комментарий к текущему сохранению</label>
-                            <div class="d-flex flex-row">
-                                <v-textarea
-                                dense
-                                rows="2"
-                                outlined
-                                prepend-icon="mdi-comment-outline"
-                                v-model="comment"
-                                placeholder="Комментарий к сохранению"
-                                :error="savingEr"
-                                >
-                                </v-textarea>
-                            </div>
+                        <label class="body-2">Напишите комментарий к текущему сохранению</label>
+                        <div class="d-flex flex-row">
+                            <v-textarea
+                            dense
+                            rows="2"
+                            outlined
+                            prepend-icon="mdi-comment-outline"
+                            v-model="comment"
+                            placeholder="Комментарий к сохранению"
+                            :error="savingEr"
+                            >
+                            </v-textarea>
                         </div>
+                    </div>
+
+                    <div>
+                        <v-checkbox
+                        v-model="deleteSaving"
+                        label="Удалить текущее сохранение"
+                        color="#0d5fd8"
+                    ></v-checkbox>
+                    </div>
                 </div>
                 
             </div>
@@ -124,6 +132,7 @@
 import getCurrentDate from '@/plugins/getCurrentDate'
 import restoreSaved from '@/services/restoreSaved'
 import { operationFromStore } from '@/services/localDB'
+import { mapMutations } from 'vuex'
 
 export default {
     props:{
@@ -138,10 +147,13 @@ export default {
             blockBtn: false,
             showProgress: false,
             savingEr: false,
-            comment: ''
+            comment: '',
+            deleteSaving: false
         }
     },
     methods:{
+        ...mapMutations(['updateTestID']),
+
         savingQuestions(){
 
             // валидаторы
@@ -197,42 +209,65 @@ export default {
                     questions: test.questions,
                     comment: this.comment,
                     date: getCurrentDate(),
-                    params
+                    params,
+                    testID: +this.saving.testID
                 }
             })
             .then(()=>{
                 operationFromStore('addSaving', {data: output})
-            })
-            .then(()=>{
-                //подстановка
-                restoreSaved(+this.saving.testID, this.saving)
-            })
+                .then(()=>{
+                    //подстановка
+                    restoreSaved(+this.saving.testID, this.saving)
+                })
+                .then(()=>{
+                    if(this.deleteSaving){
+                        // удаление текущего сохранения
+                        operationFromStore('deleteSaving', {id: this.saving.id})
+                    }
+                })
+                .then(()=>{
+                    // завершение
+                    setTimeout(()=>{
+                        this.showProgress = false
+                        this.savingSuccess = true
+                        setTimeout(()=>{
+                            this.dialog = false
+                            this.savingSuccess = false
+                            this.blockBtn = false
+                            this.comment = ''
 
-            // завершение
-            setTimeout(()=>{
-                this.showProgress = false
-                this.savingSuccess = true
-                setTimeout(()=>{
-                    this.dialog = false
-                    this.savingSuccess = false
-                    this.blockBtn = false
-                    this.comment = ''
-                },2000)
-            },2000)
-
-            //перенаправление
+                            //перенаправление
+                            this.updateTestID(this.saving.testID)
+                            this.$router.push('/workspace')
+                        },2000)
+                    },2000)
+                })
+                .catch(e=>{
+                    console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                    this.$router.push('/')
+                })
+            })
+            .catch(e=>{
+                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                this.$router.push('/')
+            })
         },
 
-        replaceTests(){
+        async replaceTests(){
             //подстановка
-            restoreSaved(+this.saving.testID, this.saving)
+            await restoreSaved(+this.saving.testID, this.saving)
+            
+            if(this.deleteSaving){
+                // await удаление текущего сохранения
+                await operationFromStore('deleteSaving', {id: this.saving.id})
+            }
 
             // сохранение
             this.blockBtn = true
             this.showProgress = true
 
             // завершение
-            setTimeout(()=>{
+            await setTimeout(()=>{
                 this.showProgress = false
                 this.savingSuccess = true
                 setTimeout(()=>{
@@ -240,10 +275,12 @@ export default {
                     this.savingSuccess = false
                     this.blockBtn = false
                     this.comment = ''
+
+                    //перенаправление
+                    this.updateTestID(this.saving.testID)
+                    this.$router.push('/workspace')
                 },2000)
             },2000)
-
-            //перенаправление
         }
     },
     watch:{
@@ -287,5 +324,10 @@ export default {
 }
 .v-dialog{
   overflow: hidden;
+}
+
+.v-input--selection-controls{
+    margin:0;
+    padding:0
 }
 </style>

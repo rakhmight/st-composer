@@ -140,6 +140,10 @@ export default {
                     operationFromStore('deleteTest',{id: this.test.id})
                     operationFromStore('addTest',{data:test})
                 })
+                .catch(e=>{
+                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                this.$router.push('/')
+                })
 
                 setTimeout(()=>{
                     this.showProgress = false

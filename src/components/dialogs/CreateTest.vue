@@ -257,6 +257,10 @@ export default {
 
                 // положить в DB
                 operationFromStore('addTest', {data: test})
+                .catch(e=>{
+                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                this.$router.push('/')
+                })
 
                 // устанавливаем новый стейт текущего теста для workspace
                 this.updateTestID(test.id)

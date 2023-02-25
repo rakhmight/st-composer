@@ -93,6 +93,10 @@ import { operationFromStore } from '@/services/localDB'
           this.tests = result
           this.loader=false
         })
+        .catch(e=>{
+          console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+          this.$router.push('/')
+        })
       }
 
     },

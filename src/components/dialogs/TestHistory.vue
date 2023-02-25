@@ -65,13 +65,15 @@
                             <td v-if="action.type=='save'"><span style="color:#ad8011"><b>► Ручное сохранение</b></span></td>
                             <td v-if="action.type=='sign'"><span style="color:#27900dfa"><b>► Тест подписан</b></span></td>
                             <td v-if="action.type=='delete'"><span style="color:#ff4500"><b>► Тест удалён</b></span></td>
+                            <td v-if="action.type=='restore'"><span style="color:blue"><b>► Подставлено сохранение</b></span></td>
 
                             <td v-if="action.type=='change' && action.des!='difficulty-dissabled' && action.des!='difficulty-enabled' && action.des!='ball-dissabled' && action.des!='ball-enabled'" class="text-center">→<br>{{ action.date.date }} {{ action.date.time }}</td>
                             <td v-else class="text-center">{{ action.date.date }} {{ action.date.time }}</td>
 
                             <td v-if="action.type=='change' && action.des!='themes'"><b>{{ action.newData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='themes'"><b>{{ action.newData.join(', ') }}</b></td>
-                            <td v-if="action.type!='change'"></td>  
+                            <td v-if="action.type=='restore'"><b>от даты: {{ action.des }}</b></td>
+                            <td v-if="action.type!='change' && action.type!='restore'"></td>  
                             </tr>
                         </tbody>
                         </template>

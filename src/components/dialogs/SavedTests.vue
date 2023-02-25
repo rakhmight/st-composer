@@ -121,10 +121,14 @@ export default {
     },
     mounted(){
 
-        operationFromStore('getAllSavings')
+        operationFromStore('getAllSavings', {sort:{id: this.id}})
         .then(result=>{
           this.saves = result
           this.loader=false
+        })
+        .catch(e=>{
+          console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+          this.$router.push('/')
         })
     }
 }

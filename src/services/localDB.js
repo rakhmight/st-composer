@@ -28,12 +28,14 @@ export function initDB(){
 // Template
 export async function operationFromStore(type, params) {
   let db = await openDB("composerStorage", 2)
+  
   let testsTransaction = db.transaction('tests', 'readwrite')
   let savingsTransaction = db.transaction('savings', 'readwrite')
   let tests = testsTransaction.objectStore('tests')
   let savings = savingsTransaction.objectStore('savings')
 
   try{
+
     // Tests
     if(type=='addTest'){
       await tests.add(params.data)
@@ -54,12 +56,21 @@ export async function operationFromStore(type, params) {
     }else if(type=='deleteTest'){
       await tests.delete(params.id)
     }
+
+    
     // Savings
     else if(type=='addSaving'){
       await savings.add(params.data)
-    }else if(type=='getAllSavings'){
+    }else if(type=='getAllSavings' && params.sort){
       let result = await savings.getAll()
-      return result
+      let output = []
+
+      for(let i = 0; i!=result.length; i++){
+        if(result[i].testID==params.sort.id){
+          output.push(result[i])
+        }
+      }
+      return output
     }else if(type=='getBySavingID'){
       let result = await savings.get(params.id)
       return result

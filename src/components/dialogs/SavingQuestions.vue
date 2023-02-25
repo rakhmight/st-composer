@@ -183,6 +183,10 @@ export default {
             .then(()=>{
                 operationFromStore('addSaving', {data: output})
             })
+            .catch(e=>{
+            console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+            this.$router.push('/')
+            })
 
             // завершение
             setTimeout(()=>{
