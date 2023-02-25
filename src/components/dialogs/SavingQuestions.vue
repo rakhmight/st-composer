@@ -12,6 +12,7 @@
             v-bind="attrs"
             v-on="on"
             @click="saveFunc"
+            :disabled="!asyncComplate"
             >
                 <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
                 Сохранить как экземпляр
@@ -108,7 +109,9 @@ export default {
     props:{
         questions: Array,
         testID: Number,
-        saveFunc: Function
+        saveFunc: Function,
+
+        asyncComplate: Boolean
     },
     data() {
         return {

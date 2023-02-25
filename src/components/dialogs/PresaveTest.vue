@@ -8,13 +8,13 @@
             small
             width="270"
             color="#2b2b2b"
-            dark
             class="mt-5"
             v-bind="attrs"
             v-on="on"
+            :disabled="!asyncComplate"
             >
                 <v-icon color="#fff" class="mr-1">mdi-arrow-u-down-right</v-icon>
-                Использовать экземпляр
+                <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">Использовать экземпляр</span>
             </v-btn>
         </template>
 
@@ -137,7 +137,9 @@ import { mapMutations } from 'vuex'
 export default {
     props:{
         saving: Object,
-        questions: Array
+        questions: Array,
+
+        asyncComplate: Boolean
     },
     data() {
         return {
@@ -191,7 +193,6 @@ export default {
             .then(result=>{
                 // Параметры текущего теста: учитывание баллов, темы, сложность, id предмета
                 test = result
-                console.log(test);
                 
                 params = {
                     subjectID: test.subjectID,

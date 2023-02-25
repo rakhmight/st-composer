@@ -19,6 +19,7 @@
                 color="#0d5fd8"
                 class="mr-8"
                 @click="createQuestion('basic-question')"
+                :disabled="!asyncComplate"
                 >
                     <v-icon size="20">mdi-plus</v-icon>
                     Добавить вопрос
@@ -37,6 +38,7 @@
                     v-bind="attrs"
                     v-on="on"
                     class="mr-8"
+                    :disabled="!asyncComplate"
                 >
                     <v-icon
                     size="22"
@@ -74,11 +76,11 @@
                     <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
                     Сохранить как экземпляр
             </v-btn> -->
-            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveProcess"/>
+            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveProcess" :asyncComplate="asyncComplate"/>
         </div> 
 
         <!-- INSTRUCTION -->
-        <to-instruction :saveFunction="saveProcess"></to-instruction>
+        <to-instruction :saveFunction="saveProcess" :asyncComplate="asyncComplate"></to-instruction>
 
     </div>
 </template>
@@ -95,7 +97,9 @@ export default {
         saveFunction: Function,
         
         allQuestions: Array,
-        currentTestID: Number
+        currentTestID: Number,
+
+        asyncComplate: Boolean
     },
     data() {
         return {

@@ -111,12 +111,12 @@
                     small
                     width="270"
                     color="#0d5fd8"
-                    dark
                     class="mt-5"
                     @click="goToBack"
+                    :disabled="!asyncComplate"
                     >
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
-                        Вернуться назад
+                        <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">Вернуться назад</span>
                     </v-btn>
                 </div>
 
@@ -171,7 +171,7 @@
                 <div class="workspace__tools-box">
                     
                         <!-- TOOLS -->
-                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions"/>
+                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate"/>
 
                 </div>
             </div>
@@ -211,7 +211,8 @@ export default {
             loaderInterval: {},
 
             // util
-            allowToSaveTheme: false
+            allowToSaveTheme: false,
+            asyncComplate: false
         }
     },
     methods:{
@@ -514,6 +515,8 @@ export default {
                     setTimeout(()=>{
                         this.allowToSaveTheme = true
                     }, 1000)
+
+                    this.asyncComplate = true
                 })
                 .catch(e=>{
                 console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)

@@ -86,7 +86,7 @@
                     </v-btn>
 
                    <!--  -->
-                   <presave-test :state="initPresave" :saving="saving"/>
+                   <presave-test :state="initPresave" :saving="saving" :asyncComplate="asyncComplate"/>
                 </div>
 
                 <div class="saved__sidebar-box"></div>
@@ -303,7 +303,9 @@ export default {
 
             loader: true,
             loaderValue: 0,
-            loaderInterval: {}
+            loaderInterval: {},
+
+            asyncComplate: false
         }
     },
     computed: mapGetters(['getTestID']),
@@ -372,6 +374,8 @@ export default {
 
                         this.loader = false
                         clearInterval(this.loaderInterval)
+
+                        this.asyncComplate = true
                 })
                 .catch(e=>{
                 console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)

@@ -29,7 +29,7 @@
             <h4 class="">Сохранённые работы</h4>
 
             <!-- INSTRUCTION -->
-            <to-instruction></to-instruction>
+            <to-instruction :asyncComplate="true"></to-instruction>
 
           </div>
 
