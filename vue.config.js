@@ -6,7 +6,7 @@ module.exports = defineConfig({
   pluginOptions:{
     electronBuilder:{
       builderOptions:{
-        "productName": "Composer of Smart Testing (beta)",
+        "productName": "Composer of ST",
         "appId": "st-composer",
         "win" : {
           "target": [
@@ -21,7 +21,8 @@ module.exports = defineConfig({
           "license": "license.md",
           "allowToChangeInstallationDirectory": true,
           "multiLanguageInstaller": true,
-          "runAfterFinish": false
+          "runAfterFinish": false,
+          "unicode": true
         },
         "mac" : {
           "icon" : "./public/icons/icon-stc.ico"

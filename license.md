@@ -1,1 +1,1 @@
-Данное ПО является продуктом, авторские права на которое принадлежит Диёру Рахимову. Распространение ограничено.
+This software is a product, the copyright of which belongs to Diyor Rakhimov. The product is at the final stage of development. Distribution of the product is prohibited.
