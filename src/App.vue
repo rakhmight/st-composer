@@ -19,12 +19,13 @@ export default {
     HeaderComponent
   },
   methods: {
-      ...mapMutations(['updateTestsCounter', 'updateWorkStatus', 'updateTestID']),
+      ...mapMutations(['updateTestsCounter', 'updateWorkStatus', 'updateTestID', 'changeLang']),
   },
   computed: mapGetters(['getTestID']),
   mounted() {
     // инициализация DB
     initDB()
+
 
     // testCounter в LS
     let testsCounter = localStorage.getItem('testsCounter')
@@ -45,6 +46,12 @@ export default {
       this.updateTestID(localID)
     }
     
+
+    // Languages в LS
+    let language = localStorage.getItem('language')
+    if(language){
+      this.changeLang(language)
+    }
   },
   watch:{
     $route(to, from) {

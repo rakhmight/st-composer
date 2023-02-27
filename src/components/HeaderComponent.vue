@@ -17,8 +17,8 @@
         >
         </v-img>
         <div class="d-flex flex-column">
-          <h4 class="header__title">Сборщик тестов для системы Smart Testing</h4>
-          <p>на базе системы проверки подписей</p>
+          <h4 class="header__title">{{ currentLang.header[0] }}</h4>
+          <p>{{ currentLang.header[1] }}</p>
         </div>
       </div>
     
@@ -50,8 +50,9 @@
           small color="#eaeaea" 
           v-for="(lang, i) in langs"
           :key="i"
+          @click="setLanguage(lang.short)"
           >
-            <span style="color: #0167FF">{{lang}}</span>
+            <span style="color: #0167FF">{{lang.lang}}</span>
           </v-btn>
         </v-list>
       </v-menu>
@@ -60,7 +61,7 @@
       
       <v-menu
       offset-y
-      max-width="120"
+      max-width="400"
       >
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -77,18 +78,19 @@
               transition="scale-transition"
               width="15"
             />
-            <span style="color:#0167FF">User</span>
+            <span style="color:#0167FF">{{ currentSign.fullname }}</span>
           </v-btn>
         </template>
         <v-list
         class="header__list">
           <v-btn
           class="header__btn" 
-          small color="#c8c7ce" 
+          small
+          color="#c8c7ce" 
           dark
           @click="$router.push('/')"
           >
-            <span style="color:red">Выйти</span>
+            <span style="color:red">{{ currentLang.header[2] }}</span>
           </v-btn>
         </v-list>
       </v-menu>
@@ -96,12 +98,27 @@
 </template>
 
 <script>
+import { mapMutations, mapGetters } from 'vuex'
+
 export default {
     data() {
       return {
-        langs: ['русский',"o'zbek",'english']
+        langs: [{lang: 'русский', short: 'ru'},{lang: "o'zbek", short: 'uz_l'},{lang: 'english', short: 'eng'}]
       }
     },
+    computed: mapGetters(['currentLang', 'currentSign']),
+    methods:{
+      ...mapMutations(['changeLang']),
+
+      setLanguage(lang){
+        this.changeLang(lang)
+
+        localStorage.setItem('language', lang)
+      }
+    },
+    mounted(){
+      console.log(this.currentLang);
+    }
 }
 </script>
 
