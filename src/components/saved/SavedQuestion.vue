@@ -7,14 +7,14 @@
         <div class="test__header d-flex flex-row justify-space-between mb-2" style="position: relative;">
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-pound</v-icon>
-                <p style="color: #888" class="mr-5">Вопрос {{ serialNumber }} (п/п) | {{ question.id }} (ID)</p>
+                <p style="color: #888" class="mr-5">{{ currentLang.savedTestView[24] }} {{ serialNumber }} (п/п) | {{ question.id }} {{ currentLang.savedTestView[25] }}</p>
 
                 <test-type-icons :type="question.type" :questionID="question.id" :questions="questions"/>
 
             </div>
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
-                <p style="color: #888">Последнее изменение: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
+                <p style="color: #888">{{ currentLang.savedTestView[26] }}: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
             </div>
         </div>
 
@@ -23,11 +23,11 @@
         <div class="test__question-box mt-3 mb-6">
             <!-- Вопрос, картинка, параметры темы, балла, сложности -->
             <div class="mb-6">
-                <p>Сущность вопроса:</p>
+                <p>{{ currentLang.savedTestView[27] }}:</p>
                 <div class="d-flex flex-row align-start">
                     <v-icon class="mr-2 mt-2" :color="question.questionCtx ? '#0d5fd8' : ''">mdi-help-circle-outline</v-icon>
                     <div class="questionCtx" v-if="question.questionCtx">{{ question.questionCtx }}</div>
-                    <div class="questionCtxEmpty" v-else>Не заполнено</div>
+                    <div class="questionCtxEmpty" v-else>{{ currentLang.savedTestView[28] }}</div>
                 </div>
             </div>
 
@@ -36,27 +36,27 @@
                     <div class="d-flex flex-row mb-3">
                         <v-icon class="mr-2" :color="question.theme ? '#0d5fd8' : ''">mdi-alpha-t-box-outline</v-icon>
                         <div>
-                            Тема:
+                            {{ currentLang.savedTestView[29] }}:
                             <span style="color:#0d5fd8" v-if="question.theme">{{ question.theme }}</span>
-                            <span style="color:#888" v-else>(не указана)</span>
+                            <span style="color:#888" v-else>({{ currentLang.savedTestView[30] }})</span>
                         </div>
                     </div>
 
                     <div class="d-flex flex-row mb-3" v-if="testParams.considerDifficulty">
                         <v-icon class="mr-2" :color="question.difficulty ? '#0d5fd8' : ''">mdi-chart-line</v-icon>
                         <div>
-                            Сложность:
-                            <span style="color:#0d5fd8" v-if="question.difficulty && question.difficulty==1">лёгкий</span>
-                            <span style="color:#0d5fd8" v-if="question.difficulty && question.difficulty==2">средний</span>
-                            <span style="color:#0d5fd8" v-if="question.difficulty && question.difficulty==3">сложный</span>
-                            <span style="color:#888" v-if="!question.difficulty">(не указана)</span>
+                            {{ currentLang.savedTestView[31] }}:
+                            <span style="color:#0d5fd8" v-if="question.difficulty && question.difficulty==1">{{ currentLang.savedTestView[32] }}</span>
+                            <span style="color:#0d5fd8" v-if="question.difficulty && question.difficulty==2">{{ currentLang.savedTestView[33] }}</span>
+                            <span style="color:#0d5fd8" v-if="question.difficulty && question.difficulty==3">{{ currentLang.savedTestView[34] }}</span>
+                            <span style="color:#888" v-if="!question.difficulty">({{ currentLang.savedTestView[30] }})</span>
                         </div>
                     </div>
 
                     <div class="d-flex flex-row mb-3" v-if="testParams.ballSystem">
                         <v-icon class="mr-2" :color="question.ball ? '#0d5fd8' : ''">mdi-circle-double</v-icon>
                         <div>
-                            Балл:
+                            {{ currentLang.savedTestView[35] }}:
                             <span style="color:#0d5fd8">{{ question.ball }}</span>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                     <div class="d-flex flex-row" v-if="question.type=='question-with-images'"> 
                         <v-icon class="mr-2" :color="question.imagePreview ? '#0d5fd8' : ''">mdi-camera</v-icon>
                         <div>
-                            Изображение:
+                            {{ currentLang.savedTestView[36] }}:
                             <span></span>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                         <v-icon class="mt-2 mr-2" :color="answer.isCurrect ? '#51c551' : ''">mdi-lightbulb-auto</v-icon>
                         <div class="answerCtx" v-if="answer.answerCtx && !answer.isCurrect">{{ answer.answerCtx }}</div>
                         <div class="answerCtx" v-if="answer.answerCtx && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
-                        <div class="answerCtxEmpty" v-if="!answer.answerCtx">Не заполнено</div>
+                        <div class="answerCtxEmpty" v-if="!answer.answerCtx">{{ currentLang.savedTestView[37] }}</div>
                     </div>
                 </div>
 
@@ -137,10 +137,10 @@
             <div class="d-flex flex-row mb-2">
                 <v-icon class="mr-2" :color="question.imagePreview ? '#0d5fd8' : ''">mdi-focus-field</v-icon>
                 <div>
-                    Приемлемый радиус погрешности ответа:
+                    {{ currentLang.savedTestView[38] }}:
                     <span style="color:#0d5fd8">{{ question.answer[0].fault }}</span>
-                    <span v-if="!question.imagePreview" style="color:#888"> (не установлена картинка)</span>
-                    <span v-if="question.imagePreview && !question.answer[1].x" style="color:#888"> (не установлены координаты)</span>
+                    <span v-if="!question.imagePreview" style="color:#888"> ({{ currentLang.savedTestView[39] }})</span>
+                    <span v-if="question.imagePreview && !question.answer[1].x" style="color:#888"> ({{ currentLang.savedTestView[40] }})</span>
                 </div>
             </div>
             <div v-if="question.imagePreview">
@@ -168,6 +168,7 @@
 
 <script>
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -176,6 +177,7 @@ export default {
         testParams: Object,
         questions: Array,
     },
+    computed: mapGetters(['currentLang']),
     mounted() {
         if(this.question.type=='question-with-field' && this.question.imagePreview){
             let target = document.querySelector(`.img_${this.question.id}`)

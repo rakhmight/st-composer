@@ -11,8 +11,8 @@
                     mdi-file-account-outline
                 </v-icon>
                 <div class="card__titles d-flex flex-column">
-                    <h3 class="card__title">Загрузите подпись</h3>
-                    <p class="card__subtitle">прикрипите файл с подписью</p>
+                    <h3 class="card__title">{{ currentLang.authView[0] }}</h3>
+                    <p class="card__subtitle">{{ currentLang.authView[1] }}</p>
                 </div>
         
                 <v-spacer></v-spacer>
@@ -28,8 +28,8 @@
             <v-file-input
                 :rules="rules"
                 accept="application/json"
-                placeholder="Выберите файл с подписью"
-                label="Загрузить подпись"
+                :placeholder="currentLang.authView[2]"
+                :label="currentLang.authView[3]"
                 outlined
                 dense
                 class="mt-6 auth__file-input"
@@ -41,15 +41,16 @@
             dark
             class="mb-6"
             @click="$router.push('/dashboard')"
+            small
             >
             <v-icon
             color="#fff"
             class="mr-2"
-            size="20"
+            size="18"
             >
                 mdi-upload
             </v-icon>
-            Загрузить подпись
+            {{ currentLang.authView[3] }}
             </v-btn>
     
             <v-divider width="100%" color="#ccc"></v-divider>
@@ -63,7 +64,7 @@
             @click="updateTab('free-sign-form')"
             small
             >
-            Использовать свободную подпись
+            {{ currentLang.authView[4] }}
             <v-icon
             color="#fff"
             class="ml-2"
@@ -77,7 +78,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import AuthSignInfo from '@/components/authForms/AuthSignInfo.vue'
 
 export default {
@@ -88,6 +89,7 @@ export default {
             ],
         }
     },
+    computed: mapGetters(['currentLang']),
     methods: {
         ...mapMutations(['updateTab']),
     },

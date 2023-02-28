@@ -10,7 +10,7 @@
         class="dashboard__btn"
         >
         <v-icon color="#0167FF" size="20">mdi-information</v-icon>
-        <span style="color:#0167FF">Информация</span>
+        <span style="color:#0167FF">{{ currentLang.dashboardView[18] }}</span>
         </v-btn>
     </template>
 
@@ -18,7 +18,7 @@
         <v-card-title
         class="text-h5 lighten-2 d-flex flex-row justify-space-between"
         >
-        Информация о тесте
+        {{ currentLang.dashboardView[19] }}
         <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
         </v-card-title>
 
@@ -27,11 +27,11 @@
         <div class="dialog-content">
             <div class="main-info mb-3">
                 <div class="d-flex flex-column">
-                    <div>Тест создан</div>
-                    <div v-if="test.lastModified">Последнее изменение внесено</div>
-                    <div class="mb-3">Автор</div>
-                    <div>ID предмета</div>
-                    <div>Темы</div>
+                    <div>{{ currentLang.dashboardView[20] }}</div>
+                    <div v-if="test.lastModified">{{ currentLang.dashboardView[21] }}</div>
+                    <div class="mb-3">{{ currentLang.dashboardView[22] }}</div>
+                    <div>{{ currentLang.dashboardView[23] }}</div>
+                    <div>{{ currentLang.dashboardView[24] }}</div>
                 </div>
                 <div class="d-flex flex-column">
                     <div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div>
@@ -44,27 +44,27 @@
 
             <div class="mb-3" v-if="test.considerDifficulty">
                 <v-icon color="green">mdi-check-circle</v-icon>
-                В тесте учитывается сложность вопросов
+                {{ currentLang.dashboardView[25] }}
             </div>
 
             <div class="mb-3" v-if="test.ballSystem">
                 <v-icon color="green">mdi-check-circle</v-icon>
-                Ответы оцениваются по балльной шкале
+                {{ currentLang.dashboardView[26] }}
                 <div class="d-flex flex-row justify-space-between flex-wrap">
-                    <div><v-icon>mdi-minus</v-icon>Минимальный балл: <b>{{ test.ballSystem.min }}</b></div>
-                    <div><v-icon>mdi-vector-line</v-icon>Интервал между баллами: <b>{{ test.ballSystem.interval }}</b></div>
-                    <div><v-icon>mdi-plus</v-icon>Максимальный балл: <b>{{ test.ballSystem.max }}</b></div>
+                    <div><v-icon>mdi-minus</v-icon>{{ currentLang.dashboardView[27] }}: <b>{{ test.ballSystem.min }}</b></div>
+                    <div><v-icon>mdi-vector-line</v-icon>{{ currentLang.dashboardView[28] }}: <b>{{ test.ballSystem.interval }}</b></div>
+                    <div><v-icon>mdi-plus</v-icon>{{ currentLang.dashboardView[29] }}: <b>{{ test.ballSystem.max }}</b></div>
                 </div>
             </div>
 
             <div>
                 <v-icon>mdi-help-circle</v-icon>
-                Общее количество вопросов: <b>{{ test.questions.length }}</b> <span v-if="test.questions.length">, из них:</span>
+                {{ currentLang.dashboardView[30] }}: <b>{{ test.questions.length }}</b> <span v-if="test.questions.length">, {{ currentLang.dashboardView[31] }}:</span>
                 <div class="question-info" v-if="test.questions.length">
                     <div>
-                        <div><span style="color:rgb(255, 99, 132)">►</span> текстовых вопросов: <b>{{ basicQuestions }}</b></div>
-                        <div><span style="color:rgb(54, 162, 235)">►</span> вопросов с изображениями: <b>{{ questionsWithImages }}</b></div>
-                        <div><span style="color:rgb(255, 205, 86)">►</span> вопросов с выбранной областью: <b>{{ questionWithField }}</b></div>
+                        <div><span style="color:rgb(255, 99, 132)">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
+                        <div><span style="color:rgb(54, 162, 235)">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
+                        <div><span style="color:rgb(255, 205, 86)">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
                     </div>
                     <div class="canvas-box">
                         <!-- Нужно создавать canvas с помощью скрипта -->
@@ -79,6 +79,7 @@
 
 <script>
 import Chart from 'chart.js/auto'
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -96,6 +97,7 @@ export default {
             basicQuestions: 0
         }
     },
+    computed: mapGetters(['currentLang']),
     mounted() {
         //Расчитать вопросы по их виду
         if(this.test.questions.length){
@@ -119,9 +121,9 @@ export default {
                         type: 'pie',
                         data: {
                         labels: [
-                            'текстовые',
-                            'с изображением',
-                            'с выбранной областью'
+                            this.currentLang.dashboardView[35],
+                            this.currentLang.dashboardView[36],
+                            this.currentLang.dashboardView[37],
                         ],
                         datasets: [{
                             data: [this.basicQuestions, this.questionsWithImages, this.questionWithField],

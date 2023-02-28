@@ -11,7 +11,7 @@
             class="dashboard__btn"
             >
             <v-icon color="#0167FF" size="20">mdi-pencil-outline</v-icon>
-            <span style="color:#0167FF">Изменить</span>
+            <span style="color:#0167FF">{{ currentLang.dashboardView[45] }}</span>
             </v-btn>
         </template>
 
@@ -19,7 +19,7 @@
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
-            Изменить параметры теста
+            {{ currentLang.dashboardView[46] }}
             <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
@@ -29,27 +29,27 @@
                 <div class="content__subject-box flex-column">
                     
                     <div class="d-flex flex-column">
-                        <label class="body-2">Изменение ID предмета:</label>
+                        <label class="body-2">{{ currentLang.dashboardView[47] }}:</label>
                         <v-text-field
                         dense
                         outlined
                         prepend-icon="mdi-pound"
                         v-model="subjectID"
                         :value="subjectID"
-                        placeholder="ID предмета"
+                        :placeholder="currentLang.dashboardView[4]"
                         :error="subjectEr"
                         >
                         </v-text-field>
                     </div>
                     <div>
-                        <label class="body-2">Изменение тем:</label>
+                        <label class="body-2">{{ currentLang.dashboardView[48] }}:</label>
                         <v-text-field
                         dense
                         outlined
                         prepend-icon="mdi-alpha-t-box-outline"
                         v-model="themes"
                         :value="themes"
-                        placeholder="Укажите темы через запятую"
+                        :placeholder="currentLang.dashboardView[5]"
                         :error="themesEr"
                         >
                         </v-text-field>
@@ -57,12 +57,12 @@
                     <div class="d-flex flex-row justify-space-between">
                         <v-checkbox
                         v-model="haveLevel"
-                        label="Учитывать уровень сложности?"
+                        :label="currentLang.dashboardView[6]"
                         ></v-checkbox>
                         
                         <v-checkbox
                         v-model="haveBall"
-                        label="Учитывать балльную систему?"
+                        :label="currentLang.dashboardView[7]"
                         ></v-checkbox>
                     </div>
 
@@ -72,7 +72,7 @@
                         <!-- Использовать для ошибки -->
                         <div class="d-flex flex-row mt-3 align-start">
                             <v-icon color="error" class="mr-2 mt-1">mdi-alert-circle-outline</v-icon>
-                            <div style="font-size: 0.9em;">Помните, что если в вопросах текущих тестов балл меньше чем указываемое минимальное значение, то в этих вопросах балл будет изменён на указываемое минимальное значение. Если же в вопросах текущих тестов балл больше чем указываемое максимальное значение, то в этих вопросах балл будет изменён на указываемое максимальное значение</div>
+                            <div style="font-size: 0.9em;">{{ currentLang.dashboardView[49] }}</div>
                         </div>
                     </div>
                 </div>
@@ -101,7 +101,7 @@
                 type="success"
                 class="subtitle-2"
                 v-if="editSuccess"
-                >Изменения сохранены</v-alert>
+                >{{ currentLang.dashboardView[50] }}</v-alert>
             </div>
 
             <v-spacer></v-spacer>
@@ -114,7 +114,7 @@
                 class="edit-btn"
                 @click="saveChanges"
             >
-                Сохранить изменения
+                {{ currentLang.dashboardView[51] }}
             </v-btn>
             </v-card-actions>
 
@@ -133,6 +133,7 @@
 import BallSettings from '@/components/dialogs/BallSettings.vue'
 import putToHistory from '@/services/putToHistory'
 import { operationFromStore } from '@/services/localDB'
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -170,6 +171,7 @@ export default {
             oldBallSystem: undefined
         }
     },
+    computed: mapGetters(['currentLang']),
     methods:{
         changeSettings(type, ctx){
             if(type=='min'){
@@ -191,16 +193,16 @@ export default {
             // валидаторы
             if(!this.subjectID){
                 this.subjectEr = true
-                return this.errors.push('Не указан ID предмета')
+                return this.errors.push(this.currentLang.validators[0])
             }
             let subject = +((''+this.subjectID).trim())
             if(!subject){
                 this.subjectEr = true
-                return this.errors.push('Указан некорректный ID предмета')
+                return this.errors.push(this.currentLang.validators[1])
             }
             if(!this.themes){
                 this.themesEr = true
-                return this.errors.push('Не указаны ID тем')
+                return this.errors.push(this.currentLang.validators[4])
             }
 
             let themes = (''+this.themes).trim()
@@ -211,7 +213,7 @@ export default {
 
                 if(!arr[i]){
                     this.themesEr = true
-                    return this.errors.push('Указаны некорректные ID тем')
+                    return this.errors.push(this.currentLang.validators[2])
                 }
             })
             // повторяющиеся темы
@@ -223,7 +225,7 @@ export default {
                     }
                     if(themes[i]==themes[j] && themesCounter==2){
                         this.themesEr = true
-                        return this.errors.push('Указаны повторяющиеся ID тем')  
+                        return this.errors.push(this.currentLang.validators[3])  
                     }
                 }
                 themesCounter=0
@@ -231,7 +233,7 @@ export default {
 
             if(this.haveBall){
                 if(!this.ballIsCurrect){
-                    return this.errors.push('Не верно указаны параметры баллов')
+                    return this.errors.push(this.currentLang.validators[5])
                 }
             }
 
@@ -344,7 +346,7 @@ export default {
                     operationFromStore('addTest',{data:test})
                 })
                 .catch(e=>{
-                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                console.error(this.currentLang.errors[0], e.message)
                 this.$router.push('/')
                 })
 
@@ -373,7 +375,7 @@ export default {
                     },2000)
                 },2000)
             }else{
-                return this.errors.push('Не были введены изменения для текущего теста')
+                return this.errors.push(this.currentLang.validators[6])
             }
         }
     },

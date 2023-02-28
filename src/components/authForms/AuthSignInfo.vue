@@ -2,7 +2,7 @@
 
     <v-dialog
     v-model="dialog"
-    width="600"
+    width="800"
     >
             <template v-slot:activator="{ on, attrs }">
                 <v-icon
@@ -25,28 +25,29 @@
             >
                 mdi-information
             </v-icon>
-            Подпись и как её получить
+            {{ currentLang.authView[8] }}
             </v-card-title>
 
             <v-card-text>
-            <b>Подпись</b> - файл, содержащий в себе необходимые реквизиты, которые в дальнейшим будут использованы для указания автора тестов, аунтификации кафедры автора и в шифровании написанных тестов. Подпись используется для определения источника тестов.
+                <b>{{ currentLang.authView[9] }}</b> - {{ currentLang.authView[10] }}
             </v-card-text>
             <v-card-text>
-            Подпись состоит из:
-            <ul>
-                <li>ID автора</li>
-                <li>ID кафедры, к которой автор прикреплён</li>
-                <li>открытый ключ шифрования</li>
-            </ul>
+                {{ currentLang.authView[11] }}
+                <ul>
+                    <li>{{ currentLang.authView[12] }}</li>
+                    <li>{{ currentLang.authView[13] }}</li>
+                    <li>{{ currentLang.authView[14] }}</li>
+                    <li>{{ currentLang.authView[15] }}</li>
+                </ul>
             </v-card-text>
             <v-card-text>
-            Подпись для работы со сборщиком системы Smart Testing выдаётся в Тестовом Центре. Подписи генерируются сервером системы тестирования Smart Testing.
+                {{ currentLang.authView[16] }}
             </v-card-text>
             <v-card-text>
-            <span style="color:#0167FF">Кто может получить подпись?</span><br>Подписи выдаются преподавательскому составу Академии МВД. <b style="color: orangered">Распространение подписи запрещено.</b>
+            <span style="color:#0167FF">{{ currentLang.authView[17] }}</span><br>{{ currentLang.authView[18] }} <b style="color: orangered">{{ currentLang.authView[19] }}</b>
             </v-card-text>
             <v-card-text>
-            <span style="color:#0167FF">Свободная подпись</span><br>Энтузиастам и лицам, изъявившим желание написать тесты на свободную тему, предоставлена возможность использования свободной подписи. При её использовании желательно указать своё полное имя, псевдоним либо же использовать подпись в анонимном порядке.
+            <span style="color:#0167FF">{{ currentLang.authView[20] }}</span><br>{{ currentLang.authView[21] }} <b style="color: orangered">{{ currentLang.authView[23] }}</b>
             </v-card-text>
 
             <v-divider></v-divider>
@@ -57,8 +58,9 @@
                 color="#0167FF"
                 text
                 @click="dialog = false"
+                small
             >
-                Понятно
+                {{ currentLang.authView[22] }}
             </v-btn>
             </v-card-actions>
         </v-card>
@@ -67,12 +69,15 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
     data() {
         return {
             dialog: false,
         }
     },
+    computed: mapGetters(['currentLang']),
 }
 </script>
 

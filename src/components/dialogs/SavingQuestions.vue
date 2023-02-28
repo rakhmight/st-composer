@@ -15,7 +15,7 @@
             :disabled="!asyncComplate"
             >
                 <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
-                Сохранить как экземпляр
+                {{ currentLang.workspaceView[45] }}
             </v-btn>
         </template>
 
@@ -23,7 +23,7 @@
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
-            Сохранение текущих тестов как экземпляр
+            {{ currentLang.workspaceView[46] }}
             <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
@@ -33,7 +33,7 @@
                 <div class="content__subject-box flex-column">
                     
                     <div class="d-flex flex-column">
-                            <label class="body-2">Напишите комментарий к текущему сохранению</label>
+                            <label class="body-2">{{ currentLang.workspaceView[47] }}</label>
                             <div class="d-flex flex-row">
                                 <v-textarea
                                 dense
@@ -41,7 +41,7 @@
                                 outlined
                                 prepend-icon="mdi-comment-outline"
                                 v-model="comment"
-                                placeholder="Комментарий к сохранению"
+                                :placeholder="currentLang.workspaceView[48]"
                                 :error="savingEr"
                                 >
                                 </v-textarea>
@@ -73,7 +73,9 @@
                 type="success"
                 class="subtitle-2"
                 v-if="savingSuccess"
-                >Текущие вопросы сохранены в экземпляр</v-alert>
+                >
+                    {{ currentLang.workspaceView[49] }}
+                </v-alert>
             </div>
 
             <v-spacer></v-spacer>
@@ -86,7 +88,7 @@
                 class="delete-btn"
                 @click="savingQuestions"
             >
-                Сохранить экземпляр
+                {{ currentLang.workspaceView[50] }}
             </v-btn>
             </v-card-actions>
 
@@ -104,6 +106,8 @@
 <script>
 import getCurrentDate from '@/plugins/getCurrentDate'
 import { operationFromStore } from '@/services/localDB'
+import putToHistory from '@/services/putToHistory'
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -124,17 +128,18 @@ export default {
             comment: ''
         }
     },
+    computed: mapGetters(['currentLang']),
     methods:{
         savingQuestions(){
 
             // валидаторы
             if(!this.comment){
-                this.errors.push('Напишите комментарий сохраняемому экземпляру')
+                this.errors.push(this.currentLang.validators[9])
                 this.savingEr = true
                 return
             }
             if(this.comment.length<=7){
-                this.errors.push('Слишком короткий комментарий. Длина комментария должна быть больше 7')
+                this.errors.push(this.currentLang.validators[10])
                 this.savingEr = true
                 return
             }
@@ -182,13 +187,19 @@ export default {
                     date: getCurrentDate(),
                     params
                 }
+
+                // Внесение сохранения в историю теста
+                test.history.push(putToHistory('save'))
             })
             .then(()=>{
                 operationFromStore('addSaving', {data: output})
+                .then(()=>{
+                    this.saveFunc({newTest: test})
+                })
             })
             .catch(e=>{
-            console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
-            this.$router.push('/')
+                console.error(this.currentLang.errors[0], e.message)
+                this.$router.push('/')
             })
 
             // завершение

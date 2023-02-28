@@ -14,7 +14,7 @@
           rules.valueNotZero,
         ]"
         prepend-icon="mdi-minus-thick"
-        label="Укажите минимальный балл"
+        :label="currentLang.dashboardView[52]"
       ></v-text-field>
       <v-text-field
         dense
@@ -29,7 +29,7 @@
           rules.valueNotZero,
         ]"
         prepend-icon="mdi-plus-thick"
-        label="Укажите максимальный балл"
+        :label="currentLang.dashboardView[53]"
       ></v-text-field>
     </div>
 
@@ -45,12 +45,14 @@
         rules.valueIsNumber,
         rules.valueNotZero,
       ]"
-      label="интервал между баллами"
+      :label="currentLang.dashboardView[54]"
     ></v-text-field>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   props: {
     min: String,
@@ -70,7 +72,7 @@ export default {
             return true;
           } else {
             this.valueIsNumber = false;
-            return "Введённое значение должно быть числом";
+            return this.currentLang.dashboardView[55];
           }
         },
         valueNotZero: (v) => {
@@ -79,7 +81,7 @@ export default {
             return true;
           } else {
             this.valueNotZero = false;
-            return "Введённое значение должно быть больше 0";
+            return this.currentLang.dashboardView[56];
           }
         },
 
@@ -89,14 +91,14 @@ export default {
             return true;
           } else {
             this.valueLength = false;
-            return "Значение не может быть больше 4-ёх значного числа (включая дробь)";
+            return this.currentLang.dashboardView[57];
           }
         },
         invalidValue: (v) => {
           const start = /^0[0-9]+/;
           if (v.match(start)) {
             this.invalidValue = false;
-            return "Указано не валидное число";
+            return this.currentLang.dashboardView[58];
           } else {
             this.invalidValue = true;
             return true;
@@ -108,7 +110,7 @@ export default {
             return true;
           } else {
             this.emptyValue = false;
-            return "Обязательное поле для заполнения";
+            return this.currentLang.dashboardView[59];
           }
         },
       },
@@ -126,6 +128,7 @@ export default {
       ballIsCurrect: this.currect,
     };
   },
+  computed: mapGetters(['currentLang']),
   watch: {
     minBall() {
       this.settingsFunc("min", this.minBall);

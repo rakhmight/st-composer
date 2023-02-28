@@ -10,7 +10,7 @@
             mdi-text
             </v-icon>
         </template>
-        <span>Простой текстовый вопрос</span>
+        <span>{{ currentLang.workspaceView[13] }}</span>
         </v-tooltip>
 
         <v-tooltip bottom v-if="testType=='question-with-images'">
@@ -23,7 +23,7 @@
             mdi-image-outline
             </v-icon>
         </template>
-        <span>Вопрос с картинками</span>
+        <span>{{ currentLang.workspaceView[14] }}</span>
         </v-tooltip>
 
         <v-tooltip bottom v-if="testType=='question-with-field'">
@@ -36,12 +36,13 @@
             mdi-selection-ellipse-arrow-inside
             </v-icon>
         </template>
-        <span>Вопрос с выбором области на картинке</span>
+        <span>{{ currentLang.workspaceView[15] }}</span>
         </v-tooltip>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -49,6 +50,7 @@ export default {
         questionID: Number,
         questions: Array,
     },
+    computed: mapGetters(['currentLang']),
     data() {
         return {
             testType: this.type,

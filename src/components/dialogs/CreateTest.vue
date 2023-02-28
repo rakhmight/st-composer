@@ -11,7 +11,7 @@
             v-bind="attrs"
             v-on="on"
             >
-              + Создать тест
+              + {{ currentLang.dashboardView[3] }}
             </v-btn>
         </template>
 
@@ -19,7 +19,7 @@
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
-            Создать тест
+            {{ currentLang.dashboardView[3] }}
             <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
@@ -33,7 +33,7 @@
                         outlined
                         prepend-icon="mdi-pound"
                         v-model="subjectID"
-                        placeholder="ID предмета"
+                        :placeholder="currentLang.dashboardView[4]"
                         :error="subjectIsEmpty"
                         >
                         </v-text-field>
@@ -44,7 +44,7 @@
                         outlined
                         prepend-icon="mdi-alpha-t-box-outline"
                         v-model="subjectThemes"
-                        placeholder="Укажите темы через запятую"
+                        :placeholder="currentLang.dashboardView[5]"
                         :error="themesIsEmpty"
                         >
                         </v-text-field>
@@ -52,12 +52,12 @@
                     <div class="d-flex flex-row justify-space-between">
                         <v-checkbox
                         v-model="haveLevel"
-                        label="Учитывать уровень сложности?"
+                        :label="currentLang.dashboardView[6]"
                         ></v-checkbox>
                         
                         <v-checkbox
                         v-model="haveBall"
-                        label="Учитывать балльную систему?"
+                        :label="currentLang.dashboardView[7]"
                         ></v-checkbox>
                     </div>
 
@@ -86,22 +86,24 @@
                     type="success"
                     class="subtitle-2"
                     v-if="createSuccess"
-                    >Тест создан</v-alert>
+                    >
+                        {{ currentLang.dashboardView[8] }}
+                    </v-alert>
             </div>
             
 
             <v-divider></v-divider>
             <v-card-actions class="d-flex align-items-center flex-column">
                 <v-btn
-                    color="#0167FF"
-                    small
-                    justify="center"
-                    width="200"
-                    :disabled="blockBtn"
-                    class="add-btn"
-                    @click="createTest"
+                color="#0167FF"
+                small
+                justify="center"
+                width="200"
+                :disabled="blockBtn"
+                class="add-btn"
+                @click="createTest"
                 >
-                    Создать
+                    {{ currentLang.dashboardView[9] }}
                 </v-btn>
             </v-card-actions>
 
@@ -171,14 +173,14 @@ export default {
             // уровень валидаторов
             if(!this.subjectID){
                 this.subjectIsEmpty = true
-                return this.errors.push('Укажите ID предмета')
+                return this.errors.push(this.currentLang.validators[0])
             }
 
             // проверка предмета
             let subject = +(this.subjectID.trim())
             if(!subject){
                 this.subjectIsEmpty = true
-                this.errors.push('Указан некорректный ID предмета')
+                this.errors.push(this.currentLang.validators[1])
                 return
             }
                         
@@ -191,7 +193,7 @@ export default {
 
                 if(!arr[i]){
                     this.themesIsEmpty = true
-                    return this.errors.push('Указаны некорректные ID тем')
+                    return this.errors.push(this.currentLang.validators[2])
                 }
             })
             //повторяющиеся темы
@@ -203,7 +205,7 @@ export default {
                     }
                     if(themes[i]==themes[j] && themesCounter==2){
                         this.themesIsEmpty = true
-                        return this.errors.push('Указаны повторяющиеся ID тем')  
+                        return this.errors.push(this.currentLang.validators[3])  
                     }
                 }
                 themesCounter=0
@@ -214,10 +216,10 @@ export default {
 
             if(!this.subjectThemes){
                 this.themesIsEmpty = true
-                return this.errors.push('Укажите темы по их ID через запятую')
+                return this.errors.push(this.currentLang.validators[4])
             }
             if(!this.ballIsCurrect && this.haveBall){
-                return this.errors.push('Введены некорректные значения баллов') 
+                return this.errors.push(this.currentLang.validators[5]) 
             }
 
             // уровень сохранения в LS и перехода к тестам
@@ -258,7 +260,7 @@ export default {
                 // положить в DB
                 operationFromStore('addTest', {data: test})
                 .catch(e=>{
-                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                console.error(this.currentLang.errors[0], e.message)
                 this.$router.push('/')
                 })
 
@@ -282,7 +284,7 @@ export default {
             }
         }
     },
-    computed: mapGetters(['currentTestsCounter', 'currentSign']),
+    computed: mapGetters(['currentTestsCounter', 'currentSign', 'currentLang']),
     watch:{
         subjectID(){
             if(this.subjectID.length){

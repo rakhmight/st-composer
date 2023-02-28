@@ -9,7 +9,7 @@
                                 <v-icon size="20" color="#fff" class="mr-1">
                                     mdi-content-paste
                                 </v-icon>
-                                <h4 style="color:#fff">Содержание</h4>
+                                <h4 style="color:#fff">{{ currentLang.savedTestView[0] }}</h4>
                             </div>
                         </div>
                         <div v-if="questions.length==0 && !loader" class="saved__map-empty d-flex flex-column justify-center align-center" style="border-radius: 0 0 5px 5px;">
@@ -82,7 +82,7 @@
                     @click="goToBack"
                     >
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
-                        Вернуться назад
+                        {{ currentLang.savedTestView[1] }}
                     </v-btn>
 
                    <!--  -->
@@ -124,8 +124,8 @@
                         contain
                         transition="scale-transition"
                         ></v-img>
-                        <h2 style="color:#888" class="mt-5">ВОПРОСОВ НЕТ</h2>
-                        <h4 style="color:#888">Сохранение выполнено без написанных вопросов</h4>
+                        <h2 style="color:#888" class="mt-5">{{ currentLang.savedTestView[2] }}</h2>
+                        <h4 style="color:#888">{{ currentLang.savedTestView[3] }}</h4>
                     </div>
 
                 </div>
@@ -135,7 +135,7 @@
                         <div style="width: 100%" v-if="!showFullInfo">
                             <div class="d-flex flex-row">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-comment-outline</v-icon>
-                                <div class="small-comment"><span style="color:#bbb">Комментарий к сохранению: </span>
+                                <div class="small-comment"><span style="color:#bbb">{{ currentLang.savedTestView[4] }}: </span>
                                     {{ savingComment }}
                                     <v-progress-circular
                                     v-if="loader"
@@ -148,7 +148,7 @@
                             </div>
                             <div class="d-flex flex-row">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-calendar-range</v-icon>
-                                <div><span style="color:#bbb">Дата сохранения: </span>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[5] }}: </span>
                                     {{ savingDate.date }} {{ savingDate.time }}
                                     <v-progress-circular
                                     v-if="loader"
@@ -163,7 +163,7 @@
 
                         <div v-if="showFullInfo" class="d-flex flex-row">
                             <v-icon color="#fff" class="mr-1" size="19">mdi-information-outline</v-icon>
-                            Подробная информация о сохранённом экземпляре теста
+                            {{ currentLang.savedTestView[6] }}
                         </div>
                         
                         <div class="d-flex flex-row align-center">
@@ -174,7 +174,7 @@
                             v-if="showDeleteBtn"
                             @click="deleteSaving"
                             >
-                                Уверены?
+                            {{ currentLang.savedTestView[7] }}
                             </v-btn>
 
                             <div class="mr-10" v-if="asyncComplate">
@@ -190,7 +190,7 @@
                                     mdi-delete-outline
                                     </v-icon>
                                 </template>
-                                <span>Удалить сохранение</span>
+                                <span>{{ currentLang.savedTestView[8] }}</span>
                                 </v-tooltip>
                             </div>
 
@@ -217,8 +217,8 @@
                                 mdi-chevron-down
                                 </v-icon>
                             </template>
-                            <span v-if="!showFullInfo">Подробнее</span>
-                            <span v-else>Скрыть</span>
+                            <span v-if="!showFullInfo">{{ currentLang.savedTestView[9] }}</span>
+                            <span v-else>{{ currentLang.savedTestView[10] }}</span>
                             </v-tooltip>
                         </div>
                     </div>
@@ -239,19 +239,19 @@
                         <div>
                             <div class="d-flex flex-row align-start">
                                 <v-icon color="#fff" class="mr-1 mt-1" size="19">mdi-comment-outline</v-icon>
-                                <div class=""><span style="color:#bbb">Комментарий к сохранению:</span> {{ savingComment }}</div>
+                                <div class=""><span style="color:#bbb">{{ currentLang.savedTestView[11] }}:</span> {{ savingComment }}</div>
                             </div>
                             <div class="d-flex flex-row mt-1">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-calendar-range</v-icon>
-                                <div><span style="color:#bbb">Дата сохранения:</span> {{ savingDate.date }} {{ savingDate.time }}</div>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[12] }}:</span> {{ savingDate.date }} {{ savingDate.time }}</div>
                             </div>
                             <div class="d-flex flex-row mt-3">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
-                                <div><span style="color:#bbb">ID предмета:</span> {{ testParams.subjectID ? testParams.subjectID : 'null' }}</div>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[13] }}:</span> {{ testParams.subjectID ? testParams.subjectID : 'null' }}</div>
                             </div>
                             <div class="d-flex flex-row mt-1">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
-                                <div><span style="color:#bbb">ID тем:</span> {{ testParams.themes ? testParams.themes.join(', ') : 'null' }}</div>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes ? testParams.themes.join(', ') : 'null' }}</div>
                             </div>
                         </div>
 
@@ -261,33 +261,33 @@
                             <div class="d-flex flex-column mt-1">
                                 <div class="d-flex flex-row">
                                     <v-icon color="#fff" class="mr-1" size="19">mdi-help-circle-outline</v-icon>
-                                    <div><span style="color:#bbb">Количество вопросов:</span> {{ questions.length }}</div>
+                                    <div><span style="color:#bbb">{{ currentLang.savedTestView[15] }}:</span> {{ questions.length }}</div>
                                 </div>
                                 <div class="ml-5">
-                                    <div><span style="color:#bbb">• текстовых вопросов:</span> {{ basicQuestions }}</div>
-                                    <div><span style="color:#bbb">• вопросов с изображениями:</span> {{ questionsWithImages }}</div>
-                                    <div><span style="color:#bbb">• вопросов с выбранной областью:</span> {{ questionWithField }}</div>
+                                    <div><span style="color:#bbb">• {{ currentLang.savedTestView[16] }}:</span> {{ basicQuestions }}</div>
+                                    <div><span style="color:#bbb">• {{ currentLang.savedTestView[17] }}:</span> {{ questionsWithImages }}</div>
+                                    <div><span style="color:#bbb">• {{ currentLang.savedTestView[18] }}:</span> {{ questionWithField }}</div>
                                 </div>
                             </div>
 
                             <div class="d-flex flex-row mt-3" v-if="testParams.considerDifficulty">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-check-circle</v-icon>
-                                <div>В тесте учитывается сложность вопросов</div>
+                                <div>{{ currentLang.savedTestView[19] }}</div>
                             </div>
 
                             <div class="d-flex flex-column mt-3" v-if="testParams.ballSystem">
                                 <div class="d-flex flex-row">
                                     <v-icon color="#fff" class="mr-1" size="19">mdi-check-circle</v-icon>
-                                    <div>В тесте учитывается сложность вопросов</div>
+                                    <div>{{ currentLang.savedTestView[20] }}</div>
                                 </div>
                                 <div class="d-flex flex-row justify-space-between flex-wrap">
                                     <div>
                                         <v-icon color="#fff" size="19" class="mr-1">mdi-minus</v-icon>
-                                        <span style="color:#bbb">минимальный балл:</span>
+                                        <span style="color:#bbb">{{ currentLang.savedTestView[21] }}:</span>
                                         {{ testParams.ballSystem.min }}
                                     </div>
-                                    <div><v-icon color="#fff" size="19" class="mr-1">mdi-vector-line</v-icon><span style="color:#bbb">интервал между баллами:</span>  {{ testParams.ballSystem.interval }}</div>
-                                    <div><v-icon color="#fff" size="19" class="mr-1">mdi-plus</v-icon><span style="color:#bbb">максимальный балл:</span>  {{ testParams.ballSystem.max }}</div>
+                                    <div><v-icon color="#fff" size="19" class="mr-1">mdi-vector-line</v-icon><span style="color:#bbb">{{ currentLang.savedTestView[22] }}:</span>  {{ testParams.ballSystem.interval }}</div>
+                                    <div><v-icon color="#fff" size="19" class="mr-1">mdi-plus</v-icon><span style="color:#bbb">{{ currentLang.savedTestView[23] }}:</span>  {{ testParams.ballSystem.max }}</div>
                                 </div>
                             </div>
                         </div>
@@ -339,7 +339,7 @@ export default {
             showDeleteBtn: false
         }
     },
-    computed: mapGetters(['getTestID']),
+    computed: mapGetters(['getTestID', 'currentLang']),
     methods:{
         goToBack(){
             this.$router.push('/dashboard')
@@ -374,7 +374,7 @@ export default {
         // Loader
         this.loaderInterval = setInterval(() => {
             if (this.loaderValue === 100) {
-                return (this.loaderValue = 0)
+                clearInterval(this.loaderInterval)
             }
             this.loaderValue += 5
         }, 100)
@@ -416,7 +416,7 @@ export default {
                         this.asyncComplate = true
                 })
                 .catch(e=>{
-                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                console.error(this.currentLang.errors[0], e.message)
                 this.$router.push('/')
                 })
             }

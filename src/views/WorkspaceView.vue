@@ -9,7 +9,7 @@
                                 <v-icon size="20" color="#fff" class="mr-1">
                                     mdi-content-paste
                                 </v-icon>
-                                <h4 style="color:#fff">Содержание</h4>
+                                <h4 style="color:#fff">{{ currentLang.workspaceView[0] }}</h4>
                             </div>
 
                             <v-tooltip bottom v-if="questions.length">
@@ -24,7 +24,7 @@
                                     <v-icon color="#fff" v-else>mdi-arrow-left-thin</v-icon>
                                 </v-btn>
                             </template>
-                            <span>Показать полностью</span>
+                            <span>{{ currentLang.workspaceView[1] }}</span>
                             </v-tooltip>
 
                         </div>
@@ -51,10 +51,10 @@
                                                 #
                                             </th>
                                             <th class="text-left">
-                                                Вопрос
+                                                {{ currentLang.workspaceView[2] }}
                                             </th>
                                             <th class="text-left" v-if="showFullMap">
-                                                Ответы
+                                                {{ currentLang.workspaceView[3] }}
                                             </th>
                                         </tr>
                                     </thead>
@@ -72,7 +72,7 @@
                                             <td>
                                                 <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap, 'map-full':showFullMap}">
                                                     <span v-if="question.questionCtx">{{ question.questionCtx }}</span>
-                                                    <span style="color:#888;" v-else>Пока не заполнено</span>
+                                                    <span style="color:#888;" v-else>{{ currentLang.workspaceView[4] }}</span>
                                                 </p>
                                             </td>
                                             <td v-if="showFullMap" style="min-width:20vw; max-width:20vw; word-break: break-all;">
@@ -87,8 +87,8 @@
                                                 <p
                                                 v-if="question.type=='question-with-field'"
                                                 >
-                                                    <span v-if="question.answer[1].x" style="color: green">отмечено</span>
-                                                    <span v-else>не отмечено</span>
+                                                    <span v-if="question.answer[1].x" style="color: green">{{ currentLang.workspaceView[5] }}</span>
+                                                    <span v-else>{{ currentLang.workspaceView[6] }}</span>
                                                 </p>
                                             </td>
                                         </tr>
@@ -116,7 +116,7 @@
                     :disabled="!asyncComplate"
                     >
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
-                        <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">Вернуться назад</span>
+                        <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">{{ currentLang.workspaceView[7] }}</span>
                     </v-btn>
                 </div>
 
@@ -152,7 +152,7 @@
                     />
 
                     <div v-if="questions.length && !loader">
-                        <p style="color:#444; text-align: center;">В целях оптимизации отображаются выбранные 10 вопросов. Для их переключения используйте панель содержания слева. Отображаемые вопросы подсвечаны</p>
+                        <p style="color:#444; text-align: center;">{{ currentLang.workspaceView[8] }}</p>
                     </div>
 
                     <div v-if="questions.length==0 && !loader" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
@@ -163,7 +163,7 @@
                         contain
                         transition="scale-transition"
                         ></v-img>
-                        <h2 style="color:#888" class="mt-5">ВОПРОСОВ ПОКА НЕТ</h2>
+                        <h2 style="color:#888" class="mt-5">{{ currentLang.workspaceView[9] }}</h2>
                     </div>
 
                 </div>
@@ -192,9 +192,9 @@ export default {
         return {
             currentTest: undefined,
             tasks:[
-                {name:'вопрос с картинками', isDisabled: false, type: 'question-with-images'},
-                {name:'выбор области на картинке', isDisabled: false, type: 'question-with-field'},
-                {name:'скоро', isDisabled: true,}
+                {name:'', isDisabled: false, type: 'question-with-images'},
+                {name:'', isDisabled: false, type: 'question-with-field'},
+                {name:'', isDisabled: true,}
             ],
             questions: [],
             questionsCounter: 0,
@@ -433,8 +433,13 @@ export default {
         },
 
         saveProcess(params){
+            if(params){
+                if(params.newTest){
+                    this.blockAddQBtn = true
+                    this.currentTest = params.newTest 
+                }
+            }
             if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn){
-
                 this.currentTest.lastModified = getCurrentDate()
                 let output = {
                     ...this.currentTest,
@@ -456,7 +461,7 @@ export default {
                     }
                 })
                 .catch(e=>{
-                    console.error('(DB) Не удалось сохранить процесс. Подробнее: ',e)
+                    console.error(this.currentLang.errors[0],e)
                 })
                 console.info('(i) process is saved')
             }
@@ -467,12 +472,16 @@ export default {
             this.saveProcess({route: true})
         }
     },
-    computed: mapGetters(['onWorkProcess','getTestID']),
+    computed: mapGetters(['onWorkProcess','getTestID', 'currentLang']),
     mounted(){
+        this.tasks[0].name= this.currentLang.workspaceView[10]
+        this.tasks[1].name= this.currentLang.workspaceView[11]
+        this.tasks[2].name= this.currentLang.workspaceView[12]
+
         // Loader
         this.loaderInterval = setInterval(() => {
             if (this.loaderValue === 100) {
-                return (this.loaderValue = 0)
+                clearInterval(this.loaderInterval)
             }
             this.loaderValue += 5
         }, 100)
@@ -524,7 +533,7 @@ export default {
                     }
                 })
                 .catch(e=>{
-                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                console.error(this.currentLang.errors[0], e.message)
                 this.$router.push('/')
                 })
             }

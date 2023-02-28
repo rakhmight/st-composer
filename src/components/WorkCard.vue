@@ -24,9 +24,10 @@
                 v-on="on"> 
                   <v-icon size="20" color="#ff4500">mdi-delete</v-icon>
                   4
+                  <!--  -->
               </div>
             </template>
-            <span>Автоматический удалится через: 4дн.</span>
+            <span>{{ currentLang.dashboardView[10] }}: 4{{ currentLang.dashboardView[11] }}</span>
           </v-tooltip>
           <!--  -->
 
@@ -34,24 +35,24 @@
         <div class="work__info d-flex justify-content-center">
           <table>
             <tr>
-              <td>Предмет:</td>
+              <td>{{ currentLang.dashboardView[12] }}:</td>
               <td style="color:#0167FF">{{ test.subjectID }}</td>
             </tr>
             <tr>
               <td style="opacity:0">space</td>
             </tr>
             <tr>
-              <td>Создан:</td>
+              <td>{{ currentLang.dashboardView[13] }}:</td>
               <td style="color:#0167FF">{{ test.creationDate.date }}</td>
             </tr>
             <tr v-if="!status.isSigned">
-              <td>Изменён:</td>
+              <td>{{ currentLang.dashboardView[14] }}:</td>
               <td style="color:#0167FF">{{ test.lastModified ? `${test.lastModified.date}` : '-' }}</td>
             </tr>
 
             <!-- isSigned -->
             <tr v-else>
-              <td style="color:orangered">Завершён:</td>
+              <td style="color:orangered">{{ currentLang.dashboardView[15] }}:</td>
               <td style="color:orangered">{{ test.signedDate.date }}</td>
             </tr>
             <!--  -->
@@ -82,7 +83,7 @@
                 </v-list>
             </v-menu>
           </template>
-          <span>Действия</span>
+          <span>{{ currentLang.dashboardView[16] }}</span>
         </v-tooltip>
 
         <v-tooltip bottom color="#00000073">
@@ -98,7 +99,7 @@
               <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
             </v-btn>
           </template>
-          <span>Перейти к редактированию</span>
+          <span>{{ currentLang.dashboardView[17] }}</span>
         </v-tooltip>
       </div>
     </div>
@@ -110,7 +111,7 @@ import SavedTests from './dialogs/SavedTests.vue'
 import EditTest from './dialogs/EditTest.vue'
 import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   props:{
@@ -126,6 +127,7 @@ export default {
       currentTest: this.test
     }
   },
+  computed: mapGetters(['currentLang']),
   methods:{
     ...mapMutations(['updateTestID']),
     renderTests(ctx){

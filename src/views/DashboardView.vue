@@ -14,7 +14,7 @@
             <v-divider vertical color="#ccc"></v-divider>
             <div class="dashboard__author-info ml-2">
               <h2>{{ currentSign.fullname }}</h2>
-              <p style="color:#615f5f">Кол-во тестов: {{ tests.length }}</p>
+              <p style="color:#615f5f">{{ currentLang.dashboardView[0] }}: {{ tests.length }}</p>
             </div>
           </div>
           <div class="dashboard__create-btn">
@@ -26,7 +26,7 @@
 
         <div class="dashboard__content">
           <div class="dashboard__content-info d-flex justify-space-between">
-            <h4 class="">Сохранённые работы</h4>
+            <h4 class="">{{ currentLang.dashboardView[1] }}</h4>
 
             <!-- INSTRUCTION -->
             <to-instruction :asyncComplate="true"></to-instruction>
@@ -63,7 +63,7 @@
             contain
             transition="scale-transition"
             ></v-img>
-              <h2 style="color:#888" class="mt-5">СОХРАНЕНИЙ ПОКА НЕТ</h2>
+              <h2 style="color:#888" class="mt-5">{{ currentLang.dashboardView[2] }}</h2>
           </div>
 
         </div>
@@ -94,7 +94,7 @@ import { operationFromStore } from '@/services/localDB'
           this.loader=false
         })
         .catch(e=>{
-          console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+          console.error(this.currentLang.errors[0], e.message)
           this.$router.push('/')
         })
       }
@@ -104,7 +104,7 @@ import { operationFromStore } from '@/services/localDB'
         this.loadTests()
       
     },
-    computed: mapGetters(['currentSign']),
+    computed: mapGetters(['currentSign', 'currentLang']),
     components:{
       WorkCard,
       ToInstruction,

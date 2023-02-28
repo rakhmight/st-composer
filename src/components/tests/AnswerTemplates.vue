@@ -7,7 +7,7 @@
                     <v-textarea
                         dense
                         outlined
-                        :placeholder="answer.isCurrect ? 'Напишите верный ответ': 'Напишите отвлекающий ответ'"
+                        :placeholder="answer.isCurrect ? currentLang.workspaceView[39] : currentLang.workspaceView[40]"
                         rows="2"
                         prepend-icon="mdi-lightbulb-auto"
                         v-model="answerCtx"
@@ -27,8 +27,8 @@
                     <v-file-input
                         :rules="rules"
                         accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
-                        placeholder="Выберите изображение"
-                        label="Загрузить изображение"
+                        :placeholder="currentLang.workspaceView[28]"
+                        :label="currentLang.workspaceView[29]"
                         outlined
                         dense
                         min-width="100%"
@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
     props:{
         answer: Object,
@@ -65,7 +67,7 @@ export default {
     data() {
         return {
             rules: [
-                value => !value || value.size < 2000000 || 'Размер файла не должен превышать 2МБ',
+                value => !value || value.size < 20000000 || this.currentLang.workspaceView[16],
             ],
 			file: '',
             showPreview: false,
@@ -77,6 +79,7 @@ export default {
             isCurrect: this.answer.isCurrect,
         }
     },
+    computed: mapGetters(['currentLang']),
     methods: {
 		handleFileUpload( event ){
 			this.file = event

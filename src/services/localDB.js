@@ -38,6 +38,7 @@ export async function operationFromStore(type, params) {
 
     // Tests
     if(type=='addTest'){
+      console.log(params.data)
       await tests.add(params.data)
     }else if(type=='getAllTests' && params.sort){
       let result = await tests.getAll()

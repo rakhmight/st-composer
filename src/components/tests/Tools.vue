@@ -5,10 +5,10 @@
             <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on" class="d-flex flex-row align-center">
                     <v-progress-circular color="primary" indeterminate size="15" width="2"></v-progress-circular>
-                    <p style="color: #888" class="ml-2">Автосохранение</p>
+                    <p style="color: #888" class="ml-2">{{ currentLang.workspaceView[41] }}</p>
                 </div>
             </template>
-            <span>Автоматическиое сохранение тестов каждые 10 секунд</span>
+            <span>{{ currentLang.workspaceView[42] }}</span>
             </v-tooltip>
         </div>
 
@@ -22,7 +22,7 @@
                 :disabled="!asyncComplate || blockAddQBtn"
                 >
                     <v-icon size="20">mdi-plus</v-icon>
-                    Добавить вопрос
+                    {{ currentLang.workspaceView[43] }}
             </v-btn>
 
             <v-menu
@@ -43,7 +43,7 @@
                     <v-icon
                     size="22"
                     >mdi-gesture-double-tap</v-icon>
-                    Интерактивное задание
+                    {{ currentLang.workspaceView[44] }}
                     <v-icon
                     size="22"
                     >mdi-menu-down</v-icon>
@@ -88,7 +88,7 @@
 <script>
 import ToInstruction from '@/components/ToInstruction.vue'
 import SavingQuestions from '@/components/dialogs/SavingQuestions.vue'
-
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -107,12 +107,13 @@ export default {
             tasks: this.allTasks
         }
     },
+    computed: mapGetters(['currentLang']),
     methods:{
         createQuestion(type){
             this.createFunc(type)
         },
-        saveProcess(){
-            this.saveFunction()
+        saveProcess(params){
+            this.saveFunction(params)
         }
     },
     components:{

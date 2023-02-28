@@ -10,8 +10,8 @@
             mdi-file-delimited-outline
         </v-icon>
         <div class="card__titles d-flex flex-column">
-            <h3 class="card__title">Укажите данные</h3>
-            <p class="card__subtitle">вы можете указать Ф.И. либо псевдоним</p>
+            <h3 class="card__title">{{ currentLang.authView[5] }}</h3>
+            <p class="card__subtitle">{{ currentLang.authView[6] }}</p>
         </div>
 
         <v-spacer></v-spacer>
@@ -34,13 +34,13 @@
         @click="updateTab('own-sign-form')"
         small
         >
-        <v-icon
-        color="#fff"
-        class="mr-2"
-        >
-            mdi-arrow-left-thin
-        </v-icon>
-        Назад
+            <v-icon
+            color="#fff"
+            class="mr-2"
+            >
+                mdi-arrow-left-thin
+            </v-icon>
+            {{ currentLang.authView[7] }}
         </v-btn>
     </div>
 </div>
@@ -48,13 +48,14 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import AuthSignInfo from '@/components/authForms/AuthSignInfo.vue'
 
 export default {
     components:{
         AuthSignInfo
     },
+    computed: mapGetters(['currentLang']),
     methods: {
         ...mapMutations(['updateTab'])
     },

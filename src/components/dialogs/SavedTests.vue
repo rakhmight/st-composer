@@ -1,4 +1,5 @@
-<template>    <v-dialog
+<template>
+    <v-dialog
     v-model="dialog"
     width="700"
     >
@@ -10,7 +11,7 @@
         class="dashboard__btn"
         >
         <v-icon color="#0167FF" size="20">mdi-content-save-outline</v-icon>
-        <span style="color:#0167FF">Сохранения</span>
+        <span style="color:#0167FF">{{ currentLang.dashboardView[38] }}</span>
         </v-btn>
     </template>
 
@@ -18,7 +19,7 @@
         <v-card-title
         class="text-h5 lighten-2 d-flex flex-row justify-space-between"
         >
-        Сохранения выполненные вручную
+        {{ currentLang.dashboardView[39] }}
         <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
         </v-card-title>
 
@@ -30,13 +31,13 @@
                 <thead>
                     <tr>
                     <th class="text-left pt1 pb1" width="350px" max-width="350px">
-                        Описание
+                        {{ currentLang.dashboardView[40] }}
                     </th>
                     <th class="text-left">
-                        Дата
+                        {{ currentLang.dashboardView[41] }}
                     </th>
                     <th class="text-left">
-                        Действие
+                        {{ currentLang.dashboardView[42] }}
                     </th>
                     </tr>
                 </thead>
@@ -63,7 +64,7 @@
                                 </v-icon>
                             </v-btn>
                         </template>
-                        <span>Перейти к сохранению</span>
+                        <span>{{ currentLang.dashboardView[43] }}</span>
                         </v-tooltip>
                     </td>
                     </tr>
@@ -79,7 +80,7 @@
                 contain
                 transition="scale-transition"
                 ></v-img>
-                <h3 style="color: #888" class="mt-2">Сохранений пока нет</h3>
+                <h3 style="color: #888" class="mt-2">{{ currentLang.dashboardView[44] }}</h3>
             </div>
 
             <div class="d-flex justify-center mt-10" v-if="loader">
@@ -96,13 +97,14 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
 
 export default {
     props:{
         id: Number
     },
+    computed: mapGetters(['currentLang']),
     data() {
         return {
             dialog: false,
@@ -127,7 +129,7 @@ export default {
           this.loader=false
         })
         .catch(e=>{
-          console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+          console.error(this.currentLang.errors[0], e.message)
           this.$router.push('/')
         })
     }
@@ -139,5 +141,7 @@ export default {
 .dialog-content{
     width: 100%;
     padding: 30px;
+    overflow-y: scroll;
+    height: 500px;
 }
 </style>

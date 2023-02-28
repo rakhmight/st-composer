@@ -11,7 +11,7 @@
             class="dashboard__btn"
             >
             <v-icon color="#ff4500" size="20">mdi-trash-can-outline</v-icon>
-            <span style="color:#ff4500">Удалить</span>
+            <span style="color:#ff4500">{{ currentLang.dashboardView[87] }}</span>
             </v-btn>
         </template>
 
@@ -19,7 +19,7 @@
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
-            Подтверждение удаления теста
+                {{ currentLang.dashboardView[88] }}
             <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
@@ -29,14 +29,14 @@
                 <div class="content__subject-box flex-column">
                     
                     <div class="d-flex flex-column">
-                            <label class="body-2">Напишите ID предмета: <b>{{ test.subjectID }}</b></label>
+                            <label class="body-2">{{ currentLang.dashboardView[89] }}: <b>{{ test.subjectID }}</b></label>
                             <div class="d-flex flex-row">
                                 <v-text-field
                                 dense
                                 outlined
                                 prepend-icon="mdi-pound"
                                 v-model="subjectID"
-                                placeholder="ID предмета"
+                                :placeholder="currentLang.dashboardView[4]"
                                 :error="deleteEr"
                                 >
                                 </v-text-field>
@@ -68,7 +68,7 @@
                 type="success"
                 class="subtitle-2"
                 v-if="deleteSuccess"
-                >Тест удалён</v-alert>
+                >{{ currentLang.dashboardView[90] }}</v-alert>
             </div>
 
             <v-spacer></v-spacer>
@@ -81,7 +81,7 @@
                 class="delete-btn"
                 @click="deleteTest"
             >
-                Удалить
+                {{ currentLang.dashboardView[87] }}
             </v-btn>
             </v-card-actions>
 
@@ -99,6 +99,7 @@
 <script>
 import putToHistory from '@/services/putToHistory'
 import { operationFromStore } from '@/services/localDB'
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -116,6 +117,7 @@ export default {
             deleteEr: false
         }
     },
+    computed: mapGetters(['currentLang']),
     methods:{
         deleteTest(){
             if(this.subjectID == this.test.subjectID){
@@ -141,7 +143,7 @@ export default {
                     operationFromStore('addTest',{data:test})
                 })
                 .catch(e=>{
-                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                console.error(this.currentLang.errors[0], e.message)
                 this.$router.push('/')
                 })
 
@@ -159,7 +161,7 @@ export default {
                 
 
             } else{
-                this.errors.push('Введённое значение не совпадает с ID предмета')
+                this.errors.push(this.currentLang.validators[7])
                 this.deleteEr = true
             }
         }

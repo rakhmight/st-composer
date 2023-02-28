@@ -14,7 +14,7 @@
             :disabled="!asyncComplate"
             >
                 <v-icon color="#fff" class="mr-1">mdi-arrow-u-down-right</v-icon>
-                <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">Использовать экземпляр</span>
+                <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">{{ currentLang.savedTestView[41] }}</span>
             </v-btn>
         </template>
 
@@ -22,7 +22,7 @@
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
-            Предварительное сохранение текущих тестов
+            {{ currentLang.savedTestView[42] }}
             <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
             </v-card-title>
 
@@ -33,11 +33,11 @@
 
                     <div class="mb-5 d-flex flex-row align-start">
                         <v-icon class="mr-3">mdi-information-outline</v-icon>
-                        <div>Перед заменой существующих тестов на выбранные хотите сохранить существующие как экземпляр?</div>
+                        <div>{{ currentLang.savedTestView[43] }}</div>
                     </div>
                     
                     <div class="d-flex flex-column">
-                        <label class="body-2">Напишите комментарий к текущему сохранению</label>
+                        <label class="body-2">{{ currentLang.savedTestView[44] }}</label>
                         <div class="d-flex flex-row">
                             <v-textarea
                             dense
@@ -45,7 +45,7 @@
                             outlined
                             prepend-icon="mdi-comment-outline"
                             v-model="comment"
-                            placeholder="Комментарий к сохранению"
+                            :placeholder="currentLang.savedTestView[45]"
                             :error="savingEr"
                             >
                             </v-textarea>
@@ -55,7 +55,7 @@
                     <div>
                         <v-checkbox
                         v-model="deleteSaving"
-                        label="Удалить текущее сохранение"
+                        :label="currentLang.savedTestView[46]"
                         color="#0d5fd8"
                     ></v-checkbox>
                     </div>
@@ -85,7 +85,7 @@
                 type="success"
                 class="subtitle-2"
                 v-if="savingSuccess"
-                >Успешная замена текущих тестов</v-alert>
+                >{{ currentLang.savedTestView[47] }}</v-alert>
             </div>
 
             <v-spacer></v-spacer>
@@ -100,7 +100,7 @@
                 class="delete-btn mr-5"
                 @click="savingQuestions"
             >
-                Сохранить экземпляр
+                {{ currentLang.savedTestView[48] }}
             </v-btn>
             <v-btn
                 color="#2b2b2b"
@@ -111,7 +111,7 @@
                 class="delete-btn"
                 @click="replaceTests"
             >
-                Продолжить без сохранения
+                {{ currentLang.savedTestView[49] }}
             </v-btn>
             </div>
 
@@ -132,7 +132,7 @@
 import getCurrentDate from '@/plugins/getCurrentDate'
 import restoreSaved from '@/services/restoreSaved'
 import { operationFromStore } from '@/services/localDB'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -153,6 +153,7 @@ export default {
             deleteSaving: false
         }
     },
+    computed: mapGetters(['currentLang']),
     methods:{
         ...mapMutations(['updateTestID']),
 
@@ -160,12 +161,12 @@ export default {
 
             // валидаторы
             if(!this.comment){
-                this.errors.push('Напишите комментарий сохраняемому экземпляру')
+                this.errors.push(this.currentLang.validators[9])
                 this.savingEr = true
                 return
             }
             if(this.comment.length<=7){
-                this.errors.push('Слишком короткий комментарий. Длина комментария должна быть больше 7')
+                this.errors.push(this.currentLang.validators[10])
                 this.savingEr = true
                 return
             }
@@ -218,7 +219,7 @@ export default {
                 operationFromStore('addSaving', {data: output})
                 .then(()=>{
                     //подстановка
-                    restoreSaved(+this.saving.testID, this.saving)
+                    restoreSaved(+this.saving.testID, this.saving, {presaving: true})
                 })
                 .then(()=>{
                     if(this.deleteSaving){
@@ -244,12 +245,12 @@ export default {
                     },2000)
                 })
                 .catch(e=>{
-                    console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                    console.error(this.currentLang.errors[0], e.message)
                     this.$router.push('/')
                 })
             })
             .catch(e=>{
-                console.error('(DB) Ошибка! БД не инициализированно. Подробнее: ', e.message)
+                console.error(this.currentLang.errors[0], e.message)
                 this.$router.push('/')
             })
         },

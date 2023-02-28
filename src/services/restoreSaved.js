@@ -2,7 +2,7 @@ import { operationFromStore } from '@/services/localDB'
 import getCurrentDate from '@/plugins/getCurrentDate'
 import putToHistory from '@/services/putToHistory'
 
-export default function restoreSaved(id, saving){
+export default function restoreSaved(id, saving, params){
     let test
 
     operationFromStore('getByTestID', {id})
@@ -27,6 +27,10 @@ export default function restoreSaved(id, saving){
         test.questions = saving.questions
         test.lastModified = getCurrentDate()
         test.history.push(putToHistory('restore', saving.date.date))
+
+        if(params && params.presaving){
+            test.history.push(putToHistory('save'))
+        }
     })
     .then(()=>{
         operationFromStore('deleteTest', {id})

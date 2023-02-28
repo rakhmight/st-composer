@@ -3,7 +3,7 @@
         <div class="test__header d-flex flex-row justify-space-between mb-2" style="position: relative;">
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-pound</v-icon>
-                <p style="color: #888" class="mr-5">Вопрос {{ serialNumber }} (п/п) | {{ currentQuestion.id }} (ID)</p>
+                <p style="color: #888" class="mr-5">{{ currentLang.workspaceView[20] }} {{ serialNumber }} (п/п) | {{ currentQuestion.id }} {{ currentLang.workspaceView[21] }}</p>
 
                 <!--  -->
                 <test-type-icons :type="currentQuestion.type" :questionID="currentQuestion.id" :questions="allQuestions"/>
@@ -11,7 +11,7 @@
             </div>
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
-                <p style="color: #888">Последнее изменение: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
+                <p style="color: #888">{{ currentLang.workspaceView[22] }}: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
                 
                 <v-tooltip bottom color="error">
                 <template v-slot:activator="{ on, attrs }">
@@ -25,7 +25,7 @@
                     mdi-close
                     </v-icon>
                 </template>
-                <span>Удалить</span>
+                <span>{{ currentLang.workspaceView[23] }}</span>
                 </v-tooltip>
             </div>
 
@@ -36,7 +36,7 @@
                 dark
                 @click="deleteQuestion(currentQuestion.id)"
                 >
-                    Уверены?
+                    {{ currentLang.workspaceView[24] }}
                 </v-btn>
             </div>
         </div>
@@ -45,12 +45,12 @@
 
         <div class="test__question-box mt-3">
             <div>
-                <p style="color: #888">Сущность вопроса:</p>
+                <p style="color: #888">{{ currentLang.workspaceView[25] }}:</p>
                 <div class="d-flex flex-row align-start">
                     <v-textarea
                     dense
                     outlined
-                    placeholder="Опишите вопрос"
+                    :placeholder="currentLang.workspaceView[26]"
                     rows="2"
                     prepend-icon="mdi-help-circle-outline"
                     v-model="questionCtx"
@@ -62,7 +62,7 @@
                 <!-- range -->
                 <div class="d-flex flex-row mb-1">
                     <v-icon class="mr-2">mdi-circle-double</v-icon>
-                    <p style="color: #888" class="mb-1">Балл за правильный ответ: <b style="color:green">{{ ball }}</b></p>
+                    <p style="color: #888" class="mb-1">{{ currentLang.workspaceView[27] }}: <b style="color:green">{{ ball }}</b></p>
                 </div>
                 <vue-slider
                 class="pl-3 pr-3"
@@ -82,8 +82,8 @@
                 v-if="currentQuestion.type=='question-with-images' || currentQuestion.type=='question-with-field'"
                 :rules="rules"
                 accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
-                placeholder="Выберите изображение"
-                label="Загрузить изображение"
+                :placeholder="currentLang.workspaceView[28]"
+                :label="currentLang.workspaceView[29]"
                 outlined
                 dense
                 min-width="100%"
@@ -95,7 +95,7 @@
 
                 <v-select
                 :items="themes"
-                placeholder="Тема"
+                :placeholder="currentLang.workspaceView[30]"
                 outlined
                 dense
                 v-model="theme"
@@ -105,7 +105,7 @@
                 <v-select
                 v-if="params.considerDifficulty"
                 :items="difficultys"
-                placeholder="Сложность"
+                :placeholder="currentLang.workspaceView[31]"
                 outlined
                 dense
                 v-model="difficulty"
@@ -123,7 +123,7 @@
                 <!--  -->
                 <v-switch
                 v-model="multipleAnswers"
-                :label="currentQuestion.type!='question-with-field' ? 'Несколько ответов' : 'Несколько верных областей'"
+                :label="currentQuestion.type!='question-with-field' ? currentLang.workspaceView[32] : currentLang.workspaceView[33]"
                 color="#0d5fd8"
                 hide-details
                 dense
@@ -143,7 +143,7 @@
                 >
                     mdi-cancel
                 </v-icon>
-                очистить
+                {{ currentLang.workspaceView[34] }}
                 </v-btn>
             </div>
         </div>
@@ -152,7 +152,7 @@
 
         <div class="test__answers-box mt-3" v-if="currentQuestion.type!='question-with-field'">
             <div class="d-flex flex-row justify-space-between align-center">
-                <p style="color: #888">Ответы:</p>
+                <p style="color: #888">{{ currentLang.workspaceView[35] }}:</p>
                 <v-btn
                 fab
                 dark
@@ -191,8 +191,8 @@
         
         <div class="test__answers-box mt-3" v-else style="position: relative;">
             <p style="color: #888">
-                <span style="font-style: italic;color:#0d5fd8">Рекомендуемое разрешение изображения 1920:1080px (либо соотношение 16:9)</span><br>
-                Отметьте нужный участок в области
+                <span style="font-style: italic;color:#0d5fd8">{{ currentLang.workspaceView[36] }}</span><br>
+                {{ currentLang.workspaceView[37] }}
             </p>
             <div class="delete-pic" v-show="showPreview" v-if="currentQuestion.type=='question-with-field'">
                 <v-icon color="red" @click="imagePreview=''" size="25" v-show="showPreview">mdi-close-circle</v-icon>
@@ -205,7 +205,7 @@
             </div>
 
             <div v-if="showPreview" class="mt-5 pb-6">
-                <p style="color: #888">Приемлемый радиус погрешности ответа: <b>{{ answer[0].fault }}</b></p>
+                <p style="color: #888">{{ currentLang.workspaceView[38] }}: <b>{{ answer[0].fault }}</b></p>
                 
                 <vue-slider
                     ref="slider"
@@ -223,6 +223,7 @@ import Answer from '@/components/tests/AnswerTemplates.vue'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
+import { mapGetters } from 'vuex'
 
 export default {
     props:{
@@ -237,7 +238,7 @@ export default {
         return {
             // Question start params ==============
             rules: [
-                value => !value || value.size < 2000000 || 'Размер файла не должен превышать 2МБ',
+                value => !value || value.size < 20000000 || this.currentLang.workspaceView[16],
             ],
 			file: '',
             showPreview: false,
@@ -245,9 +246,9 @@ export default {
             errors:[],
             themes:this.params.themes,
             difficultys:[
-                {value:1, text:'Лёгкий'},
-                {value:2, text:'Средний'},
-                {value:3, text:'Трудный'}
+                {value:1, text: ''},
+                {value:2, text: ''},
+                {value:3, text: ''}
             ],
             options: {
                 dotSize: 14,
@@ -318,7 +319,12 @@ export default {
             answer: this.question.answer
         }
     },
+    computed: mapGetters(['currentLang']),
     mounted() {
+        this.difficultys[0].text = this.currentLang.workspaceView[17]
+        this.difficultys[1].text = this.currentLang.workspaceView[18]
+        this.difficultys[2].text = this.currentLang.workspaceView[19]
+
         this.checkIndex()
 
         if(this.currentQuestion.type != 'question-with-field'){
@@ -389,7 +395,7 @@ export default {
 
         addAnswer(){
             if(this.currentQuestion.answers.length >= 6){
-                return this.errors.push('Ответов не может быть больше 6')
+                return this.errors.push(this.currentLang.validators[8])
             }
             
             let nextID=++this.answersCounter

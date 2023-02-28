@@ -47,7 +47,8 @@
         >
           <v-btn
           class="header__btn" 
-          small color="#eaeaea" 
+          small
+          :color="activeLang == lang.short ? '#ccc' : '#eaeaea'" 
           v-for="(lang, i) in langs"
           :key="i"
           @click="setLanguage(lang.short)"
@@ -103,7 +104,8 @@ import { mapMutations, mapGetters } from 'vuex'
 export default {
     data() {
       return {
-        langs: [{lang: 'русский', short: 'ru'},{lang: "o'zbek", short: 'uz_l'},{lang: 'english', short: 'eng'}]
+        langs: [{lang: 'русский', short: 'ru'},{lang: "o'zbek", short: 'uz_l'}, {lang: "ўзбек", short: 'uz_k'},{lang: 'english', short: 'eng'}],
+        activeLang: 'ru'
       }
     },
     computed: mapGetters(['currentLang', 'currentSign']),
@@ -112,12 +114,17 @@ export default {
 
       setLanguage(lang){
         this.changeLang(lang)
+        this.activeLang = lang
 
         localStorage.setItem('language', lang)
       }
     },
     mounted(){
-      console.log(this.currentLang);
+      // Languages в LS
+      let language = localStorage.getItem('language')
+      if(language){
+        this.activeLang = language
+      }
     }
 }
 </script>
