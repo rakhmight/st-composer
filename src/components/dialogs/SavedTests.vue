@@ -142,6 +142,5 @@ export default {
     width: 100%;
     padding: 30px;
     overflow-y: scroll;
-    height: 500px;
 }
 </style>

@@ -20,8 +20,7 @@ import { mapGetters } from 'vuex'
 
 export default {
     props:{
-        saveFunction: Function,
-
+        saveFunc: Function,
         asyncComplate: Boolean
     },
     data() {
@@ -32,8 +31,8 @@ export default {
     computed: mapGetters(['currentLang']),
     methods:{
         goToInstruction(){
-            if(this.saveFunction){
-                this.saveFunction()
+            if(this.saveFunc){
+                this.saveFunc({forcedSave:true})
             }
             this.$router.push('/instruction')
         }

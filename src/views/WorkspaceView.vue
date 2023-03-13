@@ -171,7 +171,7 @@
                 <div class="workspace__tools-box">
                     
                         <!-- TOOLS -->
-                        <tools :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate" :blockAddQBtn="blockAddQBtn"/>
+                        <tools :loaderState='loader' :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate" :blockAddQBtn="blockAddQBtn"/>
 
                 </div>
             </div>
@@ -306,12 +306,12 @@ export default {
                         this.questions[index].theme = ctx
                         this.questions[index].lastModified = getCurrentDate()
                         if(this.allowToSaveTheme){
-                            this.saveProcess()
+                            this.saveProcess({forcedSave:true})
                         }
                     }else if(type=='difficulty'){
                         this.questions[index].difficulty = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='answer-answerCtx'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -328,7 +328,7 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='answer-add'){
                         this.questions[index].answers.push({
                             id: aID,
@@ -336,18 +336,18 @@ export default {
                             isCurrect: false
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='field-answer'){
                         this.questions[index].answer = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='multipleAnswers'){
                         this.questions[index].multipleAnswers = ctx
                         this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answers'){
                         this.questions[index].answers = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='answer-answerIsCurrect'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -356,11 +356,11 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='imagePreview'){
                         this.questions[index].imagePreview = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }else if(type=='answer-imagePreview'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -369,7 +369,7 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess()
+                        this.saveProcess({forcedSave:true})
                     }
                 }
             })
@@ -430,6 +430,10 @@ export default {
                     counter++
                 }
             }
+            
+            // погрешность
+            this.questions.push('')
+            this.questions.pop()
         },
 
         saveProcess(params){
@@ -439,7 +443,8 @@ export default {
                     this.currentTest = params.newTest 
                 }
             }
-            if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn){
+
+            if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
                 this.currentTest.lastModified = getCurrentDate()
                 let output = {
                     ...this.currentTest,
@@ -450,7 +455,9 @@ export default {
                 .then(()=>{
                     operationFromStore('addTest',{data: output})
                     .then(()=>{
-                        this.blockAddQBtn = false
+                        setTimeout(()=>{
+                            this.blockAddQBtn = false
+                        }, 500)
                     })
                 })
                 .then(()=>{
@@ -491,14 +498,6 @@ export default {
             this.$router.push('/dashboard')
         }
 
-        // установление map
-        if(this.questions.length){
-            this.countMap(this.questions[0].id)
-        }
-
-        // событие MAP
-        this.mapOriented()
-
         // Авто сохранение каждые 10 сек.
         this.savingInterval = setInterval(()=>{
             this.saveProcess()
@@ -531,6 +530,16 @@ export default {
                     if(this.questions.length){
                         this.questionsCounter = this.questions[this.questions.length-1].id
                     }
+                })
+                .then(()=>{
+                    // установление map
+                    if(this.questions.length){
+                        this.countMap(this.questions[0].id)
+                    }
+                })
+                .then(()=>{
+                    // событие MAP
+                    this.mapOriented()
                 })
                 .catch(e=>{
                 console.error(this.currentLang.errors[0], e.message)

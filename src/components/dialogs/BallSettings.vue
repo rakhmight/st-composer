@@ -11,7 +11,7 @@
           rules.valueLength,
           rules.invalidValue,
           rules.valueIsNumber,
-          rules.valueNotZero,
+          rules.valueNotZero
         ]"
         prepend-icon="mdi-minus-thick"
         :label="currentLang.dashboardView[52]"
@@ -26,32 +26,27 @@
           rules.valueLength,
           rules.invalidValue,
           rules.valueIsNumber,
-          rules.valueNotZero,
+          rules.valueNotZero
         ]"
         prepend-icon="mdi-plus-thick"
         :label="currentLang.dashboardView[53]"
       ></v-text-field>
     </div>
 
-    <v-text-field
-      dense
+      <v-select
+      :items="ballIntervals"
+      :placeholder="currentLang.workspaceView[30]"
       outlined
+      dense
       v-model="ballInterval"
-      :counter="4"
-      :rules="[
-        rules.emptyValue,
-        rules.valueLength,
-        rules.invalidValue,
-        rules.valueIsNumber,
-        rules.valueNotZero,
-      ]"
-      :label="currentLang.dashboardView[54]"
-    ></v-text-field>
+      prepend-icon="mdi-alpha-t-box-outline"
+      ></v-select>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import intervalGenerator from '@/plugins/intervalGenerator'
 
 export default {
   props: {
@@ -118,6 +113,7 @@ export default {
       minBall: this.min,
       maxBall: this.max,
       ballInterval: this.interval,
+      ballIntervals: [this.min],
 
       valueIsNumber: false,
       valueNotZero: false,
@@ -132,9 +128,17 @@ export default {
   watch: {
     minBall() {
       this.settingsFunc("min", this.minBall);
+
+      if(this.maxBall){
+        this.ballIntervals = intervalGenerator(this.minBall, this.maxBall)
+      }
     },
     maxBall() {
       this.settingsFunc("max", this.maxBall);
+
+      if(this.minBall){
+        this.ballIntervals = intervalGenerator(this.minBall, this.maxBall)
+      }
     },
     ballInterval() {
       this.settingsFunc("interval", this.ballInterval);
@@ -229,5 +233,10 @@ export default {
 
 .go {
   width: 100%;
+}
+
+.theme--light.v-list {
+    overflow-y: scroll;
+    max-height: 200px;
 }
 </style>

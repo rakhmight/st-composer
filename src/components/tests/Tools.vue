@@ -1,6 +1,6 @@
 <template>
     <div class="workspace__tools">
-        <div class="autosave">
+        <div class="autosave" v-if="!loaderState">
             <v-tooltip right color="#00000073">
             <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on" class="d-flex flex-row align-center">
@@ -76,11 +76,11 @@
                     <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
                     Сохранить как экземпляр
             </v-btn> -->
-            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveProcess" :asyncComplate="asyncComplate"/>
+            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveFunction" :asyncComplate="asyncComplate"/>
         </div> 
 
         <!-- INSTRUCTION -->
-        <to-instruction :saveFunction="saveProcess" :asyncComplate="asyncComplate"></to-instruction>
+        <to-instruction :saveFunc="saveFunction" :asyncComplate="asyncComplate"></to-instruction>
 
     </div>
 </template>
@@ -92,6 +92,7 @@ import { mapGetters } from 'vuex'
 
 export default {
     props:{
+        loaderState: Boolean,
         allTasks: Array,
         createFunc: Function,
         saveFunction: Function,
@@ -111,9 +112,6 @@ export default {
     methods:{
         createQuestion(type){
             this.createFunc(type)
-        },
-        saveProcess(params){
-            this.saveFunction(params)
         }
     },
     components:{
