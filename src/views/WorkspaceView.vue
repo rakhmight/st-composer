@@ -71,18 +71,19 @@
                                             <td :style="question.id==visibleQuestions[0] || question.id==visibleQuestions[1] || question.id==visibleQuestions[2] || question.id==visibleQuestions[3] || question.id==visibleQuestions[4] || question.id==visibleQuestions[5] || question.id==visibleQuestions[6] || question.id==visibleQuestions[7] || question.id==visibleQuestions[8] || question.id==visibleQuestions[9] ? 'color:#0d5fd8;font-weight: bolder' : 'color:#000'">{{ i+1 }}</td>
                                             <td>
                                                 <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap, 'map-full':showFullMap}">
-                                                    <span v-if="question.questionCtx">{{ question.questionCtx }}</span>
+                                                    <span v-if="question.questionCtx.ru || question.questionCtx.eng || question.questionCtx.uz_l || question.questionCtx.uz_k || question.questionCtx.custom">{{ getCurrentQuestion(question.questionCtx) }}</span>
                                                     <span style="color:#888;" v-else>{{ currentLang.workspaceView[4] }}</span>
                                                 </p>
                                             </td>
                                             <td v-if="showFullMap" style="min-width:20vw; max-width:20vw; word-break: break-all;">
                                                 <p
-                                                v-for="answer in question.answers"
-                                                :key="answer.id"
+                                                v-for="(answer, i) in question.answers"
+                                                :key="i"
                                                 class="body-2"
                                                 :style="answer.isCurrect ? 'color:green' : 'color:#484848'"
                                                 >
-                                                    • {{ answer.answerCtx }}
+                                                    <span v-if="getCurrentAnswer(answer.answerCtx)">{{ `${i+1}) ` }} {{ getCurrentAnswer(answer.answerCtx) }}</span>
+                                                    <span v-else style="color:#B3B3B3">{{ `${i+1}) ` }}пока не заполнено</span>
                                                 </p>
                                                 <p
                                                 v-if="question.type=='question-with-field'"
@@ -140,15 +141,13 @@
                     v-for="(question, i) in questions"
                     :key="question.id"
                     v-if="(questions[i].id)==visibleQuestions[0] || (questions[i].id)==visibleQuestions[1] || (questions[i].id)==visibleQuestions[2] || (questions[i].id)==visibleQuestions[3] || (questions[i].id)==visibleQuestions[4] || (questions[i].id)==visibleQuestions[5] || (questions[i].id)==visibleQuestions[6] || (questions[i].id)==visibleQuestions[7] || (questions[i].id)==visibleQuestions[8] || (questions[i].id)==visibleQuestions[9]"
-                   
-
                     :question="question"
                     :questions="questions"
                     :visible="visibleQuestions"
                     :deleteFunc="deleteQuestion"
-
                     :questionFunc="changeQuestion"
                     :params="testParams"
+                    :currentTest="currentTest"
                     />
 
                     <div v-if="questions.length && !loader">
@@ -186,6 +185,8 @@ import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import { mapGetters } from 'vuex'
 import getCurrentDate from '@/plugins/getCurrentDate'
 import { operationFromStore } from '@/services/localDB'
+import crypt from '@/plugins/crypt'
+import encrypt from '@/plugins/encrypt'
 
 export default {
     data() {
@@ -213,16 +214,65 @@ export default {
             // util
             allowToSaveTheme: false,
             asyncComplate: false,
-            blockAddQBtn: false
+            blockAddQBtn: false,
+
+            savingProcessLoop: false
         }
     },
     methods:{
+        getCurrentAnswer(answer){
+            if(this.currentTest.languagesSettings.languages[0] == 'ru'){
+                if(answer.ru){
+                    return answer.ru
+                }
+                return undefined
+            } else if(this.currentTest.languagesSettings.languages[0] == 'eng'){
+                if(answer.eng){
+                    return answer.eng
+                }
+                return undefined
+            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_l'){
+                if(answer.uz_l){
+                    return answer.uz_l
+                }
+            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_k'){
+                if(answer.uz_k){
+                    return answer.uz_k
+                }
+                return undefined
+            } else if(this.currentTest.languagesSettings.languages[0] == 'custom'){
+                if(answer.custom){
+                    return answer.custom
+                }
+                return undefined
+            }
+        },
+        getCurrentQuestion(question){
+            if(this.currentTest.languagesSettings.languages[0] == 'ru'){
+                return question.ru
+            } else if(this.currentTest.languagesSettings.languages[0] == 'eng'){
+                return question.eng
+            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_l'){
+                return question.uz_l
+            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_k'){
+                return question.uz_k
+            } else if(this.currentTest.languagesSettings.languages[0] == 'custom'){
+                return question.custom
+            }
+        },
+
         createQuestion(type){
             this.blockAddQBtn = true
             let question = {
                 id: this.questionsCounter+1,
                 type,
-                questionCtx:'',
+                questionCtx:{
+                    ru: undefined,
+                    eng: undefined,
+                    uz_l: undefined,
+                    uz_k: undefined,
+                    custom: undefined
+                },
                 theme: undefined,
                 difficulty: undefined,
                 ball:0.01,
@@ -238,9 +288,17 @@ export default {
             else{
                 if(type=='question-with-images'){
                     question.imagePreview = ''
-                    question.answers = [{id:1, imagePreview:'', isCurrect:true}, {id:2, imagePreview:'', isCurrect:false}, {id:3, imagePreview:'', isCurrect:false}]
+                    question.answers = [
+                        {id:1, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:true},
+                        {id:2, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
+                        {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}
+                    ]
                 } else{
-                    question.answers = [{id:1, answerCtx:'', isCurrect:true}, {id:2, answerCtx:'', isCurrect:false}, {id:3, answerCtx:'', isCurrect:false}, {id:4, answerCtx:'', isCurrect:false}]
+                    question.answers = [
+                        {id:1, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:true},
+                        {id:2, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
+                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
+                        {id:4, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}]
                 }
             }
 
@@ -332,7 +390,7 @@ export default {
                     }else if(type=='answer-add'){
                         this.questions[index].answers.push({
                             id: aID,
-                            answerCtx: '',
+                            answerCtx: { ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined},
                             isCurrect: false
                         })
                         this.questions[index].lastModified = getCurrentDate()
@@ -436,42 +494,53 @@ export default {
             this.questions.pop()
         },
 
-        saveProcess(params){
-            if(params){
-                if(params.newTest){
-                    this.blockAddQBtn = true
-                    this.currentTest = params.newTest 
-                }
-            }
+        async saveProcess(params){
+            if(!this.savingProcessLoop){
+                this.savingProcessLoop = true
 
-            if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
-                this.currentTest.lastModified = getCurrentDate()
-                let output = {
-                    ...this.currentTest,
-                    questions: this.questions
-                }
+                // зашифровка
+                const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
 
-                operationFromStore('deleteTest',{id: +this.getTestID})
-                .then(()=>{
-                    operationFromStore('addTest',{data: output})
-                    .then(()=>{
-                        setTimeout(()=>{
-                            this.blockAddQBtn = false
-                        }, 500)
-                    })
-                })
-                .then(()=>{
-                    if(params){
-                        if(params.route){
-                            this.$router.push('/dashboard')
-                        }
+                if(params){
+                    if(params.newTest){
+                        this.blockAddQBtn = true
+                        this.currentTest = params.newTest 
                     }
-                })
-                .catch(e=>{
-                    console.error(this.currentLang.errors[0],e)
-                })
-                console.info('(i) process is saved')
+                }
+
+                if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
+                    this.currentTest.lastModified = getCurrentDate()
+                    let output = {
+                        ...this.currentTest,
+                        questions: testData
+                    }
+
+                    await operationFromStore('deleteTest',{id: +this.getTestID})
+                    .then(async ()=>{
+                        await operationFromStore('addTest',{data: output})
+                        .then(()=>{
+                            setTimeout(()=>{
+                                this.blockAddQBtn = false
+                                this.savingProcessLoop = false
+                            }, 2000)
+                        })
+                    })
+                    .then(()=>{
+                        if(params){
+                            if(params.route){
+                                this.$router.push('/dashboard')
+                            }
+                        }
+                    })
+                    .catch(e=>{
+                        console.error(this.currentLang.errors[0],e)
+                    })
+                    console.info('(i) process is saved')
+                }
+            } else {
+                return
             }
+
         },
 
         goToBack(){
@@ -479,8 +548,17 @@ export default {
             this.saveProcess({route: true})
         }
     },
-    computed: mapGetters(['onWorkProcess','getTestID', 'currentLang']),
+    computed: mapGetters(['onWorkProcess','getTestID', 'currentLang', 'currentSign']),
     mounted(){
+        if(!this.currentSign.id){
+            return this.$router.push('/')
+        }
+
+        // текущий ID теста
+        if(!this.getTestID){
+            return this.$router.push('/dashboard')
+        }
+
         this.tasks[0].name= this.currentLang.workspaceView[10]
         this.tasks[1].name= this.currentLang.workspaceView[11]
         this.tasks[2].name= this.currentLang.workspaceView[12]
@@ -493,40 +571,35 @@ export default {
             this.loaderValue += 5
         }, 100)
 
-        // текущий ID теста
-        if(!this.getTestID){
-            this.$router.push('/dashboard')
-        }
-
         // Авто сохранение каждые 10 сек.
         this.savingInterval = setInterval(()=>{
-            this.saveProcess()
+            this.saveProcess({forcedSave:true})
         }, 10000)
     },
     watch:{
         loaderValue(){
             if(this.loaderValue==100){
                 operationFromStore('getByTestID',{id:+this.getTestID})
-                .then(result=>{            
+                .then(async (result)=>{            
                     this.currentTest = result
 
-                    this.questions = this.currentTest.questions
+                    // расшифровка
+                    const testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+
+                    this.questions = JSON.parse(testData)
                     this.testParams = {
                         id: this.currentTest.id,
                         themes: this.currentTest.themes,
                         considerDifficulty: this.currentTest.considerDifficulty,
                         ballSystem: this.currentTest.ballSystem
                     }
-
                     this.loader = false
                     clearInterval(this.loaderInterval)
+                    this.asyncComplate = true
                     
                     setTimeout(()=>{
                         this.allowToSaveTheme = true
                     }, 1000)
-
-                    this.asyncComplate = true
-
                     if(this.questions.length){
                         this.questionsCounter = this.questions[this.questions.length-1].id
                     }

@@ -25,6 +25,7 @@
     <v-divider color="#ccc"></v-divider>
 
     <div class="card__main d-flex flex-column justify-center align-center">
+        <h4 class="mt-5">Временно не поддерживается</h4>
         <v-btn
         color="#5a5a5a"
         elevation="2"

@@ -16,7 +16,12 @@ export default {
         OwnSignForm,
         FreeSignForm
     },
-    computed: mapGetters(['currentTab'])
+    computed: mapGetters(['currentTab', 'currentSign']),
+    mounted(){
+        if(this.currentSign.id){
+            this.$router.push('/dashboard')
+        }
+    },
 }
 </script>
 

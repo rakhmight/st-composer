@@ -339,7 +339,7 @@ export default {
             showDeleteBtn: false
         }
     },
-    computed: mapGetters(['getTestID', 'currentLang']),
+    computed: mapGetters(['getTestID', 'currentLang', 'currentSign']),
     methods:{
         goToBack(){
             this.$router.push('/dashboard')
@@ -378,6 +378,14 @@ export default {
             }
             this.loaderValue += 5
         }, 100)
+
+        if(!this.currentSign.id){
+            return this.$router.push('/')
+        }
+
+        if(!this.getTestID){
+            return this.$router.push('/')
+        }
     },
     watch:{
         loaderValue(){

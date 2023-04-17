@@ -9,7 +9,7 @@
                 <test-type-icons :type="currentQuestion.type" :questionID="currentQuestion.id" :questions="allQuestions"/>
 
             </div>
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row align-center">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
                 <p style="color: #888">{{ currentLang.workspaceView[22] }}: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
                 
@@ -46,15 +46,161 @@
         <div class="test__question-box mt-3">
             <div>
                 <p style="color: #888">{{ currentLang.workspaceView[25] }}:</p>
-                <div class="d-flex flex-row align-start">
-                    <v-textarea
-                    dense
-                    outlined
-                    :placeholder="currentLang.workspaceView[26]"
-                    rows="2"
-                    prepend-icon="mdi-help-circle-outline"
-                    v-model="questionCtx"
-                    ></v-textarea>
+                <div class="d-flex flex-column align-start w-100">
+
+                    <div
+                    v-if="currentTest.languagesSettings.languages.indexOf('custom')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        placeholder="Describe the question"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.custom"
+                        style="width: 100%;"
+                        spellcheck="false"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="currentTest.languagesSettings.languages.length>1"
+                            src="@/assets/media/global.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span>Question field in <b><u>foreign</u></b> language</span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="currentTest.languagesSettings.languages.indexOf('ru')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="currentLang.workspaceView[26]"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.ru"
+                        style="width: 100%;"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="currentTest.languagesSettings.languages.length>1"
+                            src="@/assets/media/russia.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span>Поле вопроса на <b><u>русском</u></b> языке</span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="currentTest.languagesSettings.languages.indexOf('eng')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        placeholder="Describe the question"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.eng"
+                        style="width: 100%;"
+                        spellcheck="false"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="currentTest.languagesSettings.languages.length>1"
+                            src="@/assets/media/united-states.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span>Question field in <b><u>english</u></b> language</span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="currentTest.languagesSettings.languages.indexOf('uz_l')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        placeholder="Savolni tasvirlab bering"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.uz_l"
+                        style="width: 100%;"
+                        spellcheck="false"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="currentTest.languagesSettings.languages.length>1"
+                            src="@/assets/media/uzbekistan.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span><b><u>O'zbek</u></b> tilida savollar qutisi (lotincha)</span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="currentTest.languagesSettings.languages.indexOf('uz_k')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        placeholder="Саволни тасвирлаб беринг"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.uz_k"
+                        style="width: 100%;"
+                        spellcheck="false"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="currentTest.languagesSettings.languages.length>1"
+                            src="@/assets/media/uzbekistan.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span><b><u>Ўзбек</u></b> тилида саволлар қутиси (кирилча)</span>
+                        </v-tooltip>
+                    </div>
                 </div>
             </div>
 
@@ -94,7 +240,7 @@
                 ></v-file-input>
 
                 <v-select
-                :items="themes"
+                :items="themesList"
                 :placeholder="currentLang.workspaceView[30]"
                 outlined
                 dense
@@ -153,13 +299,22 @@
         <div class="test__answers-box mt-3" v-if="currentQuestion.type!='question-with-field'">
             <div class="d-flex flex-row justify-space-between align-center">
                 <p style="color: #888">{{ currentLang.workspaceView[35] }}:</p>
-                <v-btn
-                fab
-                dark
-                color="#0167FF"
-                small
-                @click="addAnswer"
-                >+</v-btn>
+                <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    fab
+                    dark
+                    color="#0167FF"
+                    @click="addAnswer"
+                    x-small
+                    >
+                    <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                </template>
+                <span>Добавить ответ</span>
+                </v-tooltip>
             </div>
             <v-alert
             color="red"
@@ -183,6 +338,7 @@
                 :type="currentQuestion.type"
                 :answerFunc="changeAnswer"
                 :questionID="currentQuestion.id"
+                :currentTest="currentTest"
 
                 :isMultiple="multipleAnswers"
                 />
@@ -232,7 +388,8 @@ export default {
         questions: Array,
 
         questionFunc: Function,
-        params: Object
+        params: Object,
+        currentTest: Object
     },
     data() {
         return {
@@ -316,14 +473,31 @@ export default {
     	    ball: this.question.ball,
     	    multipleAnswers: this.question.multipleAnswers,
 
-            answer: this.question.answer
+            answer: this.question.answer,
+            themesList: [],
         }
     },
-    computed: mapGetters(['currentLang']),
+    computed: mapGetters(['currentLang', 'currentSign']),
     mounted() {
         this.difficultys[0].text = this.currentLang.workspaceView[17]
         this.difficultys[1].text = this.currentLang.workspaceView[18]
         this.difficultys[2].text = this.currentLang.workspaceView[19]
+
+        // даю темам названия из подписи
+        const subject = this.currentSign.subjects.find(subject=> subject.id ==this.currentTest.subjectID)
+        if(subject){
+            this.themes.forEach((theme)=>{
+                let fTheme = subject.themes.find(item=> item.id==theme)
+
+                if(fTheme){
+                    this.themesList.push({text:fTheme.name.ru, value:fTheme.id})
+                }else{
+                    this.themesList.push(theme)
+                }
+            })
+        }else{
+            this.themesList = [...this.themes]
+        }
 
         this.checkIndex()
 
@@ -349,7 +523,7 @@ export default {
         if(this.params.ballSystem){
             this.options.min = +this.params.ballSystem.min
             this.options.max = +this.params.ballSystem.max
-            this.options.interval = +this.params.ballSystem.interval
+            this.options.interval = +this.params.ballSystem.min>=1 && +this.params.ballSystem.max>=100 ? 1 : +this.params.ballSystem.min>=1 && +this.params.ballSystem.max<100 ? 0.1 : 0.01
             this.options.marks = [+this.params.ballSystem.min, +this.params.ballSystem.max]
 
             if(this.ball<+this.params.ballSystem.min){
@@ -542,7 +716,19 @@ export default {
         }
     },
     watch:{
-        questionCtx(){
+        'questionCtx.ru'(){
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+        },
+        'questionCtx.eng'(){
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+        },
+        'questionCtx.uz_l'(){
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+        },
+        'questionCtx.uz_k'(){
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+        },
+        'questionCtx.custom'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         ball(){

@@ -34,7 +34,15 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
+    mounted() {
+        if(!this.currentSign.id){
+          return this.$router.push('/')
+        }
+    },
+    computed: mapGetters(['currentSign']),
 }
 </script>
 

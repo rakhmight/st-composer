@@ -1,7 +1,8 @@
 <template>
   <div class="ball-box">
-    <div>
-      <v-text-field
+      <div style="width: 100%;">
+        <v-text-field
+        style="width: 100%"
         dense
         outlined
         v-model="minBall"
@@ -15,8 +16,11 @@
         ]"
         prepend-icon="mdi-minus-thick"
         :label="currentLang.dashboardView[52]"
-      ></v-text-field>
-      <v-text-field
+        ></v-text-field>
+      </div>
+
+      <div style="width: 100%;">
+        <v-text-field
         dense
         outlined
         v-model="maxBall"
@@ -30,29 +34,28 @@
         ]"
         prepend-icon="mdi-plus-thick"
         :label="currentLang.dashboardView[53]"
-      ></v-text-field>
-    </div>
+        ></v-text-field>
+      </div>
 
-      <v-select
+      <!-- <v-select
       :items="ballIntervals"
       :placeholder="currentLang.workspaceView[30]"
       outlined
       dense
       v-model="ballInterval"
       prepend-icon="mdi-alpha-t-box-outline"
-      ></v-select>
+      ></v-select> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import intervalGenerator from '@/plugins/intervalGenerator'
+//import intervalGenerator from '@/plugins/intervalGenerator'
 
 export default {
   props: {
     min: String,
     max: String,
-    interval: String,
     settingsFunc: Function,
 
     currect: Boolean,
@@ -112,8 +115,8 @@ export default {
 
       minBall: this.min,
       maxBall: this.max,
-      ballInterval: this.interval,
-      ballIntervals: [this.min],
+      // ballInterval: this.interval,
+      // ballIntervals: [this.min],
 
       valueIsNumber: false,
       valueNotZero: false,
@@ -129,20 +132,20 @@ export default {
     minBall() {
       this.settingsFunc("min", this.minBall);
 
-      if(this.maxBall){
-        this.ballIntervals = intervalGenerator(this.minBall, this.maxBall)
-      }
+      // if(this.maxBall){
+      //   this.ballIntervals = intervalGenerator(this.minBall, this.maxBall)
+      // }
     },
     maxBall() {
       this.settingsFunc("max", this.maxBall);
 
-      if(this.minBall){
-        this.ballIntervals = intervalGenerator(this.minBall, this.maxBall)
-      }
+      // if(this.minBall){
+      //   this.ballIntervals = intervalGenerator(this.minBall, this.maxBall)
+      // }
     },
-    ballInterval() {
-      this.settingsFunc("interval", this.ballInterval);
-    },
+    // ballInterval() {
+    //   this.settingsFunc("interval", this.ballInterval);
+    // },
 
     valueIsNumber() {
       if (
@@ -228,7 +231,7 @@ export default {
   display: grid;
   grid-template-columns: 0.5fr 0.5fr;
   justify-content: space-between;
-  gap: 40px;
+  gap: 30px;
 }
 
 .go {

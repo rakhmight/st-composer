@@ -38,14 +38,13 @@ export async function operationFromStore(type, params) {
 
     // Tests
     if(type=='addTest'){
-      console.log(params.data)
       await tests.add(params.data)
     }else if(type=='getAllTests' && params.sort){
       let result = await tests.getAll()
       let output = []
 
       for(let i = 0; i!=result.length; i++){
-        if(result[i].author.id==params.sort.author && result[i].status.isDeleted==params.sort.isDeleted){
+        if(result[i].author==params.sort.author && result[i].status.isDeleted==params.sort.isDeleted){
           output.push(result[i])
         }
       }

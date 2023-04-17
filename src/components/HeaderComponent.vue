@@ -63,6 +63,7 @@
       <v-menu
       offset-y
       max-width="400"
+      v-if="currentSign.id"
       >
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -79,7 +80,7 @@
               transition="scale-transition"
               width="15"
             />
-            <span style="color:#0167FF">{{ currentSign.fullname }}</span>
+            <span style="color:#0167FF">{{ currentSign.fullName }}</span>
           </v-btn>
         </template>
         <v-list
@@ -89,7 +90,7 @@
           small
           color="#c8c7ce" 
           dark
-          @click="$router.push('/')"
+          @click="quit()"
           >
             <span style="color:red">{{ currentLang.header[2] }}</span>
           </v-btn>
@@ -110,13 +111,18 @@ export default {
     },
     computed: mapGetters(['currentLang', 'currentSign']),
     methods:{
-      ...mapMutations(['changeLang']),
+      ...mapMutations(['changeLang', 'clearSign']),
 
       setLanguage(lang){
         this.changeLang(lang)
         this.activeLang = lang
 
         localStorage.setItem('language', lang)
+      },
+
+      quit(){
+        this.clearSign()
+        this.$router.push('/')
       }
     },
     mounted(){

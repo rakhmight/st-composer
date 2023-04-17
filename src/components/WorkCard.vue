@@ -34,9 +34,9 @@
         </div>
         <div class="work__info d-flex justify-content-center">
           <table>
-            <tr>
+            <tr style="overflow-x: hidden;">
               <td>{{ currentLang.dashboardView[12] }}:</td>
-              <td style="color:#0167FF">{{ test.subjectID }}</td>
+              <td style="color:#0167FF;"><div style="width:91px;overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">{{ getSubject(test.subjectID) }}</div></td>
             </tr>
             <tr>
               <td style="opacity:0">space</td>
@@ -127,7 +127,7 @@ export default {
       currentTest: this.test
     }
   },
-  computed: mapGetters(['currentLang']),
+  computed: mapGetters(['currentLang', 'currentSign']),
   methods:{
     ...mapMutations(['updateTestID']),
     renderTests(ctx){
@@ -138,6 +138,16 @@ export default {
     goToWorkspace(){
       this.updateTestID(this.testID)
       this.$router.push(`/workspace`)
+    },
+
+    getSubject(id){
+      const subject = this.currentSign.subjects.find(subject=> subject.id==id)
+
+      if(subject){
+        return subject.name.ru
+      }else {
+        return id
+      }
     }
   },
   components:{

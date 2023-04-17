@@ -30,29 +30,78 @@
                     
                     <div class="d-flex flex-column">
                         <label class="body-2">{{ currentLang.dashboardView[47] }}:</label>
-                        <v-text-field
-                        dense
-                        outlined
-                        prepend-icon="mdi-pound"
-                        v-model="subjectID"
-                        :value="subjectID"
-                        :placeholder="currentLang.dashboardView[4]"
-                        :error="subjectEr"
-                        >
-                        </v-text-field>
+                        <div class="d-flex flex-row mt-2">
+                            <v-text-field
+                            dense
+                            outlined
+                            prepend-icon="mdi-pound"
+                            v-model="subjectID"
+                            :value="subjectID"
+                            :placeholder="currentLang.dashboardView[4]"
+                            :error="subjectEr"
+                            v-if="subjectManually"
+                            >
+                            </v-text-field>
+                            <v-select
+                            v-else
+                            prepend-icon="mdi-pound"
+                            :items="subjectsList"
+                            label="Выберите предмет"
+                            outlined
+                            dense
+                            v-model="subjectID"
+                            :error="subjectEr"
+                            no-data-text="В подписи нет предметов"
+                            ></v-select>
+
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                            color="#0167FF"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            icon
+                            @click="subjectManually = !subjectManually"
+                            class="ml-2"
+                            style="margin-top: 2px;"
+                            >
+                                <v-icon v-if="!subjectManually">mdi-pencil</v-icon>
+                                <v-icon v-else>mdi-playlist-check</v-icon>
+                            </v-btn>
+                        </template>
+                            <span v-if="!subjectManually">Набрать вручную</span>
+                            <span v-else>Выбрать из списка подписи</span>
+                        </v-tooltip>
+                        </div>
                     </div>
                     <div>
                         <label class="body-2">{{ currentLang.dashboardView[48] }}:</label>
-                        <v-text-field
-                        dense
-                        outlined
-                        prepend-icon="mdi-alpha-t-box-outline"
-                        v-model="themes"
-                        :value="themes"
-                        :placeholder="currentLang.dashboardView[5]"
-                        :error="themesEr"
-                        >
-                        </v-text-field>
+                        <div class="mt-2">
+                            <v-text-field
+                            dense
+                            outlined
+                            prepend-icon="mdi-alpha-t-box-outline"
+                            v-model="themes"
+                            :value="themes"
+                            :placeholder="currentLang.dashboardView[5]"
+                            :error="themesEr"
+                            v-if="subjectManually"
+                            >
+                            </v-text-field>
+                            <v-select
+                            v-else
+                            prepend-icon="mdi-alpha-t-box-outline"
+                            :items="themesList"
+                            label="Выберите темы"
+                            outlined
+                            dense
+                            v-model="themes"
+                            :error="themesEr"
+                            no-data-text="Сначала выберите предмет"
+                            multiple
+                            ></v-select>
+                        </div>
                     </div>
                     <div class="d-flex flex-row justify-space-between">
                         <v-checkbox
@@ -65,9 +114,30 @@
                         :label="currentLang.dashboardView[7]"
                         ></v-checkbox>
                     </div>
+                    <div>
+                        <v-checkbox
+                        label="Мультиязычный тест"
+                        v-model="multiLang"
+                        ></v-checkbox>
+                    </div>
+
+                    <div>
+                        <v-select
+                        prepend-icon="mdi-translate"
+                        :items="additionalLanguages"
+                        label="Дополнительные языки"
+                        outlined
+                        dense
+                        multiple
+                        v-model="choisedLanguages"
+                        v-show="multiLang"
+                        no-data-text="Сначала выберите основной язык"
+                        :error="choisedLanguagesError"
+                        ></v-select>
+                    </div>
 
                     <div v-if="haveBall" class="pb-2 pt-2">
-                        <ball-settings :min="minBall" :max="maxBall" :interval="ballInterval" :settingsFunc="changeSettings" />
+                        <ball-settings :min="minBall" :max="maxBall" :settingsFunc="changeSettings" />
 
                         <!-- Использовать для ошибки -->
                         <div class="d-flex flex-row mt-3 align-start">
@@ -149,11 +219,10 @@ export default {
             showProgress: false,
 
             subjectID: this.test.subjectID,
-            themes: this.test.themes.join(', '),
+            themes: undefined,
 
-            minBall: '0.01',
-            maxBall: '1',
-            ballInterval: '0.01',
+            minBall: 0.01+'',
+            maxBall: 1+'',
             haveLevel: this.test.considerDifficulty,
             haveBall: undefined,
 
@@ -168,18 +237,24 @@ export default {
             oldMinBall: undefined,
             oldMaxBall: undefined,
             oldInterval: undefined,
-            oldBallSystem: undefined
+            oldBallSystem: undefined,
+
+            subjectManually: false,
+            subjectsList: [],
+            themesList: [],
+            multiLang: false,
+            choisedLanguagesError: false,
+            additionalLanguages: [],
+            choisedLanguages: []
         }
     },
-    computed: mapGetters(['currentLang']),
+    computed: mapGetters(['currentLang', 'currentSign']),
     methods:{
         changeSettings(type, ctx){
             if(type=='min'){
                 this.minBall = ctx
             }else if(type=='max'){
                 this.maxBall = ctx
-            }else if(type=='interval'){
-                this.ballInterval = ctx
             }else if(type=='currect'){
                 this.ballIsCurrect = ctx
             }
@@ -195,7 +270,7 @@ export default {
                 this.subjectEr = true
                 return this.errors.push(this.currentLang.validators[0])
             }
-            let subject = +((''+this.subjectID).trim())
+            let subject = (''+this.subjectID).trim()
             if(!subject){
                 this.subjectEr = true
                 return this.errors.push(this.currentLang.validators[1])
@@ -284,35 +359,23 @@ export default {
 
             if(this.haveBall && this.oldMinBall!=this.minBall){
                 output.ballSystem={}
-                output.ballSystem.min = this.minBall
-                output.ballSystem.max = this.maxBall
-                output.ballSystem.interval = this.ballInterval
+                output.ballSystem.min = +this.minBall
+                output.ballSystem.max = +this.maxBall
                 counter++
                 history.push(putToHistory('change', 'minBall', this.oldMinBall, this.minBall))
             }
             if(this.haveBall && this.oldMaxBall!=this.maxBall){
                 output.ballSystem={}
-                output.ballSystem.min = this.minBall
-                output.ballSystem.max = this.maxBall
-                output.ballSystem.interval = this.ballInterval
+                output.ballSystem.min = +this.minBall
+                output.ballSystem.max = +this.maxBall
                 counter++
                 history.push(putToHistory('change', 'maxBall', this.oldMaxBall, this.maxBall))
             }
 
-            if(this.haveBall && this.oldInterval!=this.ballInterval){
-                output.ballSystem={}
-                output.ballSystem.min = this.minBall
-                output.ballSystem.max = this.maxBall
-                output.ballSystem.interval = this.ballInterval
-                counter++
-                history.push(putToHistory('change', 'ballInterval', this.oldInterval, this.ballInterval))
-            }
-
             if(this.haveBall && this.haveBall!=this.oldBallSystem){
                 output.ballSystem={}
-                output.ballSystem.min = this.minBall
-                output.ballSystem.max = this.maxBall
-                output.ballSystem.interval = this.ballInterval
+                output.ballSystem.min = +this.minBall
+                output.ballSystem.max = +this.maxBall
                 
                 counter++
                 history.push(putToHistory('change', 'ball-enabled'))
@@ -320,9 +383,8 @@ export default {
             if(!this.haveBall && this.haveBall!=this.oldBallSystem){
                 output.ballSystem = undefined
                 counter++
-                this.minBall = '0.01'
-                this.maxBall = '1'
-                this.ballInterval = '0.01'
+                this.minBall = 0.01+''
+                this.maxBall = 1+''
                 history.push(putToHistory('change', 'ball-dissabled'))
             }
 
@@ -366,7 +428,6 @@ export default {
                     if(this.oldBallSystem){
                         this.oldMinBall = this.minBall
                         this.oldMaxBall = this.maxBall
-                        this.oldInterval = this.ballInterval
                     }
 
                     setTimeout(()=>{
@@ -389,6 +450,21 @@ export default {
         subjectID(){
             this.subjectEr = false
             this.errors = []
+
+            this.themesList = []
+            let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+            subject.themes.forEach(theme=>{
+                this.themesList.push({
+                    text: theme.name.ru,
+                    value: theme.id
+                })
+            })
+
+            if(this.subjectManually){
+                this.themes = this.test.themes
+            } else{
+                this.themes = this.test.themes.join(', ')
+            }
         },
         themes(){
             this.themesEr = false
@@ -419,14 +495,33 @@ export default {
         // }
     },
     mounted() {
+        if(this.test.languagesSettings.languages.length>1){
+            this.multiLang = true
+        }
+
+        this.currentSign.subjects.forEach(subject=>{
+            this.subjectsList.push({
+                text: subject.name.ru,
+                value: subject.id
+            })
+        })
+        this.themes = this.test.themes
+
+        let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+        subject.themes.forEach(theme=>{
+            this.themesList.push({
+                text: theme.name.ru,
+                value: theme.id
+            })
+        })
+
         if(this.test.considerDifficulty){
             this.haveLevel =  true
         }
 
         if(this.test.ballSystem){
-            this.oldMinBall=this.minBall = this.test.ballSystem.min
-            this.oldMaxBall=this.maxBall = this.test.ballSystem.max
-            this.oldInterval=this.ballInterval = this.test.ballSystem.interval
+            this.oldMinBall=this.minBall = this.test.ballSystem.min+''
+            this.oldMaxBall=this.maxBall = this.test.ballSystem.max+''
             this.haveBall = true
             this.oldBallSystem = true
         }else{
@@ -441,6 +536,10 @@ export default {
 </script>
 
 <style scoped>
+.v-input--selection-controls{
+    padding-top:0;
+    margin-top:0
+}
 .edit-btn.theme--light.v-btn {
     color: rgb(255 255 255 / 87%);
 } 

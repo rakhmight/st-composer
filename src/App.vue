@@ -79,6 +79,11 @@ html{
     background-color: #1b6eec9a;
     border-radius: 1em;
 }
+
+:root{
+  --main-color: #0d5fd8;
+}
+
 .wrapper{
   width: 100%;
   height: 100%;

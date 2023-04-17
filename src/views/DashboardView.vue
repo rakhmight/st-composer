@@ -13,7 +13,7 @@
             </v-icon>
             <v-divider vertical color="#ccc"></v-divider>
             <div class="dashboard__author-info ml-2">
-              <h2>{{ currentSign.fullname }}</h2>
+              <h2>{{ currentSign.fullName }}</h2>
               <p style="color:#615f5f">{{ currentLang.dashboardView[0] }}: {{ tests.length }}</p>
             </div>
           </div>
@@ -57,13 +57,13 @@
 
           <div v-if="!tests.length && !loader" class="dashboard__empty mt-5">
             <v-img
-            max-height="250"
-            max-width="250"
+            max-height="120"
+            max-width="120"
             src="@/assets/media/spider-web.png"
             contain
             transition="scale-transition"
             ></v-img>
-              <h2 style="color:#888" class="mt-5">{{ currentLang.dashboardView[2] }}</h2>
+              <h4 style="color:#888" class="mt-5">{{ currentLang.dashboardView[2] }}</h4>
           </div>
 
         </div>
@@ -76,7 +76,7 @@
 import WorkCard from '@/components/WorkCard.vue'
 import ToInstruction from '@/components/ToInstruction.vue'
 import CreateTest from '@/components/dialogs/CreateTest.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
 
   export default {
@@ -86,23 +86,28 @@ import { operationFromStore } from '@/services/localDB'
         loader: true
       }
     },
+    mounted() {
+      if(!this.currentSign.id){
+        return this.$router.push('/')
+      }
+
+      this.loadTests()
+    },
     methods:{
+      ...mapMutations(['clearSign']),
       loadTests(){
-        operationFromStore('getAllTests', {sort:{author:this.currentSign.owner, isDeleted:false}})
+        operationFromStore('getAllTests', {sort:{author:this.currentSign.id, isDeleted:false}})
         .then(result=>{
           this.tests = result
           this.loader=false
         })
         .catch(e=>{
           console.error(this.currentLang.errors[0], e.message)
-          this.$router.push('/')
+          this.clearSign()
+          return this.$router.push('/')
         })
       }
 
-    },
-    mounted() {
-        this.loadTests()
-      
     },
     computed: mapGetters(['currentSign', 'currentLang']),
     components:{
