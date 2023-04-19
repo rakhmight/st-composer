@@ -197,7 +197,8 @@ export default {
                 
                 params = {
                     subjectID: test.subjectID,
-                    themes: test.themes
+                    themes: test.themes,
+                    languagesSettings: test.languagesSettings
                 }
                 if(test.ballSystem){
                     params.ballSystem = test.ballSystem

@@ -131,7 +131,6 @@
                         multiple
                         v-model="choisedLanguages"
                         v-show="multiLang"
-                        no-data-text="Сначала выберите основной язык"
                         :error="choisedLanguagesError"
                         ></v-select>
                     </div>
@@ -242,10 +241,12 @@ export default {
             subjectManually: false,
             subjectsList: [],
             themesList: [],
-            multiLang: false,
+            multiLang: this.test.languagesSettings.multilingual,
+            oldMultiLang: this.test.languagesSettings.multilingual,
             choisedLanguagesError: false,
             additionalLanguages: [],
-            choisedLanguages: []
+            choisedLanguages: [],
+            oldChoisedLanguages: this.test.languagesSettings.languages
         }
     },
     computed: mapGetters(['currentLang', 'currentSign']),
@@ -280,6 +281,11 @@ export default {
                 return this.errors.push(this.currentLang.validators[4])
             }
 
+            if(this.multiLang && this.choisedLanguages.length<=1){
+                this.choisedLanguagesError = true
+                return this.errors.push('Выберите дополнительные языки')
+            }
+
             let themes = (''+this.themes).trim()
             themes = themes.split(',')
             themes.forEach((item, i, arr)=>{
@@ -312,12 +318,51 @@ export default {
                 }
             }
 
+            let langsAreChanged = false
+            let langsMultipleChanged = false
+            output.languagesSettings = this.test.languagesSettings
+            this.choisedLanguages.forEach(lang=>{
+                let langExist = this.oldChoisedLanguages.indexOf(lang)
+                if(langExist==-1){
+                    counter++
+                    langsAreChanged = true
+                }
+            })
+            this.oldChoisedLanguages.forEach(lang=>{
+                let langExist = this.choisedLanguages.indexOf(lang)
+                if(langExist==-1){
+                    counter++
+                    langsAreChanged = true
+                }
+            })
+
+            if(this.multiLang != this.oldMultiLang){
+                counter++
+                langsMultipleChanged = true
+            }
+
+            if(langsMultipleChanged){
+                output.languagesSettings.multilingual = this.multiLang
+                if(!this.multiLang){
+                    output.languagesSettings.languages = [this.oldChoisedLanguages[0]]
+                    this.choisedLanguages = [this.oldChoisedLanguages[0]]
+                    history.push(putToHistory('change', 'multilingual-dissabled'))
+                } else {
+                    history.push(putToHistory('change', 'multilingual-enabled'))
+                }
+            }
+
+            if(langsAreChanged) {
+                output.languagesSettings.languages = this.choisedLanguages
+                history.push(putToHistory('change', 'languages', this.oldChoisedLanguages, this.choisedLanguages))
+            }
+
 
             // наблюдатели изменений и counter
             if(this.subjectID != this.oldSubjectID){
                 counter++
-                output.subjectID = +this.subjectID
-                history.push(putToHistory('change', 'subject', +this.oldSubjectID, +this.subjectID))
+                output.subjectID = this.subjectID
+                history.push(putToHistory('change', 'subject', this.oldSubjectID, this.subjectID))
             }
 
             // темы
@@ -424,6 +469,9 @@ export default {
                     this.oldThemes = themes
                     this.oldLevel = this.haveLevel
                     this.oldBallSystem = this.haveBall
+                    this.oldChoisedLanguages = this.choisedLanguages
+                    this.oldMultiLang = this.multiLang
+                    this.choisedLanguages = this.choisedLanguages
 
                     if(this.oldBallSystem){
                         this.oldMinBall = this.minBall
@@ -448,24 +496,48 @@ export default {
         },
 
         subjectID(){
+            let themes = this.themes
+            this.themes = []
             this.subjectEr = false
             this.errors = []
 
-            this.themesList = []
-            let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
-            subject.themes.forEach(theme=>{
-                this.themesList.push({
-                    text: theme.name.ru,
-                    value: theme.id
+            if(typeof themes === 'string'){
+                let themesArr = themes.split(',')
+                themesArr.forEach(theme=>{
+                    this.themes.push(+theme.trim())
                 })
-            })
+            } else {
+                this.themes = themes
+            }
 
-            if(this.subjectManually){
-                this.themes = this.test.themes
-            } else{
-                this.themes = this.test.themes.join(', ')
+            if(this.currentSign.subjects.length){
+                this.themesList = []
+                let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+                subject.themes.forEach(theme=>{
+                    this.themesList.push({
+                        text: theme.name.ru,
+                        value: theme.id
+                    })
+                })
             }
         },
+        subjectManually(){
+            if(typeof this.themes === 'string'){
+                let themesArr = this.themes.split(',')
+                this.themes = []
+                themesArr.forEach(theme=>{
+                    this.themes.push(+theme.trim())
+                })
+            }
+        },
+        multiLang(){
+            this.choisedLanguagesError = false
+            this.errors = []    
+        },
+        choisedLanguages(){
+            this.choisedLanguagesError = false
+            this.errors = []  
+        }, 
         themes(){
             this.themesEr = false
             this.errors = []
@@ -495,25 +567,49 @@ export default {
         // }
     },
     mounted() {
-        if(this.test.languagesSettings.languages.length>1){
-            this.multiLang = true
+        if(this.test.languagesSettings.languages[0]!='ru'){
+            this.additionalLanguages.push({
+                text: 'Русский',
+                value: 'ru'
+            })
         }
-
-        this.currentSign.subjects.forEach(subject=>{
-            this.subjectsList.push({
-                text: subject.name.ru,
-                value: subject.id
+        if(this.test.languagesSettings.languages[0]!='eng'){
+            this.additionalLanguages.push({
+                text: 'English',
+                value: 'eng'
             })
-        })
-        this.themes = this.test.themes
-
-        let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
-        subject.themes.forEach(theme=>{
-            this.themesList.push({
-                text: theme.name.ru,
-                value: theme.id
+        }
+        if(this.test.languagesSettings.languages[0]!='uz_l'){
+            this.additionalLanguages.push({
+                text: "O'zbek",
+                value: 'uz_l'
             })
-        })
+        }
+        if(this.test.languagesSettings.languages[0]!='uz_k'){
+            this.additionalLanguages.push({
+                text: 'Ўзбек',
+                value: 'uz_k'
+            })
+        }
+        this.choisedLanguages = this.test.languagesSettings.languages
+
+        if(this.currentSign.subjects.length){
+            this.currentSign.subjects.forEach(subject=>{
+                this.subjectsList.push({
+                    text: subject.name.ru,
+                    value: subject.id
+                })
+            })
+            this.themes = this.test.themes
+
+            let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+            subject.themes.forEach(theme=>{
+                this.themesList.push({
+                    text: theme.name.ru,
+                    value: theme.id
+                })
+            })
+        }
 
         if(this.test.considerDifficulty){
             this.haveLevel =  true

@@ -12,7 +12,7 @@
                 <test-type-icons :type="question.type" :questionID="question.id" :questions="questions"/>
 
             </div>
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row align-center">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
                 <p style="color: #888">{{ currentLang.savedTestView[26] }}: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
             </div>
@@ -26,8 +26,104 @@
                 <p>{{ currentLang.savedTestView[27] }}:</p>
                 <div class="d-flex flex-row align-start">
                     <v-icon class="mr-2 mt-2" :color="question.questionCtx ? '#0d5fd8' : ''">mdi-help-circle-outline</v-icon>
-                    <div class="questionCtx" v-if="question.questionCtx">{{ question.questionCtx }}</div>
-                    <div class="questionCtxEmpty" v-else>{{ currentLang.savedTestView[28] }}</div>
+
+                    <div style="width: 100%; gap:15px" class="d-flex flex-column">
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('custom')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.custom">{{ question.questionCtx.custom }}</div>
+                            <div class="questionCtxEmpty" v-else>Not filled</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/global.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                                <span>Question field in <b><u>foreign</u></b> language</span>
+                            </v-tooltip>
+                        </div>
+
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('ru')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.ru">{{ question.questionCtx.ru }}</div>
+                            <div class="questionCtxEmpty" v-else>{{ currentLang.savedTestView[28] }}</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/russia.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                            <span>Поле вопроса на <b><u>русском</u></b> языке</span>
+                            </v-tooltip>
+                        </div>
+
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('eng')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.eng">{{ question.questionCtx.eng }}</div>
+                            <div class="questionCtxEmpty" v-else>Not filled</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/united-states.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                                <span>Question field in <b><u>english</u></b> language</span>
+                            </v-tooltip>
+                        </div>
+
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('uz_l')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.uz_l">{{ question.questionCtx.uz_l }}</div>
+                            <div class="questionCtxEmpty" v-else>To'ldirilmagan</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/uzbekistan.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                                <span><b><u>O'zbek</u></b> tilida savollar qutisi (lotincha)</span>
+                            </v-tooltip>
+                        </div>
+
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('uz_k')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.uz_k">{{ question.questionCtx.uz_k }}</div>
+                            <div class="questionCtxEmpty" v-else>Тўлдирилмаган</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/uzbekistan.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                                <span><b><u>Ўзбек</u></b> тилида саволлар қутиси (кирилча)</span>
+                            </v-tooltip>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -97,15 +193,125 @@
         <v-divider color="#bbb"></v-divider>
 
         <div class="test__answers-box mt-3" v-if="question.type!='question-with-field'">
+            
             <!-- Обычные ответы, ответы с изображениями -->
-            <div v-for="answer in question.answers" class="d-flex flex-column align-center" style="width:100%">
+            <div
+            v-for="(answer, i) in question.answers"
+            :key="i"
+            class="d-flex flex-column align-center"
+            style="width:100%"
+            >
                 <div style="width:100%" class="d-flex flex-row">
                     <v-divider color="#888" vertical class="mr-2"></v-divider>
                     <div class="d-flex flex-row align-start" style="width:100%">
                         <v-icon class="mt-2 mr-2" :color="answer.isCurrect ? '#51c551' : ''">mdi-lightbulb-auto</v-icon>
-                        <div class="answerCtx" v-if="answer.answerCtx && !answer.isCurrect">{{ answer.answerCtx }}</div>
-                        <div class="answerCtx" v-if="answer.answerCtx && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
-                        <div class="answerCtxEmpty" v-if="!answer.answerCtx">{{ currentLang.savedTestView[37] }}</div>
+
+                        <div class="d-flex flex-column" style="width: 100%; gap:15px">
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('custom')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.custom && !answer.isCurrect">{{ answer.answerCtx.custom }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.custom && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.custom">Not filled</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/global.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span>Answer field in <b><u>foreign</u></b> language</span>
+                                </v-tooltip>
+                            </div>
+
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('ru')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.ru && !answer.isCurrect">{{ answer.answerCtx.ru }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.ru && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.ru">{{ currentLang.savedTestView[37] }}</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/russia.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span>Поле ответа на <b><u>русском</u></b> языке</span>
+                                </v-tooltip>
+                            </div>
+
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('eng')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.eng && !answer.isCurrect">{{ answer.answerCtx.eng }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.eng && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.eng">Not filled</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/united-states.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span>Answer field in <b><u>english</u></b> language</span>
+                                </v-tooltip>
+                            </div>
+
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('uz_l')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_l && !answer.isCurrect">{{ answer.answerCtx.uz_l }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_l && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.uz_l">To'ldirilmagan</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/uzbekistan.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span><b><u>O'zbek</u></b> tilida javoblar qutisi (lotincha)</span>
+                                </v-tooltip>
+                            </div>
+
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('uz_k')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_k && !answer.isCurrect">{{ answer.answerCtx.uz_k }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_k && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.uz_k">Тўлдирилмаган</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/uzbekistan.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span><b><u>Ўзбек</u></b> тилида жавоблар қутиси (кирилча)</span>
+                                </v-tooltip>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -214,6 +420,21 @@ export default {
                 })
             }
         }
+    },
+    methods:{
+        getCurrentQuestion(question){
+            if(this.testParams.languagesSettings.languages[0] == 'ru'){
+                return question.ru
+            } else if(this.testParams.languagesSettings.languages[0] == 'eng'){
+                return question.eng
+            } else if(this.testParams.languagesSettings.languages[0] == 'uz_l'){
+                return question.uz_l
+            } else if(this.testParams.languagesSettings.languages[0] == 'uz_k'){
+                return question.uz_k
+            } else if(this.testParams.languagesSettings.languages[0] == 'custom'){
+                return question.custom
+            }
+        },
     },
     components:{
         TestTypeIcons

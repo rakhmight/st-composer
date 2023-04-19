@@ -3,19 +3,19 @@ export default {
         sign:  {
             keys: {
                 assymetric: {
-                  publicKey: "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdZu42hoFCvMUrDTQ6A2B3CIV4\ntH0ansr5XAmEgdYmdF/KOcJsnv/Y0T7Bv52UhiRr3s9HUAh9jcmjWq1+zksFEW/Z\nFOxU0SsvqhQ0lzNPulw3dPY1tWv1eVXesTl0+Ja/6RdpDNBuRisg9Lp7hgUdCt1j\ngnQcpwYUPbfNOYHOwQIDAQAB\n-----END PUBLIC KEY-----\n"
+                  publicKey: "-----BEGIN PUBLIC KEY-----\r\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCwDaNG7m1gVHxKTBlungVLnS8w\r\nPGM7BhOPKT0Vb5CF4gEK2KK96IwA1i+BYi2/2NBVgmVgeYj0Mt6xAir//v0seX5S\r\nGvdJk2g1OuVqllRFRvRUH7/jeFbOhfoWT1DvVcD/SJLLN3a4KeZnXbN3UN7wPLEw\r\nte68agt9C4Y23qKgpQIDAQAB\r\n-----END PUBLIC KEY-----\r\n"
                 },
                 symmetric: {
                   algorithm: "aes256",
                   notation: "hex",
                   encoding: "utf8",
-                  key: "Vt0hOJ+YIA9q7epztD7dswofz3glXWn3bK1DmEtGKVg=",
-                  iv: "2eRwXTaTeszmvbxRYreShQ=="
+                  key: "0cO7QAPNeLXlxoj46XQ0xlZL+kdu8Gio5LGbQfJG6v0=",
+                  iv: "kE/00EEBWqICKu4DkdC06Q=="
                 }
               },
-              id: "6437e533974544cc4cffa44d",
-              fullName: "Raupov Akbar Alisherovich",
-              subjects:  [
+              hash: "b4f9ac3b5a15cb60e36f66998820f398b7098abc55749ae8bf66b70808ea9443",
+              id: "643d17b2bc73ef10e71d363b",
+              subjects: [
                 {
                   id: "6438e1ff5adf0080ae242d36",
                   themes: [],
@@ -57,7 +57,8 @@ export default {
                   chair: "6437e49292e121403a6e2e43",
                   name: { ru: "Кафедра 4", uz_l: null, uz_k: null, eng: null }
                 }
-              ]
+              ],
+              fullName: "Makarov Radion Sergeevich"
         }
     },
     getters: {

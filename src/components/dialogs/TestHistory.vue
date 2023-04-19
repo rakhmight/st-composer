@@ -59,6 +59,11 @@
                             <td v-if="action.type=='change' && action.des=='ball-enabled'"><span style="color:blueviolet"><b>► </b></span>{{ currentLang.dashboardView[73] }} <span style="color: green">{{ currentLang.dashboardView[75] }}</span></td>
                             <td v-if="action.type=='change' && action.des=='difficulty-dissabled'"><span style="color:blueviolet"><b>► </b></span>{{ currentLang.dashboardView[76] }} <span style="color: red">{{ currentLang.dashboardView[77] }}</span></td>
                             <td v-if="action.type=='change' && action.des=='difficulty-enabled'"><span style="color:blueviolet"><b>► </b></span>{{ currentLang.dashboardView[76] }} <span style="color: green">{{ currentLang.dashboardView[78] }}</span></td>
+                            <td v-if="action.type=='change' && action.des=='multilingual-dissabled'"><span style="color:blueviolet"><b>► </b></span>Несколько языков: <span style="color: red">отключено</span></td>
+                            <td v-if="action.type=='change' && action.des=='multilingual-enabled'"><span style="color:blueviolet"><b>► </b></span>Несколько языков: <span style="color: green">включено</span></td>
+
+                            <td v-if="action.type=='change' && action.des=='languages'"><span style="color:blueviolet"><b>► </b></span>Языки: <b>{{ getLanguages(action.oldData) }}</b></td>
+
                             <td v-if="action.type=='change' && action.des=='themes'"><span style="color:blueviolet"><b>► </b></span>{{ currentLang.dashboardView[79] }}: <b>{{ action.oldData.join(', ') }}</b></td>
                             <td v-if="action.type=='change' && action.des=='subject'"><span style="color:blueviolet"><b>► </b></span>{{ currentLang.dashboardView[80] }}: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='create'"><span style="color:#0167FF"><b>► {{ currentLang.dashboardView[81] }}</b></span></td>
@@ -67,11 +72,12 @@
                             <td v-if="action.type=='delete'"><span style="color:#ff4500"><b>► {{ currentLang.dashboardView[84] }}</b></span></td>
                             <td v-if="action.type=='restore'"><span style="color:blue"><b>► {{ currentLang.dashboardView[85] }}</b></span></td>
 
-                            <td v-if="action.type=='change' && action.des!='difficulty-dissabled' && action.des!='difficulty-enabled' && action.des!='ball-dissabled' && action.des!='ball-enabled'" class="text-center">→<br>{{ action.date.date }} {{ action.date.time }}</td>
+                            <td v-if="action.type=='change' && action.des!='difficulty-dissabled' && action.des!='difficulty-enabled' && action.des!='ball-dissabled' && action.des!='ball-enabled' && action.des!='multilingual-dissabled' && action.des!='multilingual-enabled'"  class="text-center">→<br>{{ action.date.date }} {{ action.date.time }}</td>
                             <td v-else class="text-center">{{ action.date.date }} {{ action.date.time }}</td>
 
-                            <td v-if="action.type=='change' && action.des!='themes'"><b>{{ action.newData }}</b></td>
+                            <td v-if="action.type=='change' && action.des!='themes' && action.des!='languages'"><b>{{ action.newData }}</b></td>
                             <td v-if="action.type=='change' && action.des=='themes'"><b>{{ action.newData.join(', ') }}</b></td>
+                            <td v-if="action.type=='change' && action.des=='languages'"><b>{{ getLanguages(action.newData) }}</b></td>
                             <td v-if="action.type=='restore'"><b>{{ currentLang.dashboardView[86] }}: {{ action.des }}</b></td>
                             <td v-if="action.type!='change' && action.type!='restore'"></td>  
                             </tr>
@@ -97,6 +103,25 @@ export default {
         }
     },
     computed: mapGetters(['currentLang']),
+    methods:{
+        getLanguages(langs){
+            let languages = []
+            langs.forEach(lang => {
+                if(lang=='custom'){
+                    languages.push('Foreign')
+                }else if(lang=='ru'){
+                    languages.push('Русский')
+                } else if(lang=='eng'){
+                    languages.push('English')
+                } else if(lang=='uz_l'){
+                    languages.push("O'zbek")
+                } else if(lang=='uz_k'){
+                    languages.push('Ўзбек')
+                }
+            })
+            return languages.join(', ')
+        }
+    }
 }
 </script>
 

@@ -86,21 +86,42 @@
           <span>{{ currentLang.dashboardView[16] }}</span>
         </v-tooltip>
 
-        <v-tooltip bottom color="#00000073">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              v-on="on"
-              height="31"
-              text
-              body-2
-              @click="goToWorkspace"
+        <div class="d-flex align-center justify-center">
+          <v-tooltip bottom color="#00000073" v-if="!invalidHash">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-bind="attrs"
+                v-on="on"
+                height="31"
+                text
+                body-2
+                @click="goToWorkspace"
+                >
+                <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
+              </v-btn>
+            </template>
+            <span>{{ currentLang.dashboardView[17] }}</span>
+          </v-tooltip>
+
+          
+          <v-tooltip bottom color="warning" v-else>
+            <template v-slot:activator="{ on, attrs }">
+              <div
+              style="width: 50px;"
+              class="d-flex justify-center"
               >
-              <v-icon color="#0167FF" size="22">mdi-arrow-top-right</v-icon>
-            </v-btn>
-          </template>
-          <span>{{ currentLang.dashboardView[17] }}</span>
-        </v-tooltip>
+                <v-icon
+                v-bind="attrs"
+                v-on="on"
+                color="warning"
+                >
+                  mdi-alert
+                </v-icon>
+              </div>
+            </template>
+            <span style="color: #111"><b>Тест зашифрован другим ключом</b></span>
+          </v-tooltip>
+        </div>
       </div>
     </div>
 </template>
@@ -124,7 +145,8 @@ export default {
     return {
       testID: this.id,
       testStatus: this.status,
-      currentTest: this.test
+      currentTest: this.test,
+      invalidHash: false
     }
   },
   computed: mapGetters(['currentLang', 'currentSign']),
@@ -148,6 +170,11 @@ export default {
       }else {
         return id
       }
+    }
+  },
+  mounted(){
+    if(this.test.signHash != this.currentSign.hash){
+      this.invalidHash = true
     }
   },
   components:{

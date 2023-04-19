@@ -25,10 +25,10 @@
                             v-on="on"
                             v-if="currentTest.languagesSettings.languages.length>1"
                             src="@/assets/media/global.png"
-                            width="25"
-                            height="25"
+                            width="22"
+                            height="22"
                             class="mt-2"
-                            style="position:absolute; top:30px"
+                            style="position:absolute; top:-18px;right:-10px"
                             ></v-img>
                         </template>
                         <span>Answer field in <b><u>foreign</u></b> language</span>
@@ -55,10 +55,10 @@
                             v-on="on"
                             v-if="currentTest.languagesSettings.languages.length>1"
                             src="@/assets/media/russia.png"
-                            width="25"
-                            height="25"
+                            width="22"
+                            height="22"
                             class="mt-2"
-                            style="position:absolute; top:30px"
+                            style="position:absolute; top:-18px;right:-10px"
                             ></v-img>
                         </template>
                         <span>Поле ответа на <b><u>русском</u></b> языке</span>
@@ -86,10 +86,10 @@
                             v-on="on"
                             v-if="currentTest.languagesSettings.languages.length>1"
                             src="@/assets/media/united-states.png"
-                            width="25"
-                            height="25"
+                            width="22"
+                            height="22"
                             class="mt-2"
-                            style="position:absolute; top:30px"
+                            style="position:absolute; top:-18px;right:-10px"
                             ></v-img>
                         </template>
                         <span>Answer field in <b><u>english</u></b> language</span>
@@ -117,10 +117,10 @@
                             v-on="on"
                             v-if="currentTest.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
-                            width="25"
-                            height="25"
+                            width="22"
+                            height="22"
                             class="mt-2"
-                            style="position:absolute; top:30px"
+                            style="position:absolute; top:-18px;right:-10px"
                             ></v-img>
                         </template>
                         <span><b><u>O'zbek</u></b> tilida javoblar qutisi (lotincha)</span>
@@ -148,10 +148,10 @@
                             v-on="on"
                             v-if="currentTest.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
-                            width="25"
-                            height="25"
+                            width="22"
+                            height="22"
                             class="mt-2"
-                            style="position:absolute; top:30px"
+                            style="position:absolute; top:-18px;right:-10px"
                             ></v-img>
                         </template>
                         <span><b><u>Ўзбек</u></b> тилида жавоблар қутиси (кирилча)</span>

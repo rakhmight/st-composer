@@ -11,7 +11,7 @@
             class="mr-8"
             v-bind="attrs"
             v-on="on"
-            @click="saveFunc"
+            @click="saveFunc({forcedSave:true})"
             :disabled="!asyncComplate"
             >
                 <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
@@ -108,6 +108,7 @@ import getCurrentDate from '@/plugins/getCurrentDate'
 import { operationFromStore } from '@/services/localDB'
 import putToHistory from '@/services/putToHistory'
 import { mapGetters } from 'vuex'
+import crypt from '@/plugins/crypt'
 
 export default {
     props:{
@@ -128,7 +129,7 @@ export default {
             comment: ''
         }
     },
-    computed: mapGetters(['currentLang']),
+    computed: mapGetters(['currentLang', 'currentSign']),
     methods:{
         savingQuestions(){
 
@@ -164,13 +165,14 @@ export default {
 
             let test, params, output
             operationFromStore('getByTestID', {id: +this.testID})
-            .then(result=>{
+            .then(async (result)=>{
                 // Параметры текущего теста: учитывание баллов, темы, сложность, id предмета
                 test = result
                 
                 params = {
                     subjectID: test.subjectID,
-                    themes: test.themes
+                    themes: test.themes,
+                    languagesSettings: test.languagesSettings
                 }
                 if(test.ballSystem){
                     params.ballSystem = test.ballSystem
@@ -179,10 +181,12 @@ export default {
                     params.considerDifficulty = test.considerDifficulty
                 }
 
+                const questionsData = await crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+
                 output={
                     id: +_id,
                     testID: +this.testID,
-                    questions: this.questions,
+                    questions: questionsData,
                     comment: this.comment,
                     date: getCurrentDate(),
                     params

@@ -119,6 +119,8 @@
                         <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
                         <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">{{ currentLang.workspaceView[7] }}</span>
                     </v-btn>
+
+                    <sign-test :asyncComplate="asyncComplate" :currentTest="currentTest" :questions="questions" :stopSaving="stopSaving"/>
                 </div>
 
                 <div class="workspace__sidebar-box"></div>
@@ -182,7 +184,8 @@
 import Question from '@/components/tests/QuestionTemplates.vue'
 import Tools from '@/components/tests/Tools.vue'
 import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
-import { mapGetters } from 'vuex'
+import SignTest from '@/components/dialogs/SignTest.vue'
+import { mapGetters, mapMutations } from 'vuex'
 import getCurrentDate from '@/plugins/getCurrentDate'
 import { operationFromStore } from '@/services/localDB'
 import crypt from '@/plugins/crypt'
@@ -220,6 +223,11 @@ export default {
         }
     },
     methods:{
+        ...mapMutations(['clearSign']),
+        stopSaving(){
+            clearInterval(this.savingInterval)
+            clearInterval(this.loaderInterval)
+        },
         getCurrentAnswer(answer){
             if(this.currentTest.languagesSettings.languages[0] == 'ru'){
                 if(answer.ru){
@@ -275,7 +283,7 @@ export default {
                 },
                 theme: undefined,
                 difficulty: undefined,
-                ball:0.01,
+                //ball:0.01,
                 multipleAnswers: false,
                 lastModified: getCurrentDate(),
             }
@@ -346,7 +354,7 @@ export default {
             })
 
             
-            this.saveProcess()
+            this.saveProcess({forcedSave:true})
         },
 
         changeQuestion(type, ctx, id, aID){
@@ -495,18 +503,55 @@ export default {
         },
 
         async saveProcess(params){
+            if(params){
+                if(params.route || params.newTest){
+                    let output
+                    if(params.route){
+                        clearInterval(this.savingInterval)
+                        clearInterval(this.loaderInterval)
+                        
+                        const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+                        this.currentTest.lastModified = getCurrentDate()
+                        output = {
+                            ...this.currentTest,
+                            questions: testData
+                        }
+                    } else if(params.newTest){
+                        output = params.newTest
+                        this.currentTest.history = params.newTest.history
+                    }
+
+                    await operationFromStore('deleteTest',{id: +this.getTestID})
+                    .then(async ()=>{
+                        await operationFromStore('addTest',{data: output})
+                    })
+                    .then(()=>{
+                        if(params.route){
+                            console.info('(i) process is saved before quit')
+                            this.$router.push('/dashboard')
+                        } else if( params.newTest){
+                            console.info('(i) process is saved after saving')
+                        }
+                    })
+                    .catch(e=>{
+                        console.error(this.currentLang.errors[0],e)
+                    })
+                }
+            }
+
             if(!this.savingProcessLoop){
                 this.savingProcessLoop = true
 
                 // зашифровка
                 const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
 
-                if(params){
-                    if(params.newTest){
-                        this.blockAddQBtn = true
-                        this.currentTest = params.newTest 
-                    }
-                }
+                // if(params){
+                //     if(params.newTest){
+                //         this.blockAddQBtn = true
+                //         this.currentTest = params.newTest 
+                //     }
+                //     console.log(params);
+                // }
 
                 if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
                     this.currentTest.lastModified = getCurrentDate()
@@ -519,6 +564,7 @@ export default {
                     .then(async ()=>{
                         await operationFromStore('addTest',{data: output})
                         .then(()=>{
+                            console.info('(i) process is saved')
                             setTimeout(()=>{
                                 this.blockAddQBtn = false
                                 this.savingProcessLoop = false
@@ -535,12 +581,10 @@ export default {
                     .catch(e=>{
                         console.error(this.currentLang.errors[0],e)
                     })
-                    console.info('(i) process is saved')
                 }
-            } else {
+            }else {
                 return
             }
-
         },
 
         goToBack(){
@@ -584,7 +628,18 @@ export default {
                     this.currentTest = result
 
                     // расшифровка
-                    const testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+                    let testData
+                    try {
+                        testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+
+                    } catch (error) {
+                        // запись в логи
+                        console.error(error);
+                        console.error('Sign is not valid');
+                        this.clearSign()
+                        this.$router.push('/')
+                        return
+                    }
 
                     this.questions = JSON.parse(testData)
                     this.testParams = {
@@ -644,7 +699,8 @@ export default {
     components:{
         Question,
         Tools,
-        TestTypeIcons
+        TestTypeIcons,
+        SignTest
     }
 }
 </script>
@@ -677,6 +733,16 @@ export default {
     overflow-y: scroll;
     overflow-x: hidden;
     border-bottom: #0d5fd8 5px solid;
+}
+@media screen and (max-height: 400px){
+.workspace__map{
+    max-height: 40vh;
+} 
+}
+@media screen and (max-height: 900px){
+.workspace__map{
+    max-height: 55vh;
+}
 }
 .workspace__map-empty{
     height: 30vh;

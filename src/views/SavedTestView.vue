@@ -53,7 +53,7 @@
                                             <td style="color:#000">{{ i+1 }}</td>
                                             <td>
                                                 <p class="body-2 map-small" style="color:#484848">
-                                                    <span v-if="question.questionCtx">{{ question.questionCtx }}</span>
+                                                    <span v-if="question.questionCtx.ru || question.questionCtx.eng || question.questionCtx.uz_l || question.questionCtx.uz_k || question.questionCtx.custom">{{ getCurrentQuestion(question.questionCtx) }}</span>
                                                     <span style="color:#888;" v-else>Не заполнено</span>
                                                 </p>
                                             </td>
@@ -247,11 +247,15 @@
                             </div>
                             <div class="d-flex flex-row mt-3">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
-                                <div><span style="color:#bbb">{{ currentLang.savedTestView[13] }}:</span> {{ testParams.subjectID ? testParams.subjectID : 'null' }}</div>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[13] }}:</span> {{ testParams.subjectID ? getSubject(testParams.subjectID) : 'null' }}</div>
                             </div>
                             <div class="d-flex flex-row mt-1">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
-                                <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes ? testParams.themes.join(', ') : 'null' }}</div>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes ? getThemes(testParams.subjectID, testParams.themes) : 'null' }}</div>
+                            </div>
+                            <div class="d-flex flex-row mt-1">
+                                <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
+                                <div><span style="color:#bbb">Языки:</span> {{ testParams.languagesSettings ? getLanguages(testParams.languagesSettings.languages) : 'null' }}</div>
                             </div>
                         </div>
 
@@ -286,7 +290,6 @@
                                         <span style="color:#bbb">{{ currentLang.savedTestView[21] }}:</span>
                                         {{ testParams.ballSystem.min }}
                                     </div>
-                                    <div><v-icon color="#fff" size="19" class="mr-1">mdi-vector-line</v-icon><span style="color:#bbb">{{ currentLang.savedTestView[22] }}:</span>  {{ testParams.ballSystem.interval }}</div>
                                     <div><v-icon color="#fff" size="19" class="mr-1">mdi-plus</v-icon><span style="color:#bbb">{{ currentLang.savedTestView[23] }}:</span>  {{ testParams.ballSystem.max }}</div>
                                 </div>
                             </div>
@@ -304,6 +307,8 @@ import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import SavedQuestion from '@/components/saved/SavedQuestion.vue'
 import PresaveTest from '@/components/dialogs/PresaveTest.vue'
 import { operationFromStore } from '@/services/localDB'
+import encrypt from '@/plugins/encrypt'
+import { getSubject, getAuthor, getThemes, getLanguages } from '@/plugins/getInfo'
 
 export default {
     data() {
@@ -341,6 +346,15 @@ export default {
     },
     computed: mapGetters(['getTestID', 'currentLang', 'currentSign']),
     methods:{
+        getSubject(id){
+            return getSubject(id, this.currentSign.subjects)
+        },
+        getThemes(id, themes){
+            return getThemes(id, themes, this.currentSign)
+        },
+        getLanguages(langs){
+            return getLanguages(langs)
+        },
         goToBack(){
             this.$router.push('/dashboard')
         },
@@ -391,9 +405,22 @@ export default {
         loaderValue(){
             if(this.loaderValue==100){
                 operationFromStore('getBySavingID', {id: +this.getTestID})
-                .then(result=>{
+                .then(async (result)=>{
                         this.saving = result
-                        this.questions = this.saving.questions
+
+                        let questionsData
+                        try {
+                            questionsData = await encrypt(this.saving.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)  
+                        } catch (error) {
+                            // запись в логи
+                            console.error(error);
+                            console.error('Sign is not valid');
+                            this.clearSign()
+                            this.$router.push('/')
+                            return
+                        }
+
+                        this.questions = JSON.parse(questionsData)
                         this.testParams = this.saving.params
                         this.savingComment = this.saving.comment
                         this.savingDate = this.saving.date

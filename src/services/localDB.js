@@ -15,6 +15,12 @@ export function initDB(){
       if (!db.objectStoreNames.contains('savings')) { // если хранилище "savings" не существует
           db.createObjectStore('savings', {keyPath: 'id'}) // создаём хранилище
       }
+      if (!db.objectStoreNames.contains('signed')) { // если хранилище "signed" не существует
+          db.createObjectStore('signed', {keyPath: 'id'}) // создаём хранилище
+      }
+      if (!db.objectStoreNames.contains('timers')) { // если хранилище "timers" не существует
+          db.createObjectStore('timers', {keyPath: 'id'}) // создаём хранилище
+      }
 
       console.log('(DB) БД инициализировано');
   }
@@ -33,6 +39,10 @@ export async function operationFromStore(type, params) {
   let savingsTransaction = db.transaction('savings', 'readwrite')
   let tests = testsTransaction.objectStore('tests')
   let savings = savingsTransaction.objectStore('savings')
+  let signedTransaction = db.transaction('signed', 'readwrite')
+  let timersTransaction = db.transaction('timers', 'readwrite')
+  let signed = signedTransaction.objectStore('signed')
+  let timers = timersTransaction.objectStore('timers')
 
   try{
 
@@ -76,6 +86,24 @@ export async function operationFromStore(type, params) {
       return result
     }else if(type=='deleteSaving'){
       await savings.delete(params.id)
+    }
+
+    // Timers
+    else if(type=='addTimer'){
+      await timers.add(params.data)
+    }else if(type=='getTimers'){
+      let result = await tests.getAll()
+      return result
+    }
+
+    // Signed
+    else if(type=='addSigned'){
+      await signed.add(params.data)
+    }else if(type=='deleteSigned'){
+      await signed.delete(params.id)
+    }else if(type=='getSigned'){
+      let result = await savings.get(params.id)
+      return result
     }
   }catch(e){
     console.error('(DB) Ошибка: ', e.message)

@@ -11,6 +11,7 @@ export default function restoreSaved(id, saving, params){
 
         test.subjectID = saving.params.subjectID
         test.themes = saving.params.themes
+        test.languagesSettings = saving.params.languagesSettings
 
         if(saving.params.ballSystem){
             test.ballSystem = saving.params.ballSystem

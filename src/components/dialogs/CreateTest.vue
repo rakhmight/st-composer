@@ -363,7 +363,8 @@ export default {
                     status: { inProcess: true, isSigned: false, isDeleted: false },
                     history:[putToHistory('create', undefined)],
                     signedDate: undefined,
-                    questions:[]
+                    questions:[],
+                    signHash: this.currentSign.hash
                 }
                 if(this.haveBall){
                     test.ballSystem = {
@@ -422,19 +423,30 @@ export default {
                 this.errors = []
             }
 
-            this.themesList = []
-            let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
-            subject.themes.forEach(theme=>{
-                this.themesList.push({
-                    text: theme.name.ru,
-                    value: theme.id
+            if(this.currentSign.subjects.length){
+                this.themesList = []
+                let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+                subject.themes.forEach(theme=>{
+                    this.themesList.push({
+                        text: theme.name.ru,
+                        value: theme.id
+                    })
                 })
-            })
+            }
         },
         subjectThemes(){
             if(this.subjectThemes.length){
                 this.themesIsEmpty = false
                 this.errors = []
+            }
+        },
+        subjectManually(){
+            if(typeof this.subjectThemes === 'string'){
+                let themesArr = this.subjectThemes.split(',')
+                this.subjectThemes = []
+                themesArr.forEach(theme=>{
+                    this.subjectThemes.push(+theme.trim())
+                })
             }
         },
         ballIsCurrect(){

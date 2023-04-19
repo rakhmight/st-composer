@@ -26,20 +26,37 @@
 
         <div class="dialog-content">
             <div class="main-info mb-3">
-                <div class="d-flex flex-column">
-                    <div>{{ currentLang.dashboardView[20] }}</div>
-                    <div v-if="test.lastModified">{{ currentLang.dashboardView[21] }}</div>
-                    <div class="mb-3">{{ currentLang.dashboardView[22] }}</div>
-                    <div>{{ currentLang.dashboardView[23] }}</div>
-                    <div>{{ currentLang.dashboardView[24] }}</div>
-                </div>
-                <div class="d-flex flex-column">
-                    <div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div>
-                    <div class="text-end" v-if="test.lastModified"><b style="color:#444">{{ test.lastModified.date }} {{ test.lastModified.time }}</b></div>
-                    <div class="text-end mb-3"><b>{{ test.author.fullname }}</b></div>
-                    <div class="text-end"><b>{{ test.subjectID }}</b></div>
-                    <div class="text-end"><b>{{ test.themes.join(', ') }}</b></div>
-                </div>
+                
+                <v-simple-table dense>
+                    <template v-slot:default>
+                    <tbody>
+                        <tr>
+                            <td>{{ currentLang.dashboardView[20] }}</td>
+                            <td><div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div></td>
+                        </tr>
+                        <tr>
+                            <td><div v-if="test.lastModified">{{ currentLang.dashboardView[21] }}</div></td>
+                            <td><div class="text-end" v-if="test.lastModified"><b style="color:#444">{{ test.lastModified.date }} {{ test.lastModified.time }}</b></div></td>
+                        </tr>
+                        <tr>
+                            <td><div>{{ currentLang.dashboardView[22] }}</div></td>
+                            <td><div class="text-end"><b>{{ getAuthor(test.author) }}</b></div></td>
+                        </tr>
+                        <tr>
+                            <td><div>{{ currentLang.dashboardView[23] }}</div></td>
+                            <td><div class="text-end"><b>{{ getSubject(test.subjectID) }}</b></div></td>
+                        </tr>
+                        <tr>
+                            <td><div>{{ currentLang.dashboardView[24] }}</div></td>
+                            <td><div class="text-end"><b>{{ getThemes(test.subjectID,test.themes) }}</b></div></td>
+                        </tr>
+                        <tr>
+                            <td><div>Языки</div></td>
+                            <td><div class="text-end"><b>{{ getLanguages(test.languagesSettings.languages) }}</b></div></td>
+                        </tr>
+                    </tbody>
+                    </template>
+                </v-simple-table>
             </div>
 
             <div class="mb-3" v-if="test.considerDifficulty">
@@ -50,17 +67,16 @@
             <div class="mb-3" v-if="test.ballSystem">
                 <v-icon color="green">mdi-check-circle</v-icon>
                 {{ currentLang.dashboardView[26] }}
-                <div class="d-flex flex-row justify-space-between flex-wrap">
+                <div class="d-flex flex-row justify-space-between flex-wrap mt-1">
                     <div><v-icon>mdi-minus</v-icon>{{ currentLang.dashboardView[27] }}: <b>{{ test.ballSystem.min }}</b></div>
-                    <div><v-icon>mdi-vector-line</v-icon>{{ currentLang.dashboardView[28] }}: <b>{{ test.ballSystem.interval }}</b></div>
                     <div><v-icon>mdi-plus</v-icon>{{ currentLang.dashboardView[29] }}: <b>{{ test.ballSystem.max }}</b></div>
                 </div>
             </div>
 
             <div>
                 <v-icon>mdi-help-circle</v-icon>
-                {{ currentLang.dashboardView[30] }}: <b>{{ test.questions.length }}</b> <span v-if="test.questions.length">, {{ currentLang.dashboardView[31] }}:</span>
-                <div class="question-info" v-if="test.questions.length">
+                {{ currentLang.dashboardView[30] }}: <b>{{ questions.length }}</b> <span v-if="questions.length">, {{ currentLang.dashboardView[31] }}:</span>
+                <div class="question-info" v-if="questions.length">
                     <div>
                         <div><span style="color:rgb(255, 99, 132)">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
                         <div><span style="color:rgb(54, 162, 235)">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
@@ -80,6 +96,8 @@
 <script>
 import Chart from 'chart.js/auto'
 import { mapGetters } from 'vuex'
+import encrypt from '@/plugins/encrypt'
+import { getSubject, getAuthor, getThemes, getLanguages } from '@/plugins/getInfo'
 
 export default {
     props:{
@@ -94,27 +112,52 @@ export default {
 
             questionsWithImages: 0,
             questionWithField: 0,
-            basicQuestions: 0
+            basicQuestions: 0,
+            questions: []
         }
     },
-    computed: mapGetters(['currentLang']),
-    mounted() {
-        //Расчитать вопросы по их виду
-        if(this.test.questions.length){
-            for(let i =0; i!=this.test.questions.length; i++){
-                if(this.test.questions[i].type=='basic-question'){
-                    this.basicQuestions++                    
-                }else if(this.test.questions[i].type=='question-with-images'){
-                    this.questionsWithImages++
-                }else if(this.test.questions[i].type=='question-with-field'){
-                    this.questionWithField++
+    computed: mapGetters(['currentLang', 'currentSign']),
+    methods:{
+        getAuthor (id){
+            return getAuthor(id, this.currentSign)
+        },
+
+        getSubject(id){
+            return getSubject(id, this.currentSign.subjects)
+        },
+
+        getThemes(sub, thems){
+            return getThemes(sub, thems, this.currentSign)
+        },
+
+        getLanguages(langs){
+            return getLanguages(langs)
+        },
+
+        async calculateQuestions(){
+            const questions = await encrypt(this.test.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+            this.questions = JSON.parse(questions)
+        
+            //Расчитать вопросы по их виду
+            if(this.questions.length){
+                for(let i =0; i!=this.questions.length; i++){
+                    if(this.questions[i].type=='basic-question'){
+                        this.basicQuestions++                    
+                    }else if(this.questions[i].type=='question-with-images'){
+                        this.questionsWithImages++
+                    }else if(this.questions[i].type=='question-with-field'){
+                        this.questionWithField++
+                    }
                 }
             }
         }
     },
+    mounted() {
+        this.calculateQuestions()
+    },
     watch:{
         dialog(){
-            if(this.dialog && !this.chartAvaible && this.test.questions.length){
+            if(this.dialog && !this.chartAvaible && this.questions.length){
                 setTimeout(()=> {
                     const ctx = document.querySelector(`#questionsChart-${this.testID}`)
                     new Chart(ctx, {
@@ -159,10 +202,6 @@ export default {
 
 .main-info{
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap:30px;
-    justify-content: start;
 }
 
 .question-info{

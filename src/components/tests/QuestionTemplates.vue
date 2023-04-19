@@ -389,7 +389,7 @@ export default {
 
         questionFunc: Function,
         params: Object,
-        currentTest: Object
+        currentTest: Object,
     },
     data() {
         return {
