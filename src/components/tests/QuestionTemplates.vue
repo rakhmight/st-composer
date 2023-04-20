@@ -218,7 +218,7 @@
                 ></vue-slider>
             </div>
 
-            <div class="test__question-param" :class="{'params-3': currentQuestion.type=='question-with-images' || currentQuestion.type=='question-with-field', 'params-2': currentQuestion.type=='basic-question'}"> 
+            <div class="test__question-param" :class="{'params-3': currentQuestion.type=='question-with-images' || currentQuestion.type=='question-with-field', 'params-2': currentQuestion.type=='basic-question'}" style="position: relative;"> 
                 <!-- 
                     3params 
                     2params
@@ -238,6 +238,14 @@
                 @click:clear="imagePreview=''"
                 @click="imagePreview=''"
                 ></v-file-input>
+                <v-progress-circular
+                v-if="currentQuestion.type=='question-with-images' && imageLoader || currentQuestion.type=='question-with-field' && imageLoader "
+                color="#0C2242"
+                style="position: absolute;left:500px;top:8px"
+                size="25"
+                :width="2"
+                indeterminate
+                ></v-progress-circular>
 
                 <v-select
                 :items="themesList"
@@ -480,7 +488,8 @@ export default {
 
             answer: this.question.answer,
             themesList: [],
-            blockParse: false
+            blockParse: false,
+            imageLoader: false
         }
     },
     computed: mapGetters(['currentLang', 'currentSign']),
@@ -554,19 +563,23 @@ export default {
     },
     methods: {
 		handleFileUpload( event ){
+            this.imageLoader = true
 			this.file = event
 			let reader  = new FileReader()
 
 			reader.addEventListener("load", function () {
 				this.showPreview = true
 				this.imagePreview = reader.result
+                this.imageLoader = false
 			}.bind(this), false)
 
 			if( this.file ){
 				if ( /\.(jpe?g|png|svg|webp)$/i.test( this.file.name ) ) {
 					reader.readAsDataURL( this.file )
 				}
-			}
+			} else{
+                this.imageLoader = false
+            }
 		},
 
         deleteQuestion(id){

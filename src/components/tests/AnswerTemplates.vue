@@ -167,7 +167,7 @@
                 ></v-checkbox>
                 </div>
 
-                <div v-if="questionType=='question-with-images'">
+                <div v-if="questionType=='question-with-images'" style="position: relative;">
                     <v-file-input
                         :rules="rules"
                         accept="image/png, image/jpeg, image/bmp, image/webp, image/svg"
@@ -181,6 +181,15 @@
                         @click:clear="imagePreview=''"
                         @click="imagePreview=''"
                     ></v-file-input>
+                    
+                    <v-progress-circular
+                    v-if="questionType=='question-with-images' && imageLoader"
+                    color="#0C2242"
+                    style="position: absolute;left:420px;top:8px"
+                    size="25"
+                    :width="2"
+                    indeterminate
+                    ></v-progress-circular>
                 </div>
             </div>
             
@@ -239,6 +248,7 @@ export default {
             answerCtx: this.answer.answerCtx,
             currentAnswer: this.answer,
             isCurrect: this.answer.isCurrect,
+            imageLoader: false
         }
     },
     computed: mapGetters(['currentLang']),
@@ -246,17 +256,21 @@ export default {
 		handleFileUpload( event ){
 			this.file = event
 			let reader  = new FileReader()
+            this.imageLoader = true
 
 			reader.addEventListener("load", function () {
 				this.showPreview = true
 				this.imagePreview = reader.result
+                this.imageLoader = false
 			}.bind(this), false)
 
 			if( this.file ){
 				if ( /\.(jpe?g|png|svg|webp)$/i.test( this.file.name ) ) {
 					reader.readAsDataURL( this.file )
 				}
-			}
+			} else {
+                this.imageLoader = false
+            }
 		},
 
         deleteAnswer(){

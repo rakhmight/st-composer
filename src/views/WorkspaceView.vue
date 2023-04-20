@@ -1,5 +1,6 @@
 <template>
     <div class="wrapper">
+        <KeepAlive>
         <div class="container">
             <div class="workspace">
                 <div class="workspace__sidebar">
@@ -179,6 +180,7 @@
                 </div>
             </div>
         </div>
+        </KeepAlive>
     </div>
 </template>
 
@@ -458,6 +460,8 @@ export default {
 
                 questions[i].addEventListener('click', ()=>{
                     if(questionID==this.visibleQuestions[0] || questionID==this.visibleQuestions[1] || questionID==this.visibleQuestions[2] || questionID==this.visibleQuestions[3] || questionID==this.visibleQuestions[4] || questionID==this.visibleQuestions[5] || questionID==this.visibleQuestions[6] || questionID==this.visibleQuestions[7] || questionID==this.visibleQuestions[8] || questionID==this.visibleQuestions[9]){
+                    //if(questionID==this.visibleQuestions[0] || questionID==this.visibleQuestions[1] || questionID==this.visibleQuestions[2]){
+                    //if(questionID==this.visibleQuestions[0]){
                         if(desiredQuestion){
                             desiredQuestion.scrollIntoView({
                                 behavior: 'smooth',
@@ -483,6 +487,8 @@ export default {
             let counter = number
             for(let j = 0; j!=this.questions[this.questions.length-1].id; j++){
                 if(this.visibleQuestions.length!=10){
+                //if(this.visibleQuestions.length!=3){
+                //if(this.visibleQuestions.length!=1){
                     this.questions.filter(el=>{
                         if(el.id==counter){
                             this.visibleQuestions.push(el.id)
@@ -494,12 +500,16 @@ export default {
 
 
             if(this.visibleQuestions.length!=10){
+            //if(this.visibleQuestions.length!=3){
+            //if(this.visibleQuestions.length!=1){
                 if(this.questions.length==1){
                     counter = this.questions[0].id+1
                 }else{
                     counter = this.visibleQuestions[this.visibleQuestions.length-1]
                 }
                 while(this.visibleQuestions.length!=10){
+                //while(this.visibleQuestions.length!=3){
+                //while(this.visibleQuestions.length!=1){
                     this.visibleQuestions.push(counter)
                     counter++
                 }
