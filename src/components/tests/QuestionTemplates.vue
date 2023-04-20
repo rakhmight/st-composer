@@ -341,6 +341,8 @@
                 :currentTest="currentTest"
 
                 :isMultiple="multipleAnswers"
+                :parseMode="parseMode"
+                :showParse="showParse"
                 />
             </div>
         </div>
@@ -380,6 +382,7 @@ import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/default.css'
 import { mapGetters } from 'vuex'
+import uzbekLangParser from '@/plugins/uzbekLangParser'
 
 export default {
     props:{
@@ -390,6 +393,8 @@ export default {
         questionFunc: Function,
         params: Object,
         currentTest: Object,
+        parseMode: String,
+        showParse: Boolean
     },
     data() {
         return {
@@ -475,6 +480,7 @@ export default {
 
             answer: this.question.answer,
             themesList: [],
+            blockParse: false
         }
     },
     computed: mapGetters(['currentLang', 'currentSign']),
@@ -724,9 +730,17 @@ export default {
         },
         'questionCtx.uz_l'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+
+            if(this.parseMode=='lotin-kiril' && this.showParse){
+                this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'latin')
+            }
         },
         'questionCtx.uz_k'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+
+            if(this.parseMode=='kiril-lotin' && this.showParse){
+                this.questionCtx.uz_l = uzbekLangParser(this.questionCtx.uz_k, 'kiril')
+            }
         },
         'questionCtx.custom'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)

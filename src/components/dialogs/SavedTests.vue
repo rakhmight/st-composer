@@ -4,15 +4,14 @@
     width="700"
     >
     <template v-slot:activator="{ on, attrs }">
-        <v-btn
-        small
+        <div
         v-bind="attrs"
         v-on="on"
         class="dashboard__btn"
         >
-        <v-icon color="#0167FF" size="20">mdi-content-save-outline</v-icon>
-        <span style="color:#0167FF">{{ currentLang.dashboardView[38] }}</span>
-        </v-btn>
+        <v-icon color="#0167FF" size="19">mdi-content-save-outline</v-icon>
+        <span class="ml-1">{{ currentLang.dashboardView[38] }}</span>
+        </div>
     </template>
 
     <v-card>

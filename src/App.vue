@@ -12,6 +12,7 @@
 import { mapMutations,mapGetters } from 'vuex'
 import HeaderComponent from "@/components/HeaderComponent.vue"
 import { initDB } from '@/services/localDB'
+import checkTimers from '@/services/checkTimers'
 
 export default {
   name: 'App',
@@ -26,6 +27,8 @@ export default {
     // инициализация DB
     initDB()
 
+    // Проверка на удаление
+    checkTimers()
 
     // testCounter в LS
     let testsCounter = localStorage.getItem('testsCounter')

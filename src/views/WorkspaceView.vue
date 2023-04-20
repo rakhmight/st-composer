@@ -30,8 +30,8 @@
                         </div>
                         <div v-if="questions.length==0 && !loader" class="workspace__map-empty d-flex flex-column justify-center align-center" style="border-radius: 0 0 5px 5px;">
                             <v-img
-                            max-height="120"
-                            max-width="120"
+                            max-height="80"
+                            max-width="80"
                             src="@/assets/media/no-questions.png"
                             contain
                             transition="scale-transition"
@@ -71,7 +71,7 @@
                                             <td :style="question.id==visibleQuestions[0] || question.id==visibleQuestions[1] || question.id==visibleQuestions[2] || question.id==visibleQuestions[3] || question.id==visibleQuestions[4] || question.id==visibleQuestions[5] || question.id==visibleQuestions[6] || question.id==visibleQuestions[7] || question.id==visibleQuestions[8] || question.id==visibleQuestions[9] ? 'color:#0d5fd8;font-weight: bolder' : 'color:#000'">{{ i+1 }}</td>
                                             <td>
                                                 <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap, 'map-full':showFullMap}">
-                                                    <span v-if="question.questionCtx.ru || question.questionCtx.eng || question.questionCtx.uz_l || question.questionCtx.uz_k || question.questionCtx.custom">{{ getCurrentQuestion(question.questionCtx) }}</span>
+                                                    <span v-if="getCurrentQuestion(question.questionCtx)">{{ getCurrentQuestion(question.questionCtx) }}</span>
                                                     <span style="color:#888;" v-else>{{ currentLang.workspaceView[4] }}</span>
                                                 </p>
                                             </td>
@@ -150,21 +150,23 @@
                     :questionFunc="changeQuestion"
                     :params="testParams"
                     :currentTest="currentTest"
+                    :parseMode="parseMode"
+                    :showParse="showParse"
                     />
 
                     <div v-if="questions.length && !loader">
                         <p style="color:#444; text-align: center;">{{ currentLang.workspaceView[8] }}</p>
                     </div>
 
-                    <div v-if="questions.length==0 && !loader" class="d-flex flex-column justify-center align-center" style="height:400px;background-color: #aaaaaa80;border-radius: 5px;">
+                    <div v-if="questions.length==0 && !loader" class="d-flex flex-column justify-center align-center" style="height:70vh;background-color: #aaaaaa80;border-radius: 5px;">
                         <v-img
-                        max-height="200"
-                        max-width="200"
+                        max-height="100"
+                        max-width="100"
                         src="@/assets/media/spider-web.png"
                         contain
                         transition="scale-transition"
                         ></v-img>
-                        <h2 style="color:#888" class="mt-5">{{ currentLang.workspaceView[9] }}</h2>
+                        <h3 style="color:#888" class="mt-5">{{ currentLang.workspaceView[9] }}</h3>
                     </div>
 
                 </div>
@@ -172,7 +174,7 @@
                 <div class="workspace__tools-box">
                     
                         <!-- TOOLS -->
-                        <tools :loaderState='loader' :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate" :blockAddQBtn="blockAddQBtn"/>
+                        <tools :loaderState='loader' :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate" :blockAddQBtn="blockAddQBtn" :parseMode="parseMode" :changeParseMode="changeParseMode" :showParse="showParse"/>
 
                 </div>
             </div>
@@ -219,11 +221,17 @@ export default {
             asyncComplate: false,
             blockAddQBtn: false,
 
-            savingProcessLoop: false
+            savingProcessLoop: false,
+
+            parseMode: 'lotin-kiril',
+            showParse: false
         }
     },
     methods:{
         ...mapMutations(['clearSign']),
+        changeParseMode(mode){
+            this.parseMode = mode
+        },
         stopSaving(){
             clearInterval(this.savingInterval)
             clearInterval(this.loaderInterval)
@@ -626,6 +634,10 @@ export default {
                 operationFromStore('getByTestID',{id:+this.getTestID})
                 .then(async (result)=>{            
                     this.currentTest = result
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1 && this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
+                        this.showParse=true
+                    }
 
                     // расшифровка
                     let testData

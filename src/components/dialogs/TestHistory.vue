@@ -4,15 +4,14 @@
         width="800"
         >
         <template v-slot:activator="{ on, attrs }">
-            <v-btn
-            small
+            <div
             v-bind="attrs"
             v-on="on"
             class="dashboard__btn"
             >
-            <v-icon color="#0167FF" size="20">mdi-clock-time-eight-outline</v-icon>
-            <span style="color:#0167FF">{{ currentLang.dashboardView[60] }}</span>
-            </v-btn>
+            <v-icon color="#0167FF" size="19">mdi-clock-time-eight-outline</v-icon>
+            <span class="ml-1">{{ currentLang.dashboardView[60] }}</span>
+            </div>
         </template>
 
         <v-card>
@@ -30,8 +29,8 @@
                     <div class="content__subject-info mb-5">
                         <div><span style="color:#0167FF"><b>► </b></span> - {{ currentLang.dashboardView[62] }}</div>
                         <div><span style="color:blueviolet"><b>► </b></span> - {{ currentLang.dashboardView[63] }}</div>
-                        <div><span style="color:#ad8011"><b>►</b></span>/<span style="color:blue"><b>► </b></span> - {{ currentLang.dashboardView[64] }}</div>
-                        <div><span style="color:#27900dfa"><b>► </b></span> - {{ currentLang.dashboardView[65] }}</div>
+                        <div><span style="color:#ad8011"><b>►</b></span>/<span style="color:#27900dfa"><b>► </b></span> - {{ currentLang.dashboardView[64] }}</div>
+                        <div><span style="color:#0c2242"><b>► </b></span> - {{ currentLang.dashboardView[65] }}</div>
                         <div><span style="color:#ff4500"><b>► </b></span> - {{ currentLang.dashboardView[66] }}</div>
                     </div>
                     <v-simple-table>
@@ -68,10 +67,11 @@
                             <td v-if="action.type=='change' && action.des=='subject'"><span style="color:blueviolet"><b>► </b></span>{{ currentLang.dashboardView[80] }}: <b>{{ action.oldData }}</b></td>
                             <td v-if="action.type=='create'"><span style="color:#0167FF"><b>► {{ currentLang.dashboardView[81] }}</b></span></td>
                             <td v-if="action.type=='save'"><span style="color:#ad8011"><b>► {{ currentLang.dashboardView[82] }}</b></span></td>
-                            <td v-if="action.type=='sign'"><span style="color:#27900dfa"><b>► {{ currentLang.dashboardView[83] }}</b></span></td>
+                            <td v-if="action.type=='signed'"><span style="color:#0c2242"><b>► {{ currentLang.dashboardView[83] }}</b></span></td>
                             <td v-if="action.type=='delete'"><span style="color:#ff4500"><b>► {{ currentLang.dashboardView[84] }}</b></span></td>
-                            <td v-if="action.type=='restore'"><span style="color:blue"><b>► {{ currentLang.dashboardView[85] }}</b></span></td>
+                            <td v-if="action.type=='restore'"><span style="color:#27900dfa"><b>► {{ currentLang.dashboardView[85] }}</b></span></td>
 
+                            <td v-if="action.type=='signed'" class="text-center">{{ getCurrectDate(action.date) }}</td>
                             <td v-if="action.type=='change' && action.des!='difficulty-dissabled' && action.des!='difficulty-enabled' && action.des!='ball-dissabled' && action.des!='ball-enabled' && action.des!='multilingual-dissabled' && action.des!='multilingual-enabled'"  class="text-center">→<br>{{ action.date.date }} {{ action.date.time }}</td>
                             <td v-else class="text-center">{{ action.date.date }} {{ action.date.time }}</td>
 
@@ -104,6 +104,13 @@ export default {
     },
     computed: mapGetters(['currentLang']),
     methods:{
+        getCurrectDate(date){
+            if((date.getMonth()+1) < 9){
+                return `${date.getDate()}.0${date.getMonth()+1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
+            } else{
+                return `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
+            }
+        },
         getLanguages(langs){
             let languages = []
             langs.forEach(lang => {

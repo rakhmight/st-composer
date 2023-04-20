@@ -92,8 +92,10 @@ export async function operationFromStore(type, params) {
     else if(type=='addTimer'){
       await timers.add(params.data)
     }else if(type=='getTimers'){
-      let result = await tests.getAll()
+      let result = await timers.getAll()
       return result
+    } else if(type=='deleteTimer'){
+      await timers.delete(params.id)
     }
 
     // Signed
@@ -102,7 +104,7 @@ export async function operationFromStore(type, params) {
     }else if(type=='deleteSigned'){
       await signed.delete(params.id)
     }else if(type=='getSigned'){
-      let result = await savings.get(params.id)
+      let result = await signed.get(params.id)
       return result
     }
   }catch(e){

@@ -212,6 +212,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import uzbekLangParser from '@/plugins/uzbekLangParser'
 
 export default {
     props:{
@@ -220,7 +221,10 @@ export default {
         answerFunc: Function,
         questionID: Number,
         isMultiple: Boolean,
-        currentTest: Object
+        currentTest: Object,
+
+        parseMode: String,
+        showParse: Boolean
     },
     data() {
         return {
@@ -268,9 +272,17 @@ export default {
         },
         'answerCtx.uz_l'(){
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+
+            if(this.parseMode=='lotin-kiril' && this.showParse){
+                this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'latin')
+            }
         },
         'answerCtx.uz_k'(){
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+
+            if(this.parseMode=='kiril-lotin' && this.showParse){
+                this.answerCtx.uz_l = uzbekLangParser(this.answerCtx.uz_k, 'kiril')
+            }
         },
         'answerCtx.custom'(){
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)

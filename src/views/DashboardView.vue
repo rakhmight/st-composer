@@ -17,8 +17,20 @@
               <p style="color:#615f5f">{{ currentLang.dashboardView[0] }}: {{ tests.length }}</p>
             </div>
           </div>
-          <div class="dashboard__create-btn">
-            <create-test :renderFunc="loadTests"></create-test>
+          <div class="d-flex flex-row" style="gap: 15px">
+            <div class="dashboard__import-btn">
+              <v-btn
+              small
+              color="#0C2242"
+              @click="importTest()"
+              >
+              <v-icon color="#fff" size="19">mdi-file-download-outline</v-icon>
+              <span style="color:#fff">Импортировать тест</span>
+              </v-btn>
+            </div>
+            <div class="dashboard__create-btn">
+              <create-test :renderFunc="loadTests"></create-test>
+            </div>
           </div>
         </div>
 
@@ -106,8 +118,11 @@ import { operationFromStore } from '@/services/localDB'
           this.clearSign()
           return this.$router.push('/')
         })
-      }
+      },
 
+      async importTest(){
+
+      }
     },
     computed: mapGetters(['currentSign', 'currentLang']),
     components:{
@@ -161,5 +176,12 @@ import { operationFromStore } from '@/services/localDB'
 }
 .v-dialog{
   overflow: hidden;
+}
+.dashboard__btn{
+    padding: 4px 10px;
+    font-size: 0.95em;
+}
+.dashboard__btn:hover{
+    background-color: #0000000f;
 }
 </style>

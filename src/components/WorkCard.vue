@@ -7,6 +7,7 @@
           src="@/assets/media/work.png"
           contain
           max-width="40"
+          style="opacity: 0.5;"
           ></v-img>
 
           <!-- isSigned -->
@@ -15,6 +16,7 @@
           src="@/assets/media/work-complete.png"
           contain
           max-width="40"
+          style="opacity: 0.9;"
           ></v-img>
 
           <v-tooltip left color="error" v-if="status.isSigned">
@@ -23,11 +25,10 @@
                 v-bind="attrs"
                 v-on="on"> 
                   <v-icon size="20" color="#ff4500">mdi-delete</v-icon>
-                  4
-                  <!--  -->
+                  {{ getDelTime() }}
               </div>
             </template>
-            <span>{{ currentLang.dashboardView[10] }}: 4{{ currentLang.dashboardView[11] }}</span>
+            <span>{{ currentLang.dashboardView[10] }}: {{ getDelTime() }} {{ currentLang.dashboardView[11] }}</span>
           </v-tooltip>
           <!--  -->
 
@@ -52,8 +53,8 @@
 
             <!-- isSigned -->
             <tr v-else>
-              <td style="color:orangered">{{ currentLang.dashboardView[15] }}:</td>
-              <td style="color:orangered">{{ test.signedDate.date }}</td>
+              <td style="color:#0C2242">{{ currentLang.dashboardView[15] }}:</td>
+              <td style="color:#0C2242">{{ getSignedDate() }}</td>
             </tr>
             <!--  -->
 
@@ -80,6 +81,15 @@
                   <edit-test :test="currentTest" :renderFunc="renderTests"/>
                   <test-history :test="currentTest"/>
                   <delete-test :test="currentTest" :renderFunc="renderTests" />
+                  <div
+                  class="dashboard__btn"
+                  style="cursor: pointer;"
+                  v-if="test.status.isSigned"
+                  @click="uploadTest()"
+                  >
+                  <v-icon color="#0C2242" size="19">mdi-file-upload-outline</v-icon>
+                  <span class="ml-1">Скачать тест</span>
+                  </div>
                 </v-list>
             </v-menu>
           </template>
@@ -133,6 +143,7 @@ import EditTest from './dialogs/EditTest.vue'
 import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
 import { mapMutations, mapGetters } from 'vuex'
+import { operationFromStore } from '@/services/localDB'
 
 export default {
   props:{
@@ -152,6 +163,17 @@ export default {
   computed: mapGetters(['currentLang', 'currentSign']),
   methods:{
     ...mapMutations(['updateTestID']),
+    getSignedDate(){
+      if((this.test.signedDate.getMonth()+1) < 9){
+        return `${this.test.signedDate.getDate()}.0${this.test.signedDate.getMonth()+1}.${this.test.signedDate.getFullYear()}`
+      } else{
+        return `${this.test.signedDate.getDate()}.${this.test.signedDate.getMonth()+1}.${this.test.signedDate.getFullYear()}`
+      }
+    },
+    getDelTime(){
+      let time = (this.test.signedDate.getTime()+1296000000) - new Date()
+      return Math.round(time / 86400000)
+    },
     renderTests(ctx){
       this.renderFunc()
       this.currentTest = ctx
@@ -170,6 +192,19 @@ export default {
       }else {
         return id
       }
+    },
+
+    async uploadTest(){
+      await operationFromStore('getSigned', { id: this.test.id })
+      .then(data=>{
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `test-${this.test.subjectID}.json`);
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+      })
     }
   },
   mounted(){
@@ -210,7 +245,6 @@ padding: 15px 10px 0;
 .work__logo{
   height: 100%;
   width: 60px;
-  opacity: 0.5;
 }
 .work__info{
   width: 100%;

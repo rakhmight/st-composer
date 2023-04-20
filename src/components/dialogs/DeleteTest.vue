@@ -4,15 +4,14 @@
         width="700"
         >
         <template v-slot:activator="{ on, attrs }">
-            <v-btn
-            small
+            <div
             v-bind="attrs"
             v-on="on"
             class="dashboard__btn"
             >
-            <v-icon color="#ff4500" size="20">mdi-trash-can-outline</v-icon>
-            <span style="color:#ff4500">{{ currentLang.dashboardView[87] }}</span>
-            </v-btn>
+            <v-icon color="#ff4500" size="19">mdi-trash-can-outline</v-icon>
+            <span class="ml-1" style="color:#ff4500">{{ currentLang.dashboardView[87] }}</span>
+            </div>
         </template>
 
         <v-card>

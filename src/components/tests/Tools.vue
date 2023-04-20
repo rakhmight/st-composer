@@ -80,7 +80,58 @@
         </div> 
 
         <!-- INSTRUCTION -->
-        <to-instruction :saveFunc="saveFunction" :asyncComplate="asyncComplate"></to-instruction>
+        <div class="d-flex flex-row">
+            <v-menu
+            top
+            offset-y
+            max-width="250"
+            v-if="showParse"
+            >
+                <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    small
+                    dark
+                    color="#444"
+                    v-bind="attrs"
+                    v-on="on"
+                    class="mr-8"
+                >
+                    <v-img
+                    src="@/assets/media/uzbekistan.png"
+                    width="20"
+                    height="20"
+                    ></v-img>
+                    <span class="ml-1" v-if="parseMode=='lotin-kiril'">Lotin→Кирил</span>
+                    <span class="ml-1" v-else>Кирил→Lotin</span>
+                    <v-icon
+                    size="22"
+                    >mdi-menu-down</v-icon>
+                </v-btn>
+                </template>
+
+                <v-list
+                >
+                <v-btn
+                class="header__btn" 
+                small
+                color="#444"
+                @click="changeParseMode('lotin-kiril')"
+                >
+                    <span style="color:#fff">Lotin→Кирил</span>
+                </v-btn>
+                <v-btn
+                class="header__btn" 
+                small
+                color="#444"
+                @click="changeParseMode('kiril-lotin')"
+                >
+                    <span style="color:#fff">Кирил→Lotin</span>
+                </v-btn>
+                </v-list>
+            </v-menu>
+
+            <to-instruction :saveFunc="saveFunction" :asyncComplate="asyncComplate"></to-instruction>
+        </div>
 
     </div>
 </template>
@@ -101,11 +152,15 @@ export default {
         currentTestID: Number,
 
         asyncComplate: Boolean,
-        blockAddQBtn: Boolean
+        blockAddQBtn: Boolean,
+
+        parseMode: String,
+        changeParseMode: Function,
+        showParse: Boolean
     },
     data() {
         return {
-            tasks: this.allTasks
+            tasks: this.allTasks,
         }
     },
     computed: mapGetters(['currentLang']),

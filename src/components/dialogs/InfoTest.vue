@@ -3,15 +3,14 @@
     width="700"
     >
     <template v-slot:activator="{ on, attrs }">
-        <v-btn
-        small
+        <div
         v-bind="attrs"
         v-on="on"
         class="dashboard__btn"
         >
-        <v-icon color="#0167FF" size="20">mdi-information</v-icon>
-        <span style="color:#0167FF">{{ currentLang.dashboardView[18] }}</span>
-        </v-btn>
+        <v-icon color="#0167FF" size="19">mdi-information</v-icon>
+        <span class="ml-1">{{ currentLang.dashboardView[18] }}</span>
+        </div>
     </template>
 
     <v-card>
@@ -37,6 +36,10 @@
                         <tr>
                             <td><div v-if="test.lastModified">{{ currentLang.dashboardView[21] }}</div></td>
                             <td><div class="text-end" v-if="test.lastModified"><b style="color:#444">{{ test.lastModified.date }} {{ test.lastModified.time }}</b></div></td>
+                        </tr>
+                        <tr>
+                            <td><div v-if="test.status.isSigned">Дата подписания</div></td>
+                            <td><div class="text-end" v-if="test.status.isSigned"><b style="color:#0C2242">{{ getDate(test.signedDate) }}</b></div></td>
                         </tr>
                         <tr>
                             <td><div>{{ currentLang.dashboardView[22] }}</div></td>
@@ -149,6 +152,14 @@ export default {
                         this.questionWithField++
                     }
                 }
+            }
+        },
+
+        getDate(date){
+            if(date.getMonth() < 9){
+                return `${date.getDate()}.0${date.getMonth()+1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
+            } else{
+                return `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
             }
         }
     },
