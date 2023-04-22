@@ -542,11 +542,17 @@ export default {
             if(this.imagePreview){
                 this.showPreview = true
             
-                // setTimeout(()=>{
-                //     if(this.currentQuestion.type=='question-with-field'){
-                //         this.summonField()
-                //     }
-                // },500)
+                setTimeout(()=>{
+                    if(this.currentQuestion.type=='question-with-field'){
+                        const searchImage = setInterval(()=>{
+                            let target = document.querySelector(`.img_${this.currentQuestion.id}`)
+                            if(target){
+                                this.summonField()
+                                clearInterval(searchImage)
+                            }
+                        },200)
+                    }
+                },500)
             }
 
             // балловая система
@@ -686,7 +692,7 @@ export default {
         },
 
         summonField(){
-           setTimeout(()=>{
+           //setTimeout(()=>{
                 let target = document.querySelector(`.img_${this.currentQuestion.id}`)
 
                 if(!this.multipleAnswers){
@@ -734,7 +740,7 @@ export default {
                         }
                     })
                 }
-           },500)
+           //},500)
         },
 
         clearFields(){
@@ -855,9 +861,6 @@ export default {
                 }
             }else{
                 this.showPreview = true
-                if(this.currentQuestion.type=='question-with-field'){
-                    this.summonField()
-                }
             }
             this.questionFunc('imagePreview', this.imagePreview, this.currentQuestion.id)
         },
@@ -891,7 +894,13 @@ export default {
                         ]
                     }
                     
-                    this.summonField()
+                    const searchImage = setInterval(()=>{
+                        let target = document.querySelector(`.img_${this.currentQuestion.id}`)
+                        if(target){
+                            this.summonField()
+                            clearInterval(searchImage)
+                        }
+                    },200)
                 }
 
             }
