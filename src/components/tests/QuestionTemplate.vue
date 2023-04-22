@@ -495,7 +495,7 @@ export default {
     	    ball: this.currentQuestion.ball,
     	    multipleAnswers: this.currentQuestion.multipleAnswers,
 
-            answer: this.currentQuestion.answer,
+            answer: this.currentQuestion.answer ? this.currentQuestion.answer : undefined,
             themesList: [],
             blockParse: false,
             imageLoader: false,
@@ -542,11 +542,11 @@ export default {
             if(this.imagePreview){
                 this.showPreview = true
             
-                setTimeout(()=>{
-                    if(this.answer){
-                        this.summonField()
-                    }
-                },500)
+                // setTimeout(()=>{
+                //     if(this.currentQuestion.type=='question-with-field'){
+                //         this.summonField()
+                //     }
+                // },500)
             }
 
             // балловая система
@@ -686,39 +686,18 @@ export default {
         },
 
         summonField(){
-            let target = document.querySelector(`.img_${this.currentQuestion.id}`)
+           setTimeout(()=>{
+                let target = document.querySelector(`.img_${this.currentQuestion.id}`)
 
-            if(!this.multipleAnswers){
-                let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
-                if(removeEl){
-                    for(let i = 0; i!=removeEl.length; i++){
-                        removeEl[i].remove()
+                if(!this.multipleAnswers){
+                    let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                    if(removeEl){
+                        for(let i = 0; i!=removeEl.length; i++){
+                            removeEl[i].remove()
+                        }
                     }
-                }
 
-                if(this.answer[1] && this.answer[1].x){
-                    let field = document.createElement('div')
-                    field.classList.add(`target-${this.currentQuestion.id}`)
-                    field.style.padding = this.answer[0].fault+'px'
-                    field.style.backgroundColor = 'red'
-                    field.style.opacity = '0.5'
-                    field.style.position = 'absolute'
-                    field.style.zIndex = 10
-                    field.style.left = this.answer[1].x-this.answer[0].fault+'px'
-                    field.style.top =  this.answer[1].y-this.answer[0].fault+'px'
-
-                    target.appendChild(field)
-                }
-            }else{
-                let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
-                if(removeEl){
-                    for(let i = 0; i!=removeEl.length; i++){
-                        removeEl[i].remove()
-                    }
-                }
-
-                this.answer.filter(el=>{
-                    if(el.hasOwnProperty('x') && el.x){
+                    if(this.answer[1] && this.answer[1].x){
                         let field = document.createElement('div')
                         field.classList.add(`target-${this.currentQuestion.id}`)
                         field.style.padding = this.answer[0].fault+'px'
@@ -726,13 +705,36 @@ export default {
                         field.style.opacity = '0.5'
                         field.style.position = 'absolute'
                         field.style.zIndex = 10
-                        field.style.left = el.x-this.answer[0].fault+'px'
-                        field.style.top =  el.y-this.answer[0].fault+'px'
+                        field.style.left = this.answer[1].x-this.answer[0].fault+'px'
+                        field.style.top =  this.answer[1].y-this.answer[0].fault+'px'
 
                         target.appendChild(field)
                     }
-                })
-            }
+                }else{
+                    let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                    if(removeEl){
+                        for(let i = 0; i!=removeEl.length; i++){
+                            removeEl[i].remove()
+                        }
+                    }
+
+                    this.answer.filter(el=>{
+                        if(el.hasOwnProperty('x') && el.x){
+                            let field = document.createElement('div')
+                            field.classList.add(`target-${this.currentQuestion.id}`)
+                            field.style.padding = this.answer[0].fault+'px'
+                            field.style.backgroundColor = 'red'
+                            field.style.opacity = '0.5'
+                            field.style.position = 'absolute'
+                            field.style.zIndex = 10
+                            field.style.left = el.x-this.answer[0].fault+'px'
+                            field.style.top =  el.y-this.answer[0].fault+'px'
+
+                            target.appendChild(field)
+                        }
+                    })
+                }
+           },500)
         },
 
         clearFields(){
@@ -761,6 +763,10 @@ export default {
                 this.showPreview = false
                 if(this.currentQuestion.imagePreview){
                     this.imagePreview = this.currentQuestion.imagePreview
+                    this.showPreview = true
+                } else {
+                    this.imagePreview = ''
+                    this.showPreview = false
                 }
                 this.errors =[]
                 if(this.currentQuestion.answer){
@@ -849,6 +855,9 @@ export default {
                 }
             }else{
                 this.showPreview = true
+                if(this.currentQuestion.type=='question-with-field'){
+                    this.summonField()
+                }
             }
             this.questionFunc('imagePreview', this.imagePreview, this.currentQuestion.id)
         },

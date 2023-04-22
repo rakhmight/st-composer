@@ -109,6 +109,7 @@
                         v-model="answerCtx.uz_l"
                         :success="answer.isCurrect"
                         spellcheck="false"
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='kiril-lotin'"
                         ></v-textarea>
                         <v-tooltip right>
                         <template v-slot:activator="{ on, attrs }">
@@ -140,6 +141,7 @@
                         v-model="answerCtx.uz_k"
                         :success="answer.isCurrect"
                         spellcheck="false"
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='lotin-kiril'"
                         ></v-textarea>
                         <v-tooltip right>
                         <template v-slot:activator="{ on, attrs }">
