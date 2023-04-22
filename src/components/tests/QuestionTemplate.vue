@@ -1,17 +1,17 @@
 <template>
-    <div class="test" :class="`question_${currentQuestion.id}`" :id="currentQuestion.id">
+    <div class="test" :class="`question_${currentQuestion.id}`" :id="currentQuestion.id" v-if="!switchCtx">
         <div class="test__header d-flex flex-row justify-space-between mb-2" style="position: relative;">
             <div class="d-flex flex-row">
                 <v-icon size="16" color="#888" class="mr-1">mdi-pound</v-icon>
-                <p style="color: #888" class="mr-5">{{ currentLang.workspaceView[20] }} {{ serialNumber }} (п/п) | {{ currentQuestion.id }} {{ currentLang.workspaceView[21] }}</p>
+                <p style="color: #888" class="mr-5">{{ currentLang.workspaceView[20] }} {{ currentQuestion.id }} {{ currentLang.workspaceView[21] }}</p>
 
                 <!--  -->
-                <test-type-icons :type="currentQuestion.type" :questionID="currentQuestion.id" :questions="allQuestions"/>
+                <!-- <test-type-icons :type="currentQuestion.type" :questionID="currentQuestion.id" :questions="allQuestions"/> -->
 
             </div>
             <div class="d-flex flex-row align-center">
                 <v-icon size="16" color="#888" class="mr-1">mdi-clock-time-eight-outline</v-icon>
-                <p style="color: #888">{{ currentLang.workspaceView[22] }}: {{ question.lastModified.date }} {{ question.lastModified.time }}</p>
+                <p style="color: #888">{{ currentLang.workspaceView[22] }}: {{ currentQuestion.lastModified.date }} {{ currentQuestion.lastModified.time }}</p>
                 
                 <v-tooltip bottom color="error">
                 <template v-slot:activator="{ on, attrs }">
@@ -49,7 +49,7 @@
                 <div class="d-flex flex-column align-start w-100">
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('custom')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('custom')!=-1"
                     style="width:100%; gap:15px"
                     class="d-flex flex-row"
                     >
@@ -68,7 +68,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/global.png"
                             width="30"
                             height="30"
@@ -80,7 +80,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('ru')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('ru')!=-1"
                     style="width:100%; gap:15px"
                     class="d-flex flex-row"
                     >
@@ -98,7 +98,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/russia.png"
                             width="30"
                             height="30"
@@ -110,7 +110,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('eng')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('eng')!=-1"
                     style="width:100%; gap:15px"
                     class="d-flex flex-row"
                     >
@@ -129,7 +129,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/united-states.png"
                             width="30"
                             height="30"
@@ -141,7 +141,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('uz_l')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1"
                     style="width:100%; gap:15px"
                     class="d-flex flex-row"
                     >
@@ -154,13 +154,14 @@
                         v-model="questionCtx.uz_l"
                         style="width: 100%;"
                         spellcheck="false"
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='kiril-lotin'"
                         ></v-textarea>
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
                             width="30"
                             height="30"
@@ -172,7 +173,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('uz_k')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('uz_k')!=-1"
                     style="width:100%; gap:15px"
                     class="d-flex flex-row"
                     >
@@ -185,13 +186,14 @@
                         v-model="questionCtx.uz_k"
                         style="width: 100%;"
                         spellcheck="false"
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='lotin-kiril'"
                         ></v-textarea>
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
                             width="30"
                             height="30"
@@ -204,14 +206,14 @@
                 </div>
             </div>
 
-            <div class="mb-10" v-if="params.ballSystem">
+            <div class="mb-10" v-if="testOptions.ballSystem">
                 <!-- range -->
                 <div class="d-flex flex-row mb-1">
                     <v-icon class="mr-2">mdi-circle-double</v-icon>
                     <p style="color: #888" class="mb-1">{{ currentLang.workspaceView[27] }}: <b style="color:green">{{ ball }}</b></p>
                 </div>
                 <vue-slider
-                class="pl-3 pr-3"
+                    class="pl-3 pr-3"
                     ref="slider"
                     v-model="ball"
                     v-bind="options"
@@ -257,7 +259,7 @@
                 ></v-select>
 
                 <v-select
-                v-if="params.considerDifficulty"
+                v-if="testOptions.considerDifficulty"
                 :items="difficultys"
                 :placeholder="currentLang.workspaceView[31]"
                 outlined
@@ -338,15 +340,15 @@
             <div class="test__answers mt-3">
 
                 <!--  -->
-                <answer
-                v-if="currentQuestion.type!='question-with-field'"
+                <answer-templates
+                v-if="currentQuestion.type!='question-with-field' && !switchCtx"
                 v-for="answer in answers"
                 :answer="answer"
                 :key="answer.id"
                 :type="currentQuestion.type"
                 :answerFunc="changeAnswer"
                 :questionID="currentQuestion.id"
-                :currentTest="currentTest"
+                :testOptions="testOptions"
 
                 :isMultiple="multipleAnswers"
                 :parseMode="parseMode"
@@ -382,29 +384,41 @@
             </div>
         </div>
     </div>
+    <div class="switch d-flex align-center justify-center" v-else>
+        <v-progress-circular
+        :size="70"
+        :width="3"
+        color="#0167ff"
+        indeterminate
+        >
+        </v-progress-circular>
+    </div>
 </template>
 
 <script>
-import Answer from '@/components/tests/AnswerTemplates.vue'
-import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
-import VueSlider from 'vue-slider-component'
-import 'vue-slider-component/theme/default.css'
 import { mapGetters } from 'vuex'
+import AnswerTemplates from './AnswerTemplates.vue'
+import VueSlider from 'vue-slider-component'
 import uzbekLangParser from '@/plugins/uzbekLangParser'
+import 'vue-slider-component/theme/default.css'
 
 export default {
     props:{
-        question: Object,
-        deleteFunc: Function,
-        questions: Array,
-
-        questionFunc: Function,
-        params: Object,
-        currentTest: Object,
+        currentQuestion: Object,
+        testOptions: Object,
+        
         parseMode: String,
-        showParse: Boolean
+        showParse: Boolean,
+        deleteFunc: Function,
+        questionFunc: Function,
+        switchCurrentQuestion: Boolean,
+        switchQuestion: Function
     },
-    data() {
+    components:{
+        AnswerTemplates,
+        VueSlider
+    },
+    data(){
         return {
             // Question start params ==============
             rules: [
@@ -412,9 +426,9 @@ export default {
             ],
 			file: '',
             showPreview: false,
-            imagePreview: this.question.imagePreview,
+            imagePreview: this.currentQuestion.imagePreview,
             errors:[],
-            themes:this.params.themes,
+            themes:this.testOptions.themes,
             difficultys:[
                 {value:1, text: ''},
                 {value:2, text: ''},
@@ -471,35 +485,32 @@ export default {
             },
             answersCounter: 0,
             showConfirmWithDelete: false,
-            serialNumber: 0,
-            allQuestions: this.questions,
             // ===================================
 
-            // Question in props
-            currentQuestion: this.question,
-
             // сделать динамичными  - нач. значения
-            answers: this.question.answers,
-            questionCtx: this.question.questionCtx,
-            theme: this.question.theme,
-            difficulty: this.question.difficulty,
-    	    ball: this.question.ball,
-    	    multipleAnswers: this.question.multipleAnswers,
+            answers: this.currentQuestion.answers,
+            questionCtx: this.currentQuestion.questionCtx,
+            theme: this.currentQuestion.theme,
+            difficulty: this.currentQuestion.difficulty,
+    	    ball: this.currentQuestion.ball,
+    	    multipleAnswers: this.currentQuestion.multipleAnswers,
 
-            answer: this.question.answer,
+            answer: this.currentQuestion.answer,
             themesList: [],
             blockParse: false,
-            imageLoader: false
+            imageLoader: false,
+            switchCtx: false
         }
     },
     computed: mapGetters(['currentLang', 'currentSign']),
-    mounted() {
+    mounted(){
+        // Lang
         this.difficultys[0].text = this.currentLang.workspaceView[17]
         this.difficultys[1].text = this.currentLang.workspaceView[18]
         this.difficultys[2].text = this.currentLang.workspaceView[19]
 
         // даю темам названия из подписи
-        const subject = this.currentSign.subjects.find(subject=> subject.id ==this.currentTest.subjectID)
+        const subject = this.currentSign.subjects.find(subject=> subject.id == this.testOptions.subjectID)
         if(subject){
             this.themes.forEach((theme)=>{
                 let fTheme = subject.themes.find(item=> item.id==theme)
@@ -514,54 +525,57 @@ export default {
             this.themesList = [...this.themes]
         }
 
-        this.checkIndex()
-
-        if(this.currentQuestion.type != 'question-with-field'){
-            this.answersCounter = this.question.answers.length
-        }else{
-            if(this.question.answer.length>=3){
-                this.multipleAnswers = true
-            }
-        }
-
-        if(this.imagePreview){
-            this.showPreview = true
-        
-            setTimeout(()=>{
-                if(this.answer){
-                    this.summonField()
-                }
-            },500)
-        }
-
-        // балловая система
-        if(this.params.ballSystem){
-            this.options.min = +this.params.ballSystem.min
-            this.options.max = +this.params.ballSystem.max
-            this.options.interval = +this.params.ballSystem.min>=1 && +this.params.ballSystem.max>=100 ? 1 : +this.params.ballSystem.min>=1 && +this.params.ballSystem.max<100 ? 0.1 : 0.01
-            this.options.marks = [+this.params.ballSystem.min, +this.params.ballSystem.max]
-
-            if(this.ball<+this.params.ballSystem.min){
-                this.ball = +this.params.ballSystem.min
-            }
-            if(this.ball>+this.params.ballSystem.max){
-                this.ball = +this.params.ballSystem.max
-            }
-        }
-
-        // проверка темы
-        let themesCounter = 0
-        this.params.themes.filter(el=>{
-            if(el==this.theme){
-                themesCounter++
-            }
-        })
-
-        if(!themesCounter){
-            this.theme = undefined
-        }
+        this.initQuestion()
     },
-    methods: {
+    methods:{
+        initQuestion(){
+            // Счётчик ответов
+            if(this.currentQuestion.type != 'question-with-field'){
+                this.answersCounter = this.currentQuestion.answers.length
+            }else{
+                if(this.currentQuestion.answer.length>=3){
+                    this.multipleAnswers = true
+                }
+            }
+
+            // есть ли изображение у вопроса
+            if(this.imagePreview){
+                this.showPreview = true
+            
+                setTimeout(()=>{
+                    if(this.answer){
+                        this.summonField()
+                    }
+                },500)
+            }
+
+            // балловая система
+            if(this.testOptions.ballSystem){
+                this.options.min = +this.testOptions.ballSystem.min
+                this.options.max = +this.testOptions.ballSystem.max
+                this.options.interval = +this.testOptions.ballSystem.min>=1 && +this.testOptions.ballSystem.max>=100 ? 1 : +this.testOptions.ballSystem.min>=1 && +this.testOptions.ballSystem.max<100 ? 0.1 : 0.01
+                this.options.marks = [+this.testOptions.ballSystem.min, +this.testOptions.ballSystem.max]
+
+                if(this.ball<+this.testOptions.ballSystem.min){
+                    this.ball = +this.testOptions.ballSystem.min
+                }
+                if(this.ball>+this.testOptions.ballSystem.max){
+                    this.ball = +this.testOptions.ballSystem.max
+                }
+            }
+
+            // проверка темы
+            let themesCounter = 0
+            this.testOptions.themes.filter(el=>{
+                if(el==this.theme){
+                    themesCounter++
+                }
+            })
+
+            if(!themesCounter){
+                this.theme = undefined
+            }
+        },
 		handleFileUpload( event ){
             this.imageLoader = true
 			this.file = event
@@ -612,14 +626,6 @@ export default {
         launchConfirm(){
             this.showConfirmWithDelete = true
             setTimeout(()=> this.showConfirmWithDelete = false, 3000)
-        },
-        checkIndex(){
-            this.questions.filter(el => {
-                if(el.id==this.currentQuestion.id){
-                    this.serialNumber = this.questions.indexOf(el)+1
-                    
-                }
-            })
         },
 
         getCoords(elem) {
@@ -735,6 +741,48 @@ export default {
         }
     },
     watch:{
+        switchCurrentQuestion(){
+            if(this.switchCurrentQuestion){
+                this.switchCtx = true
+                if(this.currentQuestion.answers){ 
+                    this.answers = this.currentQuestion.answers
+                }
+                this.questionCtx = this.currentQuestion.questionCtx
+                this.theme = this.currentQuestion.theme
+                if(this.currentQuestion.difficulty){
+                    this.difficulty = this.currentQuestion.difficulty
+                }
+                if(this.currentQuestion.ball){
+                    this.ball = this.currentQuestion.ball
+                }
+                this.multipleAnswers = this.currentQuestion.multipleAnswers
+                this.answersCounter = 0
+                this.file = ''
+                this.showPreview = false
+                if(this.currentQuestion.imagePreview){
+                    this.imagePreview = this.currentQuestion.imagePreview
+                }
+                this.errors =[]
+                if(this.currentQuestion.answer){
+                    this.answer = this.currentQuestion.answer
+                }
+                this.blockParse = false
+                this.imageLoader = false
+
+                this.initQuestion()
+                this.switchQuestion()
+                
+                setTimeout(()=>{
+                    this.switchCtx = false
+                },500)
+            }
+        },
+        currentQuestion(){
+            this.switchCtx = true
+            setTimeout(()=>{
+                this.switchCtx = false
+            },500)
+        },
         'questionCtx.ru'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
@@ -781,7 +829,7 @@ export default {
                             removeEl.remove()
                         }
 
-                        [1].y = undefined
+                        this.answer[1].y = undefined
                         this.answer[1].x = undefined
                     } else{
                         let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
@@ -803,10 +851,6 @@ export default {
                 this.showPreview = true
             }
             this.questionFunc('imagePreview', this.imagePreview, this.currentQuestion.id)
-        },
-
-        allQuestions(){
-            this.checkIndex()
         },
 
         multipleAnswers(){
@@ -843,16 +887,15 @@ export default {
 
             }
         }
-    },
-    components:{
-        Answer,
-        VueSlider,
-        TestTypeIcons
     }
 }
 </script>
 
-<style>
+<style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .test{
     background-color: aliceblue;
     border-radius: 5px;
@@ -860,6 +903,11 @@ export default {
     box-shadow: 0px 0px 5px 5px #4444441c;
     scroll-margin-top:90px;
     min-width: 1020px;
+}
+
+.switch{
+    height: 50vh;
+    border-radius: 5px;
 }
 
 .test__answers{

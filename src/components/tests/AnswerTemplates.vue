@@ -6,7 +6,7 @@
                 <div style="position: relative">
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('custom')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('custom')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -23,7 +23,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/global.png"
                             width="22"
                             height="22"
@@ -36,7 +36,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('ru')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('ru')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -53,7 +53,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/russia.png"
                             width="22"
                             height="22"
@@ -66,7 +66,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('eng')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('eng')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -84,7 +84,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/united-states.png"
                             width="22"
                             height="22"
@@ -97,7 +97,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('uz_l')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -115,7 +115,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
                             width="22"
                             height="22"
@@ -128,7 +128,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('uz_k')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('uz_k')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -146,7 +146,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
                             width="22"
                             height="22"
@@ -230,10 +230,10 @@ export default {
         answerFunc: Function,
         questionID: Number,
         isMultiple: Boolean,
-        currentTest: Object,
+        testOptions: Object,
 
         parseMode: String,
-        showParse: Boolean
+        showParse: Boolean,
     },
     data() {
         return {

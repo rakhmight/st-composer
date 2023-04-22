@@ -364,7 +364,13 @@ export default {
                     history:[putToHistory('create', undefined)],
                     signedDate: undefined,
                     questions:[],
-                    signHash: this.currentSign.hash
+                    signHash: this.currentSign.hash,
+                    testInfo: {
+                        totalQuestions: 0,
+                        qwi: 0,
+                        qwf: 0,
+                        bq:0
+                    }
                 }
                 if(this.haveBall){
                     test.ballSystem = {

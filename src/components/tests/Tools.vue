@@ -1,11 +1,12 @@
 <template>
     <div class="workspace__tools">
-        <div class="autosave" v-if="!loaderState">
+        <div class="autosave" v-if="loaderState">
             <v-tooltip right color="#00000073">
             <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on" class="d-flex flex-row align-center">
-                    <v-progress-circular color="primary" indeterminate size="15" width="2"></v-progress-circular>
-                    <p style="color: #888" class="ml-2">{{ currentLang.workspaceView[41] }}</p>
+                    
+                    <v-checkbox v-model="autosavingEnable"></v-checkbox>
+                    <p style="color: #888">{{ currentLang.workspaceView[41] }}</p>
                 </div>
             </template>
             <span>{{ currentLang.workspaceView[42] }}</span>
@@ -19,7 +20,7 @@
                 color="#0d5fd8"
                 class="mr-8"
                 @click="createQuestion('basic-question')"
-                :disabled="!asyncComplate || blockAddQBtn"
+                :disabled="!loaderState || blockAddQBtn || saveProcessFinally.value"
                 >
                     <v-icon size="20">mdi-plus</v-icon>
                     {{ currentLang.workspaceView[43] }}
@@ -38,7 +39,7 @@
                     v-bind="attrs"
                     v-on="on"
                     class="mr-8"
-                    :disabled="!asyncComplate"
+                    :disabled="!loaderState || saveProcessFinally.value"
                 >
                     <v-icon
                     size="22"
@@ -59,9 +60,9 @@
                 v-for="(task, i) in tasks"
                 @click="createQuestion(task.type)"
                 :key="i"
-                :disabled="task.isDisabled || blockAddQBtn"
+                :disabled="task.isDisabled || blockAddQBtn || saveProcessFinally.value"
                 >
-                    <span v-if="!task.isDisabled" style="color:#0167FF">{{task.name}}</span>
+                    <span v-if="task.isDisabled || !blockAddQBtn || !saveProcessFinally.value" style="color:#0167FF">{{task.name}}</span>
                     <span v-else style="color:#888">{{task.name}}</span>
                 </v-btn>
                 </v-list>
@@ -76,7 +77,7 @@
                     <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
                     Сохранить как экземпляр
             </v-btn> -->
-            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveFunction" :asyncComplate="asyncComplate"/>
+            <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveFunction" :asyncComplate="loaderState" :saveProcessFinally="saveProcessFinally"/>
         </div> 
 
         <!-- INSTRUCTION -->
@@ -130,7 +131,7 @@
                 </v-list>
             </v-menu>
 
-            <to-instruction :saveFunc="saveFunction" :asyncComplate="asyncComplate"></to-instruction>
+            <to-instruction :saveFunc="saveFunction" :asyncComplate="loaderState" :saveProcessFinally="saveProcessFinally"></to-instruction>
         </div>
 
     </div>
@@ -150,17 +151,18 @@ export default {
         
         allQuestions: Array,
         currentTestID: Number,
-
-        asyncComplate: Boolean,
         blockAddQBtn: Boolean,
 
         parseMode: String,
         changeParseMode: Function,
-        showParse: Boolean
+        showParse: Boolean,
+        saveProcessFinally: Object,
+        switchAutosaving: Function
     },
     data() {
         return {
             tasks: this.allTasks,
+            autosavingEnable: true
         }
     },
     computed: mapGetters(['currentLang']),
@@ -172,6 +174,15 @@ export default {
     components:{
         ToInstruction,
         SavingQuestions
+    },
+    watch:{
+        autosavingEnable(){
+            if(this.autosavingEnable){
+                this.switchAutosaving('on')
+            } else {
+                this.switchAutosaving('off')
+            }
+        }
     }
 }
 </script>
@@ -183,7 +194,7 @@ export default {
 
     .autosave{
         position: absolute;
-        top: -50px;
+        top: -70px;
         left: 0;
     }
 </style>

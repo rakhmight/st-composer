@@ -1,165 +1,52 @@
 <template>
     <div class="wrapper">
-        <KeepAlive>
         <div class="container">
             <div class="workspace">
-                <div class="workspace__sidebar">
-                    <div :class="{'full-map':showFullMap}" :style="showFullMap ? 'width: 90vw' : 'width: 270px'" style="transition: width 0.3s ease-in-out;">
-                        <div class="d-flex flex-row align-center justify-space-between" style="background-color: #0d5fd8;padding:7px 5px;border-radius: 5px 5px 0 0;">
-                            <div class="d-flex flex-row align-center">
-                                <v-icon size="20" color="#fff" class="mr-1">
-                                    mdi-content-paste
-                                </v-icon>
-                                <h4 style="color:#fff">{{ currentLang.workspaceView[0] }}</h4>
-                            </div>
 
-                            <v-tooltip bottom v-if="questions.length">
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                icon
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="showFullMap=!showFullMap"
-                                >
-                                    <v-icon color="#fff" v-if="!showFullMap">mdi-arrow-right-thin</v-icon>
-                                    <v-icon color="#fff" v-else>mdi-arrow-left-thin</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>{{ currentLang.workspaceView[1] }}</span>
-                            </v-tooltip>
-
-                        </div>
-                        <div v-if="questions.length==0 && !loader" class="workspace__map-empty d-flex flex-column justify-center align-center" style="border-radius: 0 0 5px 5px;">
-                            <v-img
-                            max-height="80"
-                            max-width="80"
-                            src="@/assets/media/no-questions.png"
-                            contain
-                            transition="scale-transition"
-                            style="opacity: 0.5;"
-                            ></v-img>
-                        </div>
-                        <div class="workspace__map" v-if="questions.length && !loader" :class="{'.workspace__map-full': showFullMap}">
-                            <div class="map-elem"> 
-                                <v-simple-table dense>
-                                    <template v-slot:default>
-                                    <thead>
-                                        <tr>
-                                            <th class="text-left">
-                                                
-                                            </th>
-                                            <th class="text-left">
-                                                #
-                                            </th>
-                                            <th class="text-left">
-                                                {{ currentLang.workspaceView[2] }}
-                                            </th>
-                                            <th class="text-left" v-if="showFullMap">
-                                                {{ currentLang.workspaceView[3] }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style="cursor: pointer;"
-                                        v-for="(question,i) in questions"
-                                        :key="question.id"
-                                        :to-question="question.id"
-                                        class="map-orient"
-                                        >
-                                            <td style="width:20px">
-                                                <test-type-icons :type="question.type" :questionID="question.id" :questions="questions"/>
-                                            </td>
-                                            <td :style="question.id==visibleQuestions[0] || question.id==visibleQuestions[1] || question.id==visibleQuestions[2] || question.id==visibleQuestions[3] || question.id==visibleQuestions[4] || question.id==visibleQuestions[5] || question.id==visibleQuestions[6] || question.id==visibleQuestions[7] || question.id==visibleQuestions[8] || question.id==visibleQuestions[9] ? 'color:#0d5fd8;font-weight: bolder' : 'color:#000'">{{ i+1 }}</td>
-                                            <td>
-                                                <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap, 'map-full':showFullMap}">
-                                                    <span v-if="getCurrentQuestion(question.questionCtx)">{{ getCurrentQuestion(question.questionCtx) }}</span>
-                                                    <span style="color:#888;" v-else>{{ currentLang.workspaceView[4] }}</span>
-                                                </p>
-                                            </td>
-                                            <td v-if="showFullMap" style="min-width:20vw; max-width:20vw; word-break: break-all;">
-                                                <p
-                                                v-for="(answer, i) in question.answers"
-                                                :key="i"
-                                                class="body-2"
-                                                :style="answer.isCurrect ? 'color:green' : 'color:#484848'"
-                                                >
-                                                    <span v-if="getCurrentAnswer(answer.answerCtx)">{{ `${i+1}) ` }} {{ getCurrentAnswer(answer.answerCtx) }}</span>
-                                                    <span v-else style="color:#B3B3B3">{{ `${i+1}) ` }}пока не заполнено</span>
-                                                </p>
-                                                <p
-                                                v-if="question.type=='question-with-field'"
-                                                >
-                                                    <span v-if="question.answer[1].x" style="color: green">{{ currentLang.workspaceView[5] }}</span>
-                                                    <span v-else>{{ currentLang.workspaceView[6] }}</span>
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    </template>
-                                </v-simple-table>
-                            </div>
-                        </div>
-                        <div style="height: 237px; background-color: #aaaaaa80; border-radius: 0 0 5px 5px;" v-if="loader" class="d-flex justify-center align-center">
-                            <v-progress-circular
-                            :size="50"
-                            :width="5"
-                            color="#888"
-                            indeterminate
-                            ></v-progress-circular>
-                        </div>
-                    </div>
-
-                    <v-btn
-                    small
-                    width="270"
-                    color="#0d5fd8"
-                    class="mt-5"
-                    @click="goToBack"
-                    :disabled="!asyncComplate"
-                    >
-                        <v-icon color="#fff" class="mr-1">mdi-arrow-left-thin</v-icon>
-                        <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">{{ currentLang.workspaceView[7] }}</span>
-                    </v-btn>
-
-                    <sign-test :asyncComplate="asyncComplate" :currentTest="currentTest" :questions="questions" :stopSaving="stopSaving"/>
-                </div>
+                <map-component
+                :loader="loader.value"
+                :mapQuestions="mapQuestions"
+                :testOptions="testOptions"
+                :currentQuestion="currentQuestion"
+                :changeCurrentQuestion="changeCurrentQuestion"
+                :saveProcess="saveProcess"
+                :blockAddQBtnFunc="blockAddQBtnFunc"
+                :stopSavingLoop="stopSavingLoop"
+                :currentTest="currentTest"
+                :questions="questions"
+                :saveProcessFinally="saveProcessFinally"
+                />
 
                 <div class="workspace__sidebar-box"></div>
                 
                 <div class="workspace__content">
-                    <div class="d-flex justify-center" style="margin-top:200px" v-if="loader">
+                    <div class="d-flex flex-column justify-center align-center" style="height: 60vh" v-if="loader.value">
+                        <!-- !! Поменять!!!!! -->
                         <v-progress-circular
-                        :rotate="360"
-                        :size="100"
-                        :width="10"
-                        :model-value="loaderValue"
+                        :size="70"
+                        :width="3"
                         color="#0167ff"
+                        indeterminate
                         >
-                        {{ loaderValue }} %
                         </v-progress-circular>
+
+                        <span class="mt-3" style="font-size: 0.95em;">{{ loader.text }}</span>
                     </div>
 
-                    <!--  -->
-                    <question
-                    v-for="(question, i) in questions"
-                    :key="question.id"
-                    v-if="(questions[i].id)==visibleQuestions[0] || (questions[i].id)==visibleQuestions[1] || (questions[i].id)==visibleQuestions[2] || (questions[i].id)==visibleQuestions[3] || (questions[i].id)==visibleQuestions[4] || (questions[i].id)==visibleQuestions[5] || (questions[i].id)==visibleQuestions[6] || (questions[i].id)==visibleQuestions[7] || (questions[i].id)==visibleQuestions[8] || (questions[i].id)==visibleQuestions[9]"
-                    :question="question"
-                    :questions="questions"
-                    :visible="visibleQuestions"
+                    <!-- !! 1 Question -->
+                    <question-template
+                    v-if="!loader.value && questions.length && !saveProcessFinally.value"
+                    :currentQuestion="currentQuestion"
+                    :testOptions="testOptions"
                     :deleteFunc="deleteQuestion"
                     :questionFunc="changeQuestion"
-                    :params="testParams"
-                    :currentTest="currentTest"
                     :parseMode="parseMode"
                     :showParse="showParse"
+                    :switchCurrentQuestion="switchCurrentQuestion"
+                    :switchQuestion="switchQuestion"
                     />
 
-                    <div v-if="questions.length && !loader">
-                        <p style="color:#444; text-align: center;">{{ currentLang.workspaceView[8] }}</p>
-                    </div>
-
-                    <div v-if="questions.length==0 && !loader" class="d-flex flex-column justify-center align-center" style="height:70vh;background-color: #aaaaaa80;border-radius: 5px;">
+                    <div v-if="questions.length==0 && !loader.value && !saveProcessFinally.value" class="d-flex flex-column justify-center align-center" style="height:70vh;background-color: #aaaaaa80;border-radius: 5px;">
                         <v-img
                         max-height="100"
                         max-width="100"
@@ -170,113 +57,224 @@
                         <h3 style="color:#888" class="mt-5">{{ currentLang.workspaceView[9] }}</h3>
                     </div>
 
+                    <div
+                    v-if="saveProcessFinally.value"
+                    class="d-flex flex-column align-center justify-center"
+                    style="width: 100%; height: 60vh;"
+                    >
+                        <v-progress-circular
+                        :size="50"
+                        :width="3"
+                        color="#0167ff"
+                        indeterminate
+                        >
+                        </v-progress-circular>
+                        <span class="mt-3" style="font-size: 0.95em;">{{ saveProcessFinally.ctx }}</span>
+                    </div>
                 </div>
 
-                <div class="workspace__tools-box">
-                    
-                        <!-- TOOLS -->
-                        <tools :loaderState='loader' :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+getTestID" :allQuestions="questions" :asyncComplate="asyncComplate" :blockAddQBtn="blockAddQBtn" :parseMode="parseMode" :changeParseMode="changeParseMode" :showParse="showParse"/>
 
+                <div class="workspace__tools-box">
+                    <!-- <tools/> -->
+                    <tools :loaderState='!loader.value' :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+currentTest.id" :allQuestions="questions" :blockAddQBtn="blockAddQBtn" :parseMode="parseMode" :changeParseMode="changeParseMode" :showParse="showParse" :saveProcessFinally="saveProcessFinally" :switchAutosaving="switchAutosaving"/>
                 </div>
             </div>
         </div>
-        </KeepAlive>
     </div>
 </template>
 
 <script>
-import Question from '@/components/tests/QuestionTemplates.vue'
-import Tools from '@/components/tests/Tools.vue'
-import TestTypeIcons from '@/components/tests/TestTypeIcons.vue'
-import SignTest from '@/components/dialogs/SignTest.vue'
 import { mapGetters, mapMutations } from 'vuex'
-import getCurrentDate from '@/plugins/getCurrentDate'
 import { operationFromStore } from '@/services/localDB'
-import crypt from '@/plugins/crypt'
 import encrypt from '@/plugins/encrypt'
+import QuestionTemplate from '@/components/tests/QuestionTemplate.vue'
+import MapComponent from '@/components/tests/Map.vue'
+import getCurrentDate from '@/plugins/getCurrentDate'
+import Tools from '@/components/tests/Tools.vue'
+import crypt from '@/plugins/crypt'
 
 export default {
-    data() {
+    data(){
         return {
-            currentTest: undefined,
+            // Main
+            mapQuestions: [],
+            questions: [],
+            currentTest: {},
+            currentQuestion: {},
+
+            // Optionaly
+            testOptions: {},
+            questionsCounter: 0,
+            loader: {
+                value: true,
+                text: undefined,
+                step: 'load-from-store',
+                counter: 0,
+            },
+            parseMode: 'lotin-kiril',
+            showParse: false,
+            switchCurrentQuestion: false,
             tasks:[
                 {name:'', isDisabled: false, type: 'question-with-images'},
                 {name:'', isDisabled: false, type: 'question-with-field'},
                 {name:'', isDisabled: true,}
             ],
-            questions: [],
-            questionsCounter: 0,
-            questionsDeleted: true,
-
-            showFullMap: false,
-            testParams: {},
-            
-            visibleQuestions:[1,2,3,4,5,6,7,8,9,10],
+            blockAddQBtn: false,
             savingInterval: undefined,
 
-            loader: true,
-            loaderValue: 0,
-            loaderInterval: {},
-
-            // util
-            allowToSaveTheme: false,
-            asyncComplate: false,
-            blockAddQBtn: false,
-
             savingProcessLoop: false,
-
-            parseMode: 'lotin-kiril',
-            showParse: false
+            saveProcessFinally: {
+                value: false,
+                ctx: undefined
+            }
         }
+    },
+    computed: mapGetters(['onWorkProcess','getTestID', 'currentLang', 'currentSign']),
+    components:{
+        QuestionTemplate,
+        MapComponent,
+        Tools
+    },
+    mounted(){
+        if(!this.currentSign.id){
+            return this.$router.push('/')
+        }
+
+        // текущий ID теста
+        if(!this.getTestID){
+            return this.$router.push('/dashboard')
+        }
+
+        // Task Lang
+        this.tasks[0].name= this.currentLang.workspaceView[10]
+        this.tasks[1].name= this.currentLang.workspaceView[11]
+        this.tasks[2].name= this.currentLang.workspaceView[12]
+
+        // Loader
+        this.loader.text = 'Загрузка тестов'
+        const loaderTextInterval = setInterval(()=>{
+            if(this.loader.counter<3){
+                this.loader.text = this.loader.text+'.'
+                this.loader.counter++
+            }else{
+                this.loader.counter = 0
+                if(this.loader.step == 'load-from-store'){
+                    this.loader.text = 'Загрузка тестов'
+                } else if (this.loader.step == 'encrypt-questions'){
+                    this.loader.text = 'Расшифровка вопросов'
+                } else if (this.loader.step == 'prepared-env'){
+                    this.loader.text = 'Настройка окружения'
+                }
+            }
+        }, 500)
+
+        // Получение тестов
+        operationFromStore('getByTestID',{id:+this.getTestID})
+        .then(async (result)=>{            
+            this.currentTest = result
+
+            if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1 && this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
+                this.showParse=true
+            }
+
+            // Их расшифровка
+            let testData
+            this.loader.step = 'encrypt-questions'
+            try {
+                testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+            } catch (error) {
+                // запись в логи
+                console.error(error);
+                console.error('Sign is not valid');
+                this.clearSign()
+                this.$router.push('/')
+                return
+            }
+
+            // Настройка окружения
+            this.loader.step = 'prepared-env'
+            this.questions = JSON.parse(testData)
+            this.currentQuestion = this.questions[0]
+
+            // Test Options
+            const testOptions = {
+                languagesSettings: this.currentTest.languagesSettings,
+                themes: this.currentTest.themes,
+                subjectID: this.currentTest.subjectID,
+            }
+            if(this.currentTest.ballSystem){
+                testOptions.ballSystem = this.currentTest.ballSystem
+            }
+            if(this.currentTest.considerDifficulty){
+                testOptions.considerDifficulty = this.currentTest.considerDifficulty
+            }
+            this.testOptions = testOptions
+
+            // подготовка MAP
+            this.questions.forEach(question=>{
+                const element = {
+                    id: question.id,
+                    questionCtx: question.questionCtx,
+                    type: question.type
+                }
+                if(question.type=='question-with-field'){
+                    element.answer = question.answer
+                } else if (question.type=='basic-question' || question.type=='question-with-images'){
+                    element.answers = question.answers
+                }
+                this.mapQuestions.push(element)
+            })
+
+            this.loader.value = false
+            clearInterval(loaderTextInterval)
+
+            // установка счётчика вопросов
+            if(this.questions.length){
+                this.questionsCounter = this.questions[this.questions.length-1].id
+            }
+        })
+        .catch(e=>{
+            console.error(this.currentLang.errors[0], e.message)
+            this.$router.push('/')
+        })
+
+        // Австосохранение (кажд. 10 мин.)
+        this.savingInterval = setInterval(()=>{
+            this.saveProcess({forcedSave:true})
+        }, 600000)
     },
     methods:{
         ...mapMutations(['clearSign']),
+        switchAutosaving(mode){
+            if(mode=='off'){
+                clearInterval(this.savingInterval )
+                this.savingInterval = undefined
+            }else if(mode=='on'){
+                if(!this.savingInterval){
+                    // Австосохранение (кажд. 10 мин.)
+                    this.savingInterval = setInterval(()=>{
+                        this.saveProcess({forcedSave:true})
+                    }, 600000)
+                }
+            }
+        },
+        stopSavingLoop(){
+            // блокируем автосохранение
+            this.savingProcessLoop = true
+        },
+        blockAddQBtnFunc(){
+            this.blockAddQBtn = true
+        },
+        switchQuestion(){
+            this.switchCurrentQuestion = false
+        },
+        changeCurrentQuestion(id){
+            const target = this.questions.find(question => question.id == id)
+            this.currentQuestion = target
+            this.switchCurrentQuestion = true
+        },
         changeParseMode(mode){
             this.parseMode = mode
-        },
-        stopSaving(){
-            clearInterval(this.savingInterval)
-            clearInterval(this.loaderInterval)
-        },
-        getCurrentAnswer(answer){
-            if(this.currentTest.languagesSettings.languages[0] == 'ru'){
-                if(answer.ru){
-                    return answer.ru
-                }
-                return undefined
-            } else if(this.currentTest.languagesSettings.languages[0] == 'eng'){
-                if(answer.eng){
-                    return answer.eng
-                }
-                return undefined
-            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_l'){
-                if(answer.uz_l){
-                    return answer.uz_l
-                }
-            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_k'){
-                if(answer.uz_k){
-                    return answer.uz_k
-                }
-                return undefined
-            } else if(this.currentTest.languagesSettings.languages[0] == 'custom'){
-                if(answer.custom){
-                    return answer.custom
-                }
-                return undefined
-            }
-        },
-        getCurrentQuestion(question){
-            if(this.currentTest.languagesSettings.languages[0] == 'ru'){
-                return question.ru
-            } else if(this.currentTest.languagesSettings.languages[0] == 'eng'){
-                return question.eng
-            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_l'){
-                return question.uz_l
-            } else if(this.currentTest.languagesSettings.languages[0] == 'uz_k'){
-                return question.uz_k
-            } else if(this.currentTest.languagesSettings.languages[0] == 'custom'){
-                return question.custom
-            }
         },
 
         createQuestion(type){
@@ -293,15 +291,17 @@ export default {
                 },
                 theme: undefined,
                 difficulty: undefined,
-                //ball:0.01,
+                ball:0.01,
                 multipleAnswers: false,
                 lastModified: getCurrentDate(),
             }
 
+            this.currentTest.testInfo.totalQuestions++
             if(type=='question-with-field'){
                 // позже реализовать логику обнуления x и y если нет картинки
                 question.imagePreview = ''
                 question.answer = [{fault: 20},{x:undefined, y:undefined}]
+                this.currentTest.testInfo.qwf++
             }
             else{
                 if(type=='question-with-images'){
@@ -311,60 +311,57 @@ export default {
                         {id:2, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
                         {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}
                     ]
+                    this.currentTest.testInfo.qwi++
                 } else{
                     question.answers = [
                         {id:1, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:true},
                         {id:2, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
-                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
-                        {id:4, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}]
+                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}
+                    ]
+                    this.currentTest.testInfo.bq++
                 }
             }
 
             this.questions.push(question)
             this.questionsCounter++
-            this.saveProcess()
+            this.mapQuestions.push(question)
+
+            if(this.questions.length==1){
+                this.currentQuestion = this.questions[0]
+            }
+            //this.saveProcess()
+            
+            this.blockAddQBtn = false
         },
 
         deleteQuestion(id){
-            this.questions.filter(el => {
-                if(el.id==id){
-                    let index = this.questions.indexOf(el)
-                    this.questions.splice(index, 1)
-                }
-            })
-
-            this.visibleQuestions.filter(el=>{
-                if(el==id){
-                    let index = this.visibleQuestions.indexOf(el)
-                    let counter = id+1
-
-                    for(let i = index; i != this.visibleQuestions.length; i++){
-                        let isAvaible = false
-
-                        if(counter>this.questionsCounter){
-                            this.visibleQuestions[i]=counter
-                            counter++
-                        }else{
-                            this.questions.filter(e=>{
-                                if(e.id==counter){
-                                    this.visibleQuestions[i]=counter
-                                    isAvaible = true
-                                }
-                            })
-                            
-                            if(!isAvaible){
-                                counter++
-                                i--
-                            }else{
-                                counter++
-                            }
-                        }
-                    }
-                }
-            })
-
+            const target = this.questions.find(question=> question.id==id)
             
-            this.saveProcess({forcedSave:true})
+            this.currentTest.testInfo.totalQuestions--
+            if(target.type=='basic-question'){
+                this.currentTest.testInfo.bq--
+            } else if(target.type=='question-with-images'){
+                this.currentTest.testInfo.qwi--
+            } else if(target.type=='question-with-field'){
+                this.currentTest.testInfo.qwf--
+            }
+
+            const index = this.questions.indexOf(target)
+            this.questions.splice(index, 1)
+            
+            if(this.questions[index]){
+                this.currentQuestion = this.questions[index]
+            }else if (this.questions[index-1]){
+                this.currentQuestion = this.questions[index-1]
+            }else{
+                this.currentQuestion = {}
+            }
+
+            const mapTarget = this.mapQuestions.find(map=>map.id==id)
+            const mapIndex = this.mapQuestions.indexOf(mapTarget)
+            this.mapQuestions.splice(mapIndex, 1)
+
+            // this.saveProcess({forcedSave:true})
         },
 
         changeQuestion(type, ctx, id, aID){
@@ -382,12 +379,12 @@ export default {
                         this.questions[index].theme = ctx
                         this.questions[index].lastModified = getCurrentDate()
                         if(this.allowToSaveTheme){
-                            this.saveProcess({forcedSave:true})
+                            //this.saveProcess({forcedSave:true})
                         }
                     }else if(type=='difficulty'){
                         this.questions[index].difficulty = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='answer-answerCtx'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -404,7 +401,7 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='answer-add'){
                         this.questions[index].answers.push({
                             id: aID,
@@ -412,18 +409,18 @@ export default {
                             isCurrect: false
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='field-answer'){
                         this.questions[index].answer = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='multipleAnswers'){
                         this.questions[index].multipleAnswers = ctx
                         this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='answers'){
                         this.questions[index].answers = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='answer-answerIsCurrect'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -432,11 +429,11 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='imagePreview'){
                         this.questions[index].imagePreview = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }else if(type=='answer-imagePreview'){
                         this.questions[index].answers.filter(el => {
                             if(el.id == aID){
@@ -445,131 +442,60 @@ export default {
                             }
                         })
                         this.questions[index].lastModified = getCurrentDate()
-                        this.saveProcess({forcedSave:true})
+                        //this.saveProcess({forcedSave:true})
                     }
                 }
             })
         },
 
-        mapOriented(){
-            const questions = document.querySelectorAll('.map-orient')
-
-            for(let i = 0; i!=questions.length; i++){
-                let questionID = questions[i].getAttribute('to-question')
-                let desiredQuestion = document.querySelector(`.question_${questionID}`)
-
-                questions[i].addEventListener('click', ()=>{
-                    if(questionID==this.visibleQuestions[0] || questionID==this.visibleQuestions[1] || questionID==this.visibleQuestions[2] || questionID==this.visibleQuestions[3] || questionID==this.visibleQuestions[4] || questionID==this.visibleQuestions[5] || questionID==this.visibleQuestions[6] || questionID==this.visibleQuestions[7] || questionID==this.visibleQuestions[8] || questionID==this.visibleQuestions[9]){
-                    //if(questionID==this.visibleQuestions[0] || questionID==this.visibleQuestions[1] || questionID==this.visibleQuestions[2]){
-                    //if(questionID==this.visibleQuestions[0]){
-                        if(desiredQuestion){
-                            desiredQuestion.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start',
-                            })
-                        }
-                    }
-                    else{
-
-                        this.countMap(questionID)
-                        // погрешность
-                        this.questions.push('')
-                        this.questions.pop()
-
-                    }
-                })
-            }
-        },
-
-        countMap(number){
-            this.visibleQuestions = []
-
-            let counter = number
-            for(let j = 0; j!=this.questions[this.questions.length-1].id; j++){
-                if(this.visibleQuestions.length!=10){
-                //if(this.visibleQuestions.length!=3){
-                //if(this.visibleQuestions.length!=1){
-                    this.questions.filter(el=>{
-                        if(el.id==counter){
-                            this.visibleQuestions.push(el.id)
-                        }
-                    })
-                    counter++
-                }
-            }
-
-
-            if(this.visibleQuestions.length!=10){
-            //if(this.visibleQuestions.length!=3){
-            //if(this.visibleQuestions.length!=1){
-                if(this.questions.length==1){
-                    counter = this.questions[0].id+1
-                }else{
-                    counter = this.visibleQuestions[this.visibleQuestions.length-1]
-                }
-                while(this.visibleQuestions.length!=10){
-                //while(this.visibleQuestions.length!=3){
-                //while(this.visibleQuestions.length!=1){
-                    this.visibleQuestions.push(counter)
-                    counter++
-                }
-            }
-            
-            // погрешность
-            this.questions.push('')
-            this.questions.pop()
-        },
-
         async saveProcess(params){
             if(params){
-                if(params.route || params.newTest){
-                    let output
-                    if(params.route){
+                if(params.route){
+                    // блокируем автосохранение
+                    this.savingProcessLoop = true
+
+                    this.saveProcessFinally.value=true
+                    if(params.newTest){
+                        this.saveProcessFinally.ctx = 'Сохранение перед подписанием'
+                    } else if(params.route){
+                        this.saveProcessFinally.ctx = 'Сохранение перед выходом'
+                    }
+                    this.blockAddQBtn = true
+
+                    setTimeout(async ()=>{
+                        let output
                         clearInterval(this.savingInterval)
-                        clearInterval(this.loaderInterval)
                         
-                        const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+                        const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetricencoding)
                         this.currentTest.lastModified = getCurrentDate()
                         output = {
                             ...this.currentTest,
                             questions: testData
                         }
-                    } else if(params.newTest){
-                        output = params.newTest
-                        this.currentTest.history = params.newTest.history
-                    }
 
-                    await operationFromStore('deleteTest',{id: +this.getTestID})
-                    .then(async ()=>{
-                        await operationFromStore('addTest',{data: output})
-                    })
-                    .then(()=>{
-                        if(params.route){
+                        await operationFromStore('deleteTest',{id: +this.getTestID})
+                        .then(async ()=>{
+                            await operationFromStore('addTest',{data: output})
+                        })
+                        .then(()=>{
                             console.info('(i) process is saved before quit')
                             this.$router.push('/dashboard')
-                        } else if( params.newTest){
-                            console.info('(i) process is saved after saving')
-                        }
-                    })
-                    .catch(e=>{
-                        console.error(this.currentLang.errors[0],e)
-                    })
+                            this.savingProcessLoop = false
+                        })
+                        .catch(e=>{
+                            console.error(this.currentLang.errors[0],e)
+                        })
+                    }, 4000)
                 }
             }
 
-            if(!this.savingProcessLoop){
+            if(!this.savingProcessLoop && !params.route){
+                this.saveProcessFinally.value = true
+                this.saveProcessFinally.ctx = 'Автоматическое сохранение.\nПодождите..'
                 this.savingProcessLoop = true
 
                 // зашифровка
                 const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
-
-                // if(params){
-                //     if(params.newTest){
-                //         this.blockAddQBtn = true
-                //         this.currentTest = params.newTest 
-                //     }
-                //     console.log(params);
-                // }
 
                 if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
                     this.currentTest.lastModified = getCurrentDate()
@@ -586,15 +512,9 @@ export default {
                             setTimeout(()=>{
                                 this.blockAddQBtn = false
                                 this.savingProcessLoop = false
+                                this.saveProcessFinally.value = false
                             }, 2000)
                         })
-                    })
-                    .then(()=>{
-                        if(params){
-                            if(params.route){
-                                this.$router.push('/dashboard')
-                            }
-                        }
                     })
                     .catch(e=>{
                         console.error(this.currentLang.errors[0],e)
@@ -604,125 +524,6 @@ export default {
                 return
             }
         },
-
-        goToBack(){
-            this.blockAddQBtn = true
-            this.saveProcess({route: true})
-        }
-    },
-    computed: mapGetters(['onWorkProcess','getTestID', 'currentLang', 'currentSign']),
-    mounted(){
-        if(!this.currentSign.id){
-            return this.$router.push('/')
-        }
-
-        // текущий ID теста
-        if(!this.getTestID){
-            return this.$router.push('/dashboard')
-        }
-
-        this.tasks[0].name= this.currentLang.workspaceView[10]
-        this.tasks[1].name= this.currentLang.workspaceView[11]
-        this.tasks[2].name= this.currentLang.workspaceView[12]
-
-        // Loader
-        this.loaderInterval = setInterval(() => {
-            if (this.loaderValue === 100) {
-                clearInterval(this.loaderInterval)
-            }
-            this.loaderValue += 5
-        }, 100)
-
-        // Авто сохранение каждые 10 сек.
-        this.savingInterval = setInterval(()=>{
-            this.saveProcess({forcedSave:true})
-        }, 10000)
-    },
-    watch:{
-        loaderValue(){
-            if(this.loaderValue==100){
-                operationFromStore('getByTestID',{id:+this.getTestID})
-                .then(async (result)=>{            
-                    this.currentTest = result
-
-                    if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1 && this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
-                        this.showParse=true
-                    }
-
-                    // расшифровка
-                    let testData
-                    try {
-                        testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
-
-                    } catch (error) {
-                        // запись в логи
-                        console.error(error);
-                        console.error('Sign is not valid');
-                        this.clearSign()
-                        this.$router.push('/')
-                        return
-                    }
-
-                    this.questions = JSON.parse(testData)
-                    this.testParams = {
-                        id: this.currentTest.id,
-                        themes: this.currentTest.themes,
-                        considerDifficulty: this.currentTest.considerDifficulty,
-                        ballSystem: this.currentTest.ballSystem
-                    }
-                    this.loader = false
-                    clearInterval(this.loaderInterval)
-                    this.asyncComplate = true
-                    
-                    setTimeout(()=>{
-                        this.allowToSaveTheme = true
-                    }, 1000)
-                    if(this.questions.length){
-                        this.questionsCounter = this.questions[this.questions.length-1].id
-                    }
-                })
-                .then(()=>{
-                    // установление map
-                    if(this.questions.length){
-                        this.countMap(this.questions[0].id)
-                    }
-                })
-                .then(()=>{
-                    // событие MAP
-                    this.mapOriented()
-                })
-                .catch(e=>{
-                console.error(this.currentLang.errors[0], e.message)
-                this.$router.push('/')
-                })
-            }
-        },
-
-        questions(){
-            setTimeout(()=>{
-                this.mapOriented()
-            },300)
-        },
-        visibleQuestions(){
-            setTimeout(()=>{
-                this.mapOriented()
-
-                document.querySelector(`.question_${this.visibleQuestions[0]}`).scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                })
-            },300)
-        }
-    },
-    beforeDestroy(){
-        clearInterval(this.savingInterval)
-        clearInterval(this.loaderInterval)
-    },
-    components:{
-        Question,
-        Tools,
-        TestTypeIcons,
-        SignTest
     }
 }
 </script>
@@ -738,7 +539,6 @@ export default {
     left: 0;
     top:0;
 }
-
 
 .workspace__sidebar{
     width: 270px;

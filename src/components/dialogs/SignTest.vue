@@ -11,10 +11,10 @@
             width="270"
             color="#0c2242"
             class="mt-5"
-            :disabled="!asyncComplate"
+            :disabled="loader || saveProcessFinally.value"
             >
                 <v-icon color="#fff" class="mr-1">mdi-draw</v-icon>
-                <span :style="asyncComplate ? 'color: #fff' : 'color: #888'">Подписать тесты</span>
+                <span :style="!loader ? 'color: #fff' : 'color: #888'">Подписать тесты</span>
             </v-btn>
         </template>
 
@@ -23,7 +23,7 @@
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
                 Процедура подписания теста
-            <v-icon color="red" @click="dialog=false" size="30">mdi-close-circle</v-icon>
+            <v-icon color="red" @click="dialog=false" size="30" v-if="!signProcedure">mdi-close-circle</v-icon>
             </v-card-title>
 
             <v-divider></v-divider>
@@ -32,18 +32,24 @@
                 <p class="text-body-1" style="color: #000;text-indent: 25px;">После подписания теста его можно будет выгрузить в виде файла. Процедура запускает таймер в <b>15</b> дневный срок, после чего тест будет <span style="color: #e83b07"><b>автоматически удалён</b></span> с устройства. В течении этого срока будет возможна дальнейшая работа над вопросами теста и его повторное подписание (без изменения срока автоудаления), которое обновит выгружаемый файл.</p>
                 <p class="text-body-1 mt-2" style="color: #000;text-indent: 25px;">Процесс подписания тестов подготавливает тест к выгрузке: оптимизирует тест с его вопросами и шифрует его. Рассшифровка теста возможна только на сервере системы SmartTesting.</p>
             </div>
-            <div class="dialog-content d-flex align-center justify-center" style="height: 150px;" v-if="checkingLoader">
+            <div class="dialog-content d-flex flex-column align-center justify-center" style="height: 25vh;" v-if="checkingLoader">
                 <v-progress-circular
                 :size="50"
                 color="#0c2242"
                 indeterminate
                 ></v-progress-circular>
+                <span class="mt-3 text-center" style="font-size: 0.95em;">
+                    Запущена процедура подписания теста.
+                    <br>
+                    <v-icon color="orange" size="18" class="mr-1">mdi-alert-outline</v-icon>
+                    Это может занять время.
+                </span>
             </div>
-            <div class="dialog-content d-flex flex-column align-center justify-center" style="height: 150px;" v-if="emptyTestError">
+            <div class="dialog-content d-flex flex-column align-center justify-center" style="height: 25vh;" v-if="emptyTestError">
                 <v-icon color="warning" size="40">mdi-alert-circle-outline</v-icon>
                 <span class="text-h6">Нельзя подписать пустой тест</span>
             </div>
-            <div class="dialog-content d-flex flex-column align-center justify-center" style="height: 150px;" v-if="success">
+            <div class="dialog-content d-flex flex-column align-center justify-center" style="height: 25vh;" v-if="success">
                 <v-icon color="#0c2242" size="40">mdi-check</v-icon>
                 <span class="text-h6">Тест успешно подписан</span>
             </div>
@@ -101,10 +107,11 @@ import crypt from '@/plugins/crypt'
 
 export default {
     props:{
-        asyncComplate: Boolean,
+        loader: Boolean,
         currentTest: Object,
         questions: Array,
-        stopSaving: Function
+        stopSavingLoop: Function,
+        saveProcessFinally: Object
     },
     data(){
         return {
@@ -228,70 +235,87 @@ export default {
 
             // остановка авто сохранения
             this.blockBtn = true
-            this.stopSaving()
+            this.stopSavingLoop()
 
-            if(!this.currentTest.status.isSigned){
-                const date = new Date()
-                const timer = {
-                    id: date.getTime(),
-                    date: new Date(),
-                    testID: this.currentTest.id
+            setTimeout(async ()=>{
+                if(!this.currentTest.status.isSigned){
+                    const date = new Date()
+                    const timer = {
+                        id: date.getTime(),
+                        date: new Date(),
+                        testID: this.currentTest.id
+                    }
+                    // добавление нов элемента в БД timers
+                    await operationFromStore('addTimer', {data: timer})
                 }
-                // добавление нов элемента в БД timers
-                await operationFromStore('addTimer', {data: timer})
-            }
 
-             await asyncCrypt(JSON.stringify(this.questions), this.currentSign.keys.assymetric.publicKey.toString('utf8'))
-             .then(async (data)=>{
-                // сборка теста для выгрузки
-                const signedDate = new Date()
-                const test = {
-                    id: this.currentTest.id,
-                    author: this.currentSign.id,
-                    signHash: this.currentSign.hash,
-                    params:{
-                        themes: this.currentTest.themes,
-                        subject: this.currentTest.subject,
-                        languagesSettings: this.currentTest.languagesSettings,
-                        ballSystem: this.currentTest.ballSystem,
-                        considerDifficulty: this.currentTest.considerDifficulty
-                    },
-                    questions: data,
-                    history: [
-                        {date: this.currentTest.history[0].date.full, type: 'create'},
-                        {date: signedDate, type: 'signed'}
-                    ]
-                }
-                // Удаление прежнего signed
-                await operationFromStore('deleteSigned', {id: this.currentTest.id})
-                .then(async ()=>{
-                // добавление теста в БД signed
-                await operationFromStore('addSigned', {data: test})
+                await asyncCrypt(JSON.stringify(this.questions), this.currentSign.keys.assymetric.publicKey.toString('utf8'))
+                .then(async (data)=>{
+                    // сборка теста для выгрузки
+                    const signedDate = new Date()
+                    const test = {
+                        id: this.currentTest.id,
+                        author: this.currentSign.id,
+                        signHash: this.currentSign.hash,
+                        params:{
+                            themes: this.currentTest.themes,
+                            subject: this.currentTest.subjectID,
+                            languagesSettings: this.currentTest.languagesSettings,
+                            ballSystem: this.currentTest.ballSystem,
+                            considerDifficulty: this.currentTest.considerDifficulty
+                        },
+                        questions: data,
+                        history: [
+                            {date: this.currentTest.history[0].date.full, type: 'create'},
+                            {date: signedDate, type: 'signed'}
+                        ]
+                    }
+                    // Удаление прежнего signed
+                    await operationFromStore('deleteSigned', {id: this.currentTest.id})
                     .then(async ()=>{
-                        const history = [...this.currentTest.history, {date: signedDate, type: 'signed'}]
-                        const testToSave = {
-                            ...this.currentTest,
-                            history,
-                            questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
-                            status: {...this.currentTest.status, isSigned: true},
-                            signedDate
-                        }
-                        // изменение текущих тестов (isSigned, signedDate, history)
-                        await operationFromStore('deleteTest',{id: this.currentTest.id})
+                    // добавление теста в БД signed
+                    await operationFromStore('addSigned', {data: test})
                         .then(async ()=>{
-                            await operationFromStore('addTest',{data: testToSave})
-                            .then(()=>{
-                                this.checkingLoader = false
-                                this.success = true
+                            const history = [...this.currentTest.history, {date: signedDate, type: 'signed'}]
+                            const testToSave = {
+                                ...this.currentTest,
+                                history,
+                                questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
+                                status: {...this.currentTest.status, isSigned: true},
+                                signedDate
+                            }
+                            // изменение текущих тестов (isSigned, signedDate, history)
+                            await operationFromStore('deleteTest',{id: this.currentTest.id})
+                            .then(async ()=>{
+                                await operationFromStore('addTest',{data: testToSave})
+                                .then(()=>{
+                                    this.checkingLoader = false
+                                    this.success = true
+                                    console.info('(i) process is saved after signing')
 
-                                setTimeout(()=>{
-                                    this.$router.push('/dashboard')
-                                },3000)
+                                    setTimeout(()=>{
+                                        this.$router.push('/dashboard')
+                                    },3000)
+                                })
                             })
                         })
                     })
                 })
-             })
+            }, 400)
+        }
+    },
+    watch:{
+        'saveProcessFinally.value'(){
+            if(this.saveProcessFinally.value){
+                this.dialog = false
+            }
+        },
+        dialog(){
+            if(this.signProcedure){
+                if(!this.dialog){
+                    this.dialog = true
+                }
+            }
         }
     }
 }

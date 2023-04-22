@@ -41,7 +41,7 @@
             <h4 class="">{{ currentLang.dashboardView[1] }}</h4>
 
             <!-- INSTRUCTION -->
-            <to-instruction :asyncComplate="true"></to-instruction>
+            <to-instruction :asyncComplate="true" :saveProcessFinally="{value:false}"></to-instruction>
 
           </div>
 
