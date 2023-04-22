@@ -142,7 +142,7 @@ export default function uzbekLangParser(ctx, mode){
                     result.push('в');
                     break;
                 case 'x':
-                    result.push('Х');
+                    result.push('х');
                     break;
                 case 'y':
                     result.push('й');
