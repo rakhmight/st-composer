@@ -232,8 +232,6 @@ export default {
             if(this.questions.length){
                 this.questionsCounter = this.questions[this.questions.length-1].id
             }
-
-            console.log(this.questions);
         })
         .catch(e=>{
             console.error(this.currentLang.errors[0], e.message)
