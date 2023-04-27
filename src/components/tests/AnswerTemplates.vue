@@ -289,14 +289,14 @@ export default {
         'answerCtx.uz_l'(){
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
 
-            if(this.parseMode=='lotin-kiril' && this.showParse){
+            if(this.parseMode=='lotin-kiril' && this.showParse && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
                 this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'latin')
             }
         },
         'answerCtx.uz_k'(){
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
 
-            if(this.parseMode=='kiril-lotin' && this.showParse){
+            if(this.parseMode=='kiril-lotin' && this.showParse && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
                 this.answerCtx.uz_l = uzbekLangParser(this.answerCtx.uz_k, 'kiril')
             }
         },

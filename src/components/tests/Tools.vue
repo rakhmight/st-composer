@@ -78,6 +78,25 @@
                     Сохранить как экземпляр
             </v-btn> -->
             <saving-questions :questions="allQuestions" :testID="currentTestID" :saveFunc="saveFunction" :asyncComplate="loaderState" :saveProcessFinally="saveProcessFinally"/>
+            
+            <v-tooltip top color="#0c2242">
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                v-bind="attrs"
+                v-on="on"
+                small
+                color="#696969"
+                @click="saveFunction({forcedSave:true, manual: true})"
+                :disabled="!loaderState || saveProcessFinally.value"
+                >
+                <v-icon
+                color="#fff"
+                size="19"
+                >mdi-content-save-outline</v-icon>
+                </v-btn>
+            </template>
+            <span>Сохранить процесс</span>
+            </v-tooltip>
         </div> 
 
         <!-- INSTRUCTION -->

@@ -209,7 +209,7 @@
                         <div class="d-flex flex-column" style="width: 100%; gap:15px">
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('custom')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.custom && !answer.isCurrect">{{ answer.answerCtx.custom }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.custom && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.custom && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.custom }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.custom">Not filled</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -230,7 +230,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('ru')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.ru && !answer.isCurrect">{{ answer.answerCtx.ru }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.ru && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.ru && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.ru }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.ru">{{ currentLang.savedTestView[37] }}</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -251,7 +251,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('eng')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.eng && !answer.isCurrect">{{ answer.answerCtx.eng }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.eng && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.eng && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.eng }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.eng">Not filled</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -272,7 +272,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('uz_l')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.uz_l && !answer.isCurrect">{{ answer.answerCtx.uz_l }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.uz_l && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_l && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.uz_l }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.uz_l">To'ldirilmagan</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -293,7 +293,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('uz_k')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.uz_k && !answer.isCurrect">{{ answer.answerCtx.uz_k }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.uz_k && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_k && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.uz_k }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.uz_k">Тўлдирилмаган</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">

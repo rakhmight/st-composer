@@ -256,6 +256,7 @@
                 dense
                 v-model="theme"
                 prepend-icon="mdi-alpha-t-box-outline"
+                style="position:releative; z-index:999"
                 ></v-select>
 
                 <v-select
@@ -266,6 +267,7 @@
                 dense
                 v-model="difficulty"
                 prepend-icon="mdi-chart-line"
+                style="position:releative; z-index:999"
                 ></v-select>
             </div>
             <div class="d-flex justify-center" style="position: relative;">
@@ -502,7 +504,15 @@ export default {
             switchCtx: false
         }
     },
-    computed: mapGetters(['currentLang', 'currentSign']),
+    computed: {
+        ...mapGetters(['currentLang', 'currentSign']),
+        
+        bToWatch: function() {
+            if(this.answer){
+                return this.answer[0].fault
+            }
+        }
+    },
     mounted(){
         // Lang
         this.difficultys[0].text = this.currentLang.workspaceView[17]
@@ -749,6 +759,10 @@ export default {
         }
     },
     watch:{
+        bToWatch(){
+            this.summonField()
+        },
+
         switchCurrentQuestion(){
             if(this.switchCurrentQuestion){
                 this.switchCtx = true
@@ -804,15 +818,23 @@ export default {
         'questionCtx.uz_l'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
 
-            if(this.parseMode=='lotin-kiril' && this.showParse && this.questionCtx.uz_k){
-                this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'latin')
+            if(this.parseMode=='lotin-kiril' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 ){
+                if(this.questionCtx.uz_l){
+                    this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'latin')
+                } else {
+                    this.questionCtx.uz_k = ''
+                }
             }
         },
         'questionCtx.uz_k'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
 
-            if(this.parseMode=='kiril-lotin' && this.showParse && this.questionCtx.uz_l){
-                this.questionCtx.uz_l = uzbekLangParser(this.questionCtx.uz_k, 'kiril')
+            if(this.parseMode=='kiril-lotin' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
+                if(this.questionCtx.uz_k){
+                    this.questionCtx.uz_l = uzbekLangParser(this.questionCtx.uz_k, 'kiril')
+                } else {
+                    this.questionCtx.uz_l = ''
+                }
             }
         },
         'questionCtx.custom'(){

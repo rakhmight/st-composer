@@ -254,7 +254,7 @@
                                 <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes ? getThemes(testParams.subjectID, testParams.themes) : 'null' }}</div>
                             </div>
                             <div class="d-flex flex-row mt-1">
-                                <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
+                                <v-icon color="#fff" class="mr-1" size="19">mdi-translate</v-icon>
                                 <div><span style="color:#bbb">Языки:</span> {{ testParams.languagesSettings ? getLanguages(testParams.languagesSettings.languages) : 'null' }}</div>
                             </div>
                         </div>
@@ -346,6 +346,20 @@ export default {
     },
     computed: mapGetters(['getTestID', 'currentLang', 'currentSign']),
     methods:{
+        
+        getCurrentQuestion(question){
+            if(this.testParams.languagesSettings.languages[0] == 'ru'){
+                return question.ru
+            } else if(this.testParams.languagesSettings.languages[0] == 'eng'){
+                return question.eng
+            } else if(this.testParams.languagesSettings.languages[0] == 'uz_l'){
+                return question.uz_l
+            } else if(this.testParams.languagesSettings.languages[0] == 'uz_k'){
+                return question.uz_k
+            } else if(this.testParams.languagesSettings.languages[0] == 'custom'){
+                return question.custom
+            }
+        },
         getSubject(id){
             return getSubject(id, this.currentSign.subjects)
         },
@@ -387,7 +401,7 @@ export default {
     mounted() {
         // Loader
         this.loaderInterval = setInterval(() => {
-            if (this.loaderValue === 100) {
+            if (this.loaderValue == 100) {
                 clearInterval(this.loaderInterval)
             }
             this.loaderValue += 5

@@ -169,74 +169,77 @@ export default {
         }, 500)
 
         // Получение тестов
-        operationFromStore('getByTestID',{id:+this.getTestID})
-        .then(async (result)=>{            
-            this.currentTest = result
 
-            if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1 && this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
-                this.showParse=true
-            }
+        setTimeout(()=>{
+            operationFromStore('getByTestID',{id:+this.getTestID})
+            .then(async (result)=>{            
+                this.currentTest = result
 
-            // Их расшифровка
-            let testData
-            this.loader.step = 'encrypt-questions'
-            try {
-                testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
-            } catch (error) {
-                // запись в логи
-                console.error(error);
-                console.error('Sign is not valid');
-                this.clearSign()
-                this.$router.push('/')
-                return
-            }
-
-            // Настройка окружения
-            this.loader.step = 'prepared-env'
-            this.questions = JSON.parse(testData)
-            this.currentQuestion = this.questions[0]
-
-            // Test Options
-            const testOptions = {
-                languagesSettings: this.currentTest.languagesSettings,
-                themes: this.currentTest.themes,
-                subjectID: this.currentTest.subjectID,
-            }
-            if(this.currentTest.ballSystem){
-                testOptions.ballSystem = this.currentTest.ballSystem
-            }
-            if(this.currentTest.considerDifficulty){
-                testOptions.considerDifficulty = this.currentTest.considerDifficulty
-            }
-            this.testOptions = testOptions
-
-            // подготовка MAP
-            this.questions.forEach(question=>{
-                const element = {
-                    id: question.id,
-                    questionCtx: question.questionCtx,
-                    type: question.type
+                if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1 && this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
+                    this.showParse=true
                 }
-                if(question.type=='question-with-field'){
-                    element.answer = question.answer
-                } else if (question.type=='basic-question' || question.type=='question-with-images'){
-                    element.answers = question.answers
+
+                // Их расшифровка
+                let testData
+                this.loader.step = 'encrypt-questions'
+                try {
+                    testData = await encrypt(this.currentTest.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+                } catch (error) {
+                    // запись в логи
+                    console.error(error);
+                    console.error('Sign is not valid');
+                    this.clearSign()
+                    this.$router.push('/')
+                    return
                 }
-                this.mapQuestions.push(element)
+
+                // Настройка окружения
+                this.loader.step = 'prepared-env'
+                this.questions = JSON.parse(testData)
+                this.currentQuestion = this.questions[0]
+
+                // Test Options
+                const testOptions = {
+                    languagesSettings: this.currentTest.languagesSettings,
+                    themes: this.currentTest.themes,
+                    subjectID: this.currentTest.subjectID,
+                }
+                if(this.currentTest.ballSystem){
+                    testOptions.ballSystem = this.currentTest.ballSystem
+                }
+                if(this.currentTest.considerDifficulty){
+                    testOptions.considerDifficulty = this.currentTest.considerDifficulty
+                }
+                this.testOptions = testOptions
+
+                // подготовка MAP
+                this.questions.forEach(question=>{
+                    const element = {
+                        id: question.id,
+                        questionCtx: question.questionCtx,
+                        type: question.type
+                    }
+                    if(question.type=='question-with-field'){
+                        element.answer = question.answer
+                    } else if (question.type=='basic-question' || question.type=='question-with-images'){
+                        element.answers = question.answers
+                    }
+                    this.mapQuestions.push(element)
+                })
+
+                this.loader.value = false
+                clearInterval(loaderTextInterval)
+
+                // установка счётчика вопросов
+                if(this.questions.length){
+                    this.questionsCounter = this.questions[this.questions.length-1].id
+                }
             })
-
-            this.loader.value = false
-            clearInterval(loaderTextInterval)
-
-            // установка счётчика вопросов
-            if(this.questions.length){
-                this.questionsCounter = this.questions[this.questions.length-1].id
-            }
-        })
-        .catch(e=>{
-            console.error(this.currentLang.errors[0], e.message)
-            this.$router.push('/')
-        })
+            .catch(e=>{
+                console.error(this.currentLang.errors[0], e.message)
+                this.$router.push('/')
+            })
+        },2000)
 
         // Австосохранение (кажд. 10 мин.)
         this.savingInterval = setInterval(()=>{
@@ -491,35 +494,46 @@ export default {
 
             if(!this.savingProcessLoop && !params.route){
                 this.saveProcessFinally.value = true
-                this.saveProcessFinally.ctx = 'Автоматическое сохранение.\nПодождите..'
                 this.savingProcessLoop = true
-
-                // зашифровка
-                const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
-
-                if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
-                    this.currentTest.lastModified = getCurrentDate()
-                    let output = {
-                        ...this.currentTest,
-                        questions: testData
-                    }
-
-                    await operationFromStore('deleteTest',{id: +this.getTestID})
-                    .then(async ()=>{
-                        await operationFromStore('addTest',{data: output})
-                        .then(()=>{
-                            console.info('(i) process is saved')
-                            setTimeout(()=>{
-                                this.blockAddQBtn = false
-                                this.savingProcessLoop = false
-                                this.saveProcessFinally.value = false
-                            }, 2000)
-                        })
-                    })
-                    .catch(e=>{
-                        console.error(this.currentLang.errors[0],e)
-                    })
+                if(params.manual){
+                    
+                this.saveProcessFinally.ctx = 'Сохранение процесса.\nПодождите..'
+                } else{
+                    this.saveProcessFinally.ctx = 'Автоматическое сохранение.\nПодождите..'
                 }
+
+                
+                setTimeout(async()=>{
+
+                    // зашифровка
+                    const testData = crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
+
+                    if(this.onWorkProcess && this.$route.path == '/workspace' && this.blockAddQBtn || this.onWorkProcess && this.$route.path == '/workspace' && params && params.forcedSave){
+                        this.currentTest.lastModified = getCurrentDate()
+                        let output = {
+                            ...this.currentTest,
+                            questions: testData
+                        }
+
+                        await operationFromStore('deleteTest',{id: +this.getTestID})
+                        .then(async ()=>{
+                                await operationFromStore('addTest',{data: output})
+                                .then(()=>{
+                                    console.info('(i) process is saved')
+                                    setTimeout(()=>{
+                                        this.blockAddQBtn = false
+                                        this.savingProcessLoop = false
+                                        this.saveProcessFinally.value = false
+                                    }, 2000)
+                                })
+                        })
+                        .catch(e=>{
+                            console.error(this.currentLang.errors[0],e)
+                        })
+                    }
+            
+                },2000)
+
             }else {
                 return
             }

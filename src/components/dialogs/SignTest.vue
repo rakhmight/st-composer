@@ -53,7 +53,7 @@
                 <v-icon color="#0c2242" size="40">mdi-check</v-icon>
                 <span class="text-h6">Тест успешно подписан</span>
             </div>
-            <div class="dialog-content mt-5 mb-5 pr-5 pl-5" v-if="!checkingLoader && errors.length">
+            <div class="dialog-content mt-5 mb-5 pr-5 pl-5" v-if="!checkingLoader && errors.length && !emptyTestError">
                 <div
                 v-for="(error, i) in errors"
                 :key="i"
@@ -255,6 +255,7 @@ export default {
                     const signedDate = new Date()
                     const test = {
                         id: this.currentTest.id,
+                        fileDate: signedDate.getTime(),
                         author: this.currentSign.id,
                         signHash: this.currentSign.hash,
                         params:{
@@ -262,8 +263,9 @@ export default {
                             subject: this.currentTest.subjectID,
                             languagesSettings: this.currentTest.languagesSettings,
                             ballSystem: this.currentTest.ballSystem,
-                            considerDifficulty: this.currentTest.considerDifficulty
+                            considerDifficulty: this.currentTest.considerDifficulty,
                         },
+                        testInfo: this.currentTest.testInfo, 
                         questions: data,
                         history: [
                             {date: this.currentTest.history[0].date.full, type: 'create'},

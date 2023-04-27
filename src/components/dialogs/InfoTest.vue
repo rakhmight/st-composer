@@ -33,7 +33,7 @@
                             <td>{{ currentLang.dashboardView[20] }}</td>
                             <td><div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div></td>
                         </tr>
-                        <tr>
+                        <tr v-if="test.lastModified">
                             <td><div v-if="test.lastModified">{{ currentLang.dashboardView[21] }}</div></td>
                             <td><div class="text-end" v-if="test.lastModified"><b style="color:#444">{{ test.lastModified.date }} {{ test.lastModified.time }}</b></div></td>
                         </tr>

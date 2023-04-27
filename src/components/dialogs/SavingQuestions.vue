@@ -41,8 +41,9 @@
                                 outlined
                                 prepend-icon="mdi-comment-outline"
                                 v-model="comment"
-                                :placeholder="currentLang.workspaceView[48]"
+                                :placeholder="saveProcessFinally.value ? 'Подождите, идёт сохранение текущих тестов' : currentLang.workspaceView[48]"
                                 :error="savingEr"
+                                :disabled="saveProcessFinally.value"
                                 >
                                 </v-textarea>
                             </div>

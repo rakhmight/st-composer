@@ -26,7 +26,6 @@
 
             <div style="width: 100%; height: 100%;" class="d-flex align-center">
                 <v-file-input
-                :rules="rules"
                 accept="application/json"
                 :placeholder="currentLang.authView[2]"
                 :label="currentLang.authView[3]"
@@ -75,9 +74,6 @@ import AuthSignInfo from '@/components/authForms/AuthSignInfo.vue'
 export default {
     data() {
         return {
-            rules: [
-                value => !value || value.size < 2000000 || 'Размер файла не должен превышать 2МБ',
-            ],
             signFileError:{
                 status: false,
                 msg: undefined
