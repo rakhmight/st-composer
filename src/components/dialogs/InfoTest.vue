@@ -57,33 +57,47 @@
                             <td><div>Языки</div></td>
                             <td><div class="text-end"><b>{{ getLanguages(test.languagesSettings.languages) }}</b></div></td>
                         </tr>
+                        <tr v-if="test.remarks" style="color:#ff4500">
+                            <td><div>Количество ошибок</div></td>
+                            <td><div class="text-end"><b>{{ test.remarks.length }}</b></div></td>
+                        </tr>
                     </tbody>
                     </template>
                 </v-simple-table>
             </div>
 
-            <div class="mb-3" v-if="test.considerDifficulty">
-                <v-icon color="green">mdi-check-circle</v-icon>
-                {{ currentLang.dashboardView[25] }}
+            <div class="mb-3 d-flex flex-row align-center" v-if="test.considerDifficulty">
+                <v-icon color="green" size="19">mdi-check-circle</v-icon>
+                <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[25] }}</span>
             </div>
 
             <div class="mb-3" v-if="test.ballSystem">
-                <v-icon color="green">mdi-check-circle</v-icon>
-                {{ currentLang.dashboardView[26] }}
+                <div class="d-flex flex-row align-center">
+                    <v-icon color="green" size="19">mdi-check-circle</v-icon>
+                    <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[26] }}</span>
+                </div>
                 <div class="d-flex flex-row justify-space-between flex-wrap mt-1">
-                    <div><v-icon>mdi-minus</v-icon>{{ currentLang.dashboardView[27] }}: <b>{{ test.ballSystem.min }}</b></div>
-                    <div><v-icon>mdi-plus</v-icon>{{ currentLang.dashboardView[29] }}: <b>{{ test.ballSystem.max }}</b></div>
+                    <div class="d-flex flex-row align-center">
+                        <v-icon size="19">mdi-minus</v-icon>
+                        <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[27] }}: <b>{{ test.ballSystem.min }}</b></span>
+                    </div>
+                    <div class="d-flex flex-row align-center">
+                        <v-icon size="19">mdi-plus</v-icon>
+                        <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[29] }}: <b>{{ test.ballSystem.max }}</b></span>
+                    </div>
                 </div>
             </div>
 
             <div>
-                <v-icon>mdi-help-circle</v-icon>
-                {{ currentLang.dashboardView[30] }}: <b>{{ questions }}</b> <span v-if="questions">, {{ currentLang.dashboardView[31] }}:</span>
+                <div class="d-flex flex-row align-center">
+                    <v-icon size="19">mdi-help-circle</v-icon>
+                    <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[30] }}: <b>{{ questions }}</b> <span v-if="questions">, {{ currentLang.dashboardView[31] }}:</span></span>
+                </div>
                 <div class="question-info" v-if="questions">
                     <div>
-                        <div><span style="color:rgb(255, 99, 132)">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
-                        <div><span style="color:rgb(54, 162, 235)">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
-                        <div><span style="color:rgb(255, 205, 86)">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
+                        <div style="font-size: 0.95em;"><span style="color: #0d5fd8; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
+                        <div style="font-size: 0.95em;"><span style="color: #444; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
+                        <div style="font-size: 0.95em;"><span style="color: #0c2242; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
                     </div>
                     <div class="canvas-box">
                         <!-- Нужно создавать canvas с помощью скрипта -->
@@ -160,9 +174,9 @@ export default {
                         datasets: [{
                             data: [this.basicQuestions, this.questionsWithImages, this.questionWithField],
                             backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(255, 205, 86)'
+                            '#0d5fd8',
+                            '#444',
+                            '#0c2242'
                             ],
                             hoverOffset: 4
                         }]
@@ -184,9 +198,16 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .dialog-content{
     width: 100%;
     padding: 30px;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 
 .main-info{

@@ -15,7 +15,7 @@
             </v-btn>
         </template>
 
-        <v-card style="max-height: 600px;overflow-y: scroll;">
+        <v-card>
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
@@ -507,6 +507,10 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .v-input--selection-controls{
     padding-top:0;
     margin-top:0
@@ -520,6 +524,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 .content__subject-box{
     padding: 30px 30px 0 30px;

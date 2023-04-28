@@ -63,44 +63,103 @@
                             @click="changeCurrentQuestion(question.id)"
                             >
                                 <td style="width:20px">
-                                    <v-tooltip bottom v-if="question.type=='basic-question'">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-icon
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                        >
-                                        mdi-text
-                                        </v-icon>
-                                    </template>
-                                    <span>{{ currentLang.workspaceView[13] }}</span>
-                                    </v-tooltip>
+                                    <div v-if="remarks">
+                                        <v-tooltip bottom v-if="question.type=='basic-question' && !remarks.find(remark=>remark.question==question.id)">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
+                                            >
+                                            mdi-text
+                                            </v-icon>
+                                        </template>
+                                        <span>{{ currentLang.workspaceView[13] }}</span>
+                                        </v-tooltip>
 
-                                    <v-tooltip bottom v-if="question.type=='question-with-images'">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-icon
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                        >
-                                        mdi-image-outline
-                                        </v-icon>
-                                    </template>
-                                    <span>{{ currentLang.workspaceView[14] }}</span>
-                                    </v-tooltip>
+                                        <v-tooltip bottom v-if="question.type=='question-with-images' && !remarks.find(remark=>remark.question==question.id)">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
+                                            >
+                                            mdi-image-outline
+                                            </v-icon>
+                                        </template>
+                                        <span>{{ currentLang.workspaceView[14] }}</span>
+                                        </v-tooltip>
 
-                                    <v-tooltip bottom v-if="question.type=='question-with-field'">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-icon
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                        >
-                                        mdi-selection-ellipse-arrow-inside
-                                        </v-icon>
-                                    </template>
-                                    <span>{{ currentLang.workspaceView[15] }}</span>
-                                    </v-tooltip>
+                                        <v-tooltip bottom v-if="question.type=='question-with-field' && !remarks.find(remark=>remark.question==question.id)">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
+                                            >
+                                            mdi-selection-ellipse-arrow-inside
+                                            </v-icon>
+                                        </template>
+                                        <span>{{ currentLang.workspaceView[15] }}</span>
+                                        </v-tooltip>
+
+                                        
+                                        <v-tooltip bottom v-if="remarks.find(remark=>remark.question==question.id)">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="'red'"
+                                            >
+                                            mdi-alert-circle-outline
+                                            </v-icon>
+                                        </template>
+                                        <span v-if="question.type=='basic-question'">{{ currentLang.workspaceView[13] }}</span>
+                                        <span v-if="question.type=='question-with-images'">{{ currentLang.workspaceView[14] }}</span>
+                                        <span v-if="question.type=='question-with-field'">{{ currentLang.workspaceView[15] }}</span>
+                                        </v-tooltip>
+                                    </div>
+
+                                    <div v-else>
+                                        <v-tooltip bottom v-if="question.type=='basic-question'">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
+                                            >
+                                            mdi-text
+                                            </v-icon>
+                                        </template>
+                                        <span>{{ currentLang.workspaceView[13] }}</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom v-if="question.type=='question-with-images'">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
+                                            >
+                                            mdi-image-outline
+                                            </v-icon>
+                                        </template>
+                                        <span>{{ currentLang.workspaceView[14] }}</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom v-if="question.type=='question-with-field'">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
+                                            >
+                                            mdi-selection-ellipse-arrow-inside
+                                            </v-icon>
+                                        </template>
+                                        <span>{{ currentLang.workspaceView[15] }}</span>
+                                        </v-tooltip>
+                                    </div>
                                 </td>
                                 <td >{{ i+1 }}</td>
                                 <td>
@@ -154,7 +213,14 @@
             <span :style="!loader ? 'color: #fff' : 'color: #888'">{{ currentLang.workspaceView[7] }}</span>
         </v-btn>
 
-        <sign-test :loader="loader" :stopSavingLoop="stopSavingLoop" :currentTest="currentTest" :questions="questions" :saveProcessFinally="saveProcessFinally"/>
+        <sign-test
+        :loader="loader"
+        :stopSavingLoop="stopSavingLoop"
+        :currentTest="currentTest"
+        :questions="questions"
+        :saveProcessFinally="saveProcessFinally"
+        :remarks="remarks"
+        />
     </div>
 </template>
 
@@ -175,7 +241,8 @@ export default {
         stopSavingLoop: Function,
         currentTest: Object,
         questions: Array,
-        saveProcessFinally: Object
+        saveProcessFinally: Object,
+        remarks: undefined | Array
     },
     data(){
         return {

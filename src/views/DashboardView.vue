@@ -19,17 +19,10 @@
           </div>
           <div class="d-flex flex-row" style="gap: 15px">
             <div class="dashboard__import-btn">
-              <v-btn
-              small
-              color="#0C2242"
-              @click="importTest()"
-              >
-              <v-icon color="#fff" size="19">mdi-file-download-outline</v-icon>
-              <span style="color:#fff">Импортировать тест</span>
-              </v-btn>
+              <import-test :renderFunc="loadTests" />
             </div>
             <div class="dashboard__create-btn">
-              <create-test :renderFunc="loadTests"></create-test>
+              <create-test :renderFunc="loadTests" />
             </div>
           </div>
         </div>
@@ -88,6 +81,7 @@
 import WorkCard from '@/components/WorkCard.vue'
 import ToInstruction from '@/components/ToInstruction.vue'
 import CreateTest from '@/components/dialogs/CreateTest.vue'
+import ImportTest from '@/components/dialogs/ImportTest.vue'
 import { mapGetters, mapMutations } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
 
@@ -118,17 +112,14 @@ import { operationFromStore } from '@/services/localDB'
           this.clearSign()
           return this.$router.push('/')
         })
-      },
-
-      async importTest(){
-
       }
     },
     computed: mapGetters(['currentSign', 'currentLang']),
     components:{
       WorkCard,
       ToInstruction,
-      CreateTest
+      CreateTest,
+      ImportTest
     }
   }
 </script>

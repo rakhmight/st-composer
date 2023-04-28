@@ -65,6 +65,7 @@
                     <v-icon size="19" color="#e83b07" v-if="error.type=='pos'">mdi-selection-ellipse-arrow-inside</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='theme'">mdi-alpha-t-box-outline</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='difficulty'">mdi-chart-line</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='remarks'">mdi-alert-circle-outline</v-icon>
                     <p
                     class="text-body-1 mr-2 ml-2"
                     style="color: #000;"
@@ -111,7 +112,8 @@ export default {
         currentTest: Object,
         questions: Array,
         stopSavingLoop: Function,
-        saveProcessFinally: Object
+        saveProcessFinally: Object,
+        remarks: undefined | Array
     },
     data(){
         return {
@@ -228,6 +230,14 @@ export default {
                 }
             })
 
+            // проверка на remarks
+            if(this.remarks){
+                if(this.remarks.length){
+                   
+                    this.errors.push({type: 'remarks', ctx: `Исправьте замечания перед подписанием`}) 
+                }
+            }
+
             if(this.errors.length){
                 this.checkingLoader = false
                 return
@@ -253,6 +263,15 @@ export default {
                 .then(async (data)=>{
                     // сборка теста для выгрузки
                     const signedDate = new Date()
+                    const usefulHistory = []
+                    this.currentTest.history.forEach(item=>{
+                        if(item.type=='signed' || item.type=='rejected-inspector' || item.type=='rejected-admin'){
+                            usefulHistory.push(item)
+                        }else if(item.type=='import'){
+                            usefulHistory.push({date: item.date.full, type: 'import'})
+                        }
+                    })
+
                     const test = {
                         id: this.currentTest.id,
                         fileDate: signedDate.getTime(),
@@ -269,7 +288,8 @@ export default {
                         questions: data,
                         history: [
                             {date: this.currentTest.history[0].date.full, type: 'create'},
-                            {date: signedDate, type: 'signed'}
+                            {date: signedDate, type: 'signed'},
+                            ...usefulHistory
                         ]
                     }
                     // Удаление прежнего signed

@@ -15,6 +15,7 @@
                 :currentTest="currentTest"
                 :questions="questions"
                 :saveProcessFinally="saveProcessFinally"
+                :remarks="currentTest.remarks"
                 />
 
                 <div class="workspace__sidebar-box"></div>
@@ -33,6 +34,31 @@
                         <span class="mt-3" style="font-size: 0.95em;">{{ loader.text }}</span>
                     </div>
 
+                    <div v-if="currentTest.remarks" style="height: auto">
+                        <div
+                        style="padding:15px;border: 1px solid #de2f13;border-radius: 5px; gap:10px"
+                        class="d-flex flex-row align-center mb-3"
+                        v-if="currentTest.remarks.find(remark=>remark.type=='general')"
+                        >
+                            <v-icon color="#de2f13">mdi-alert-circle-outline</v-icon>
+                            <span style="font-size: 0.95em;width:100%">{{ getRemark() }}</span>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                class="ml-8"
+                                color="var(--main-color)"
+                                v-bind="attrs"
+                                v-on="on"
+                                @click="removeRemark('general')"
+                                >
+                                mdi-check-circle-outline
+                                </v-icon>
+                            </template>
+                            <span>Отметить как выполненное</span>
+                            </v-tooltip>
+                        </div>
+                    </div>
+
                     <!-- !! 1 Question -->
                     <question-template
                     v-if="!loader.value && questions.length && !saveProcessFinally.value"
@@ -44,6 +70,8 @@
                     :showParse="showParse"
                     :switchCurrentQuestion="switchCurrentQuestion"
                     :switchQuestion="switchQuestion"
+                    :remarks="currentTest.remarks"
+                    :removeRemark="removeRemark"
                     />
 
                     <div v-if="questions.length==0 && !loader.value && !saveProcessFinally.value" class="d-flex flex-column justify-center align-center" style="height:70vh;background-color: #aaaaaa80;border-radius: 5px;">
@@ -76,7 +104,20 @@
 
                 <div class="workspace__tools-box">
                     <!-- <tools/> -->
-                    <tools :loaderState='!loader.value' :allTasks="tasks" :createFunc="createQuestion" :saveFunction="saveProcess" :currentTestID="+currentTest.id" :allQuestions="questions" :blockAddQBtn="blockAddQBtn" :parseMode="parseMode" :changeParseMode="changeParseMode" :showParse="showParse" :saveProcessFinally="saveProcessFinally" :switchAutosaving="switchAutosaving"/>
+                    <tools
+                    :loaderState='!loader.value'
+                    :allTasks="tasks"
+                    :createFunc="createQuestion"
+                    :saveFunction="saveProcess"
+                    :currentTestID="+currentTest.id"
+                    :allQuestions="questions"
+                    :blockAddQBtn="blockAddQBtn"
+                    :parseMode="parseMode"
+                    :changeParseMode="changeParseMode"
+                    :showParse="showParse"
+                    :saveProcessFinally="saveProcessFinally"
+                    :switchAutosaving="switchAutosaving"
+                    />
                 </div>
             </div>
         </div>
@@ -248,6 +289,21 @@ export default {
     },
     methods:{
         ...mapMutations(['clearSign']),
+        getRemark(){
+            const remark = this.currentTest.remarks.find(remark => remark.type=='general')
+            return remark.msg
+        },
+        removeRemark(type, id){
+            if(type=='question'){
+                const target = this.currentTest.remarks.find(remark=>remark.question==id)
+                const index = this.currentTest.remarks.indexOf(target)
+                this.currentTest.remarks.splice(index, 1)
+            } else if(type=='general'){
+                const target = this.currentTest.remarks.find(remark=>remark.type=='general')
+                const index = this.currentTest.remarks.indexOf(target)
+                this.currentTest.remarks.splice(index, 1)
+            }
+        },
         switchAutosaving(mode){
             if(mode=='off'){
                 clearInterval(this.savingInterval )
@@ -592,7 +648,7 @@ export default {
     text-align: justify;
     display: grid;
     grid-template-rows: auto;
-    gap: 40px;
+    /* gap: 40px; */
 }
 
 .workspace__tools-box{

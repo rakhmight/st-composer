@@ -31,6 +31,17 @@
             <span>{{ currentLang.dashboardView[10] }}: {{ getDelTime() }} {{ currentLang.dashboardView[11] }}</span>
           </v-tooltip>
           <!--  -->
+          <v-tooltip left color="error" v-if="test.remarks && test.remarks.length">
+            <template v-slot:activator="{ on, attrs }">
+              <div class="clear mb-1" 
+                v-bind="attrs"
+                v-on="on"> 
+                  <v-icon size="20" color="#ff4500">mdi-alert-circle</v-icon>
+                  {{ test.remarks.length }}
+              </div>
+            </template>
+            <span>Выявленных ошибок: {{ test.remarks.length }}</span>
+          </v-tooltip>
 
         </div>
         <div class="work__info d-flex justify-content-center">

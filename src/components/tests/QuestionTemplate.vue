@@ -43,6 +43,31 @@
 
         <v-divider color="#bbb"></v-divider>
 
+        <div v-if="remarks">
+            <div
+            style="padding:15px;border: 1px solid #de2f13;border-radius: 5px; gap:10px"
+            class="d-flex flex-row align-center mt-3"
+            v-if="remarks.find(remark=>remark.question==currentQuestion.id)"
+            >
+                <v-icon color="#de2f13">mdi-alert-circle-outline</v-icon>
+                <span style="font-size: 0.95em;width:100%">{{ getRemark() }}</span>
+                <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                    class="ml-8"
+                    color="var(--main-color)"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="removeRemark('question', currentQuestion.id)"
+                    >
+                    mdi-check-circle-outline
+                    </v-icon>
+                </template>
+                <span>Отметить как выполненное</span>
+                </v-tooltip>
+            </div>
+        </div>
+
         <div class="test__question-box mt-3">
             <div>
                 <p style="color: #888">{{ currentLang.workspaceView[25] }}:</p>
@@ -414,7 +439,9 @@ export default {
         deleteFunc: Function,
         questionFunc: Function,
         switchCurrentQuestion: Boolean,
-        switchQuestion: Function
+        switchQuestion: Function,
+        remarks: undefined | Array,
+        removeRemark: Function
     },
     components:{
         AnswerTemplates,
@@ -538,6 +565,10 @@ export default {
         this.initQuestion()
     },
     methods:{
+        getRemark(){
+            const remark = this.remarks.find(remark => remark.question==this.currentQuestion.id)
+            return remark.msg
+        },
         initQuestion(){
             // Счётчик ответов
             if(this.currentQuestion.type != 'question-with-field'){

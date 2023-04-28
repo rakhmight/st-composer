@@ -32,6 +32,7 @@
                         <div><span style="color:#ad8011"><b>►</b></span>/<span style="color:#27900dfa"><b>► </b></span> - {{ currentLang.dashboardView[64] }}</div>
                         <div><span style="color:#0c2242"><b>► </b></span> - {{ currentLang.dashboardView[65] }}</div>
                         <div><span style="color:#ff4500"><b>► </b></span> - {{ currentLang.dashboardView[66] }}</div>
+                        <div><span style="color:#ff8100"><b>► </b></span> - импорт</div>
                     </div>
                     <v-simple-table>
                         <template v-slot:default>
@@ -70,8 +71,12 @@
                             <td v-if="action.type=='signed'"><span style="color:#0c2242"><b>► {{ currentLang.dashboardView[83] }}</b></span></td>
                             <td v-if="action.type=='delete'"><span style="color:#ff4500"><b>► {{ currentLang.dashboardView[84] }}</b></span></td>
                             <td v-if="action.type=='restore'"><span style="color:#27900dfa"><b>► {{ currentLang.dashboardView[85] }}</b></span></td>
+                            <td v-if="action.type=='import'"><span style="color:#ff8100"><b>► Тест импортирован</b></span></td>
+                            <td v-if="action.type=='rejected-inspector' || action.type=='rejected-admin'"><span style="color:#ff4500"><b>► Тест возвращён</b></span></td>
 
                             <td v-if="action.type=='signed'" class="text-center">{{ getCurrectDate(action.date) }}</td>
+                            <td v-if="action.type=='rejected-inspector'" class="text-center">{{ getCurrectDate(action.date) }}</td>
+                            <td v-if="action.type=='rejected-admin'" class="text-center">{{ getCurrectDate(action.date) }}</td>
                             <td v-if="action.type=='change' && action.des!='difficulty-dissabled' && action.des!='difficulty-enabled' && action.des!='ball-dissabled' && action.des!='ball-enabled' && action.des!='multilingual-dissabled' && action.des!='multilingual-enabled'"  class="text-center">→<br>{{ action.date.date }} {{ action.date.time }}</td>
                             <td v-else class="text-center">{{ action.date.date }} {{ action.date.time }}</td>
 
@@ -133,6 +138,10 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .edit-btn.theme--light.v-btn {
     color: rgb(255 255 255 / 87%);
 }
@@ -142,18 +151,19 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 .content__subject-box{
     padding: 30px;
     width: 100%;
     display: flex;
-    max-height: 500px;
-    overflow-y: scroll;
 }
 
 .content__subject-info{
     display: grid;
-    grid-template-columns: repeat(5, 0.2fr);
+    grid-template-columns: repeat(6, auto);
     gap:10px;
     justify-content: space-between;
     font-size: 0.9em;
