@@ -184,7 +184,8 @@ export default {
                     },
                     signedDate: undefined,
                     creationDate: getCurrentDate(),
-                    lastModified: undefined
+                    lastModified: undefined,
+                    testImage: this.testToImport.testImage
                 }
                 
                 this.updateTestsCounter(this.currentTestsCounter+1)
@@ -228,7 +229,7 @@ export default {
                 const test = JSON.parse(reader.result)
                 // куча проверок
                 if(test){
-                    if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' && test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object' && test.remarks && typeof test.remarks == 'object'){
+                    if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' && test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object' && test.remarks && typeof test.remarks == 'object' && test.testImage && typeof test.testImage == 'string'){
                         this.blockBtn = false
                         this.testToImport = test
                         return

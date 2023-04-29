@@ -292,6 +292,11 @@ export default {
                             ...usefulHistory
                         ]
                     }
+
+                    if(this.currentTest.testImage){
+                        test.testImage = this.currentTest.testImage
+                    }
+
                     // Удаление прежнего signed
                     await operationFromStore('deleteSigned', {id: this.currentTest.id})
                     .then(async ()=>{
@@ -346,7 +351,8 @@ export default {
 <style scoped>
 .dialog-content{
     max-height: 60vh;
-    overflow-y: scroll
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
