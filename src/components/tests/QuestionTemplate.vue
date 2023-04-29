@@ -733,18 +733,53 @@ export default {
         },
 
         summonField(){
-           //setTimeout(()=>{
-                let target = document.querySelector(`.img_${this.currentQuestion.id}`)
+            if(!document.querySelector(`.img_${this.currentQuestion.id}`)){
+                const watchTarget = setInterval(()=>{
+                    if(document.querySelector(`.img_${this.currentQuestion.id}`)){
+                        clearInterval(watchTarget)
 
-                if(!this.multipleAnswers){
-                    let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
-                    if(removeEl){
-                        for(let i = 0; i!=removeEl.length; i++){
-                            removeEl[i].remove()
-                        }
+                        this.summonFieldFunction()
                     }
+                },1000)
+            } else {
+                this.summonFieldFunction()
+            }
+        },
 
-                    if(this.answer[1] && this.answer[1].x){
+        summonFieldFunction(){
+            const target = document.querySelector(`.img_${this.currentQuestion.id}`)
+
+            if(!this.multipleAnswers){
+                let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                if(removeEl){
+                    for(let i = 0; i!=removeEl.length; i++){
+                        removeEl[i].remove()
+                    }
+                }
+
+                if(this.answer[1] && this.answer[1].x){
+                    let field = document.createElement('div')
+                    field.classList.add(`target-${this.currentQuestion.id}`)
+                    field.style.padding = this.answer[0].fault+'px'
+                    field.style.backgroundColor = 'red'
+                    field.style.opacity = '0.5'
+                    field.style.position = 'absolute'
+                    field.style.zIndex = 10
+                    field.style.left = this.answer[1].x-this.answer[0].fault+'px'
+                    field.style.top =  this.answer[1].y-this.answer[0].fault+'px'
+
+                    target.appendChild(field)
+                }
+            }else{
+                let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
+                if(removeEl){
+                    for(let i = 0; i!=removeEl.length; i++){
+                        removeEl[i].remove()
+                    }
+                }
+
+                this.answer.filter(el=>{
+                    if(el.hasOwnProperty('x') && el.x){
                         let field = document.createElement('div')
                         field.classList.add(`target-${this.currentQuestion.id}`)
                         field.style.padding = this.answer[0].fault+'px'
@@ -752,36 +787,13 @@ export default {
                         field.style.opacity = '0.5'
                         field.style.position = 'absolute'
                         field.style.zIndex = 10
-                        field.style.left = this.answer[1].x-this.answer[0].fault+'px'
-                        field.style.top =  this.answer[1].y-this.answer[0].fault+'px'
+                        field.style.left = el.x-this.answer[0].fault+'px'
+                        field.style.top =  el.y-this.answer[0].fault+'px'
 
                         target.appendChild(field)
                     }
-                }else{
-                    let removeEl = document.querySelectorAll(`.target-${this.currentQuestion.id}`)
-                    if(removeEl){
-                        for(let i = 0; i!=removeEl.length; i++){
-                            removeEl[i].remove()
-                        }
-                    }
-
-                    this.answer.filter(el=>{
-                        if(el.hasOwnProperty('x') && el.x){
-                            let field = document.createElement('div')
-                            field.classList.add(`target-${this.currentQuestion.id}`)
-                            field.style.padding = this.answer[0].fault+'px'
-                            field.style.backgroundColor = 'red'
-                            field.style.opacity = '0.5'
-                            field.style.position = 'absolute'
-                            field.style.zIndex = 10
-                            field.style.left = el.x-this.answer[0].fault+'px'
-                            field.style.top =  el.y-this.answer[0].fault+'px'
-
-                            target.appendChild(field)
-                        }
-                    })
-                }
-           //},500)
+                })
+            }
         },
 
         clearFields(){
@@ -791,7 +803,9 @@ export default {
     },
     watch:{
         bToWatch(){
-            this.summonField()
+            if(this.answer){
+                this.summonField()
+            }
         },
 
         switchCurrentQuestion(){

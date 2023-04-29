@@ -661,7 +661,7 @@ export default {
     padding:10px;
     display: flex;
     align-items: center;
-    z-index:20;
+    z-index:1000;
 }
 
 .workspace__tools{

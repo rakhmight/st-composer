@@ -84,7 +84,8 @@
                             <td v-if="action.type=='change' && action.des=='themes'"><b>{{ action.newData.join(', ') }}</b></td>
                             <td v-if="action.type=='change' && action.des=='languages'"><b>{{ getLanguages(action.newData) }}</b></td>
                             <td v-if="action.type=='restore'"><b>{{ currentLang.dashboardView[86] }}: {{ action.des }}</b></td>
-                            <td v-if="action.type!='change' && action.type!='restore'"></td>  
+                            <!-- <td v-if="action.type!='change' && action.type!='restore'"></td>   -->
+                            <td v-if="action.type=='create' || action.type=='import'"></td>  
                             </tr>
                         </tbody>
                         </template>
