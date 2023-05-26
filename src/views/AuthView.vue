@@ -18,7 +18,7 @@ export default {
     },
     computed: mapGetters(['currentTab', 'currentSign']),
     mounted(){
-        if(this.currentSign.id){
+        if(this.currentSign){
             this.$router.push('/dashboard')
         }
     },
@@ -31,14 +31,16 @@ export default {
 }
 .auth__wrapper{
     width: 100%;
+    height: 100vh;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 .card{
     width: 550px;
     min-height: 300px;
+    max-height: 300px;
     background-color: #fff;
-    margin-top: 170px;
     border-radius: 15px;
     padding: 20px;
 }

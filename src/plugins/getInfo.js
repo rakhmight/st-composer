@@ -1,5 +1,5 @@
 export function getSubject(id, subjects, lang=undefined){
-    let target = subjects.find(subject=>subject.id==id)
+    let target = subjects.find(subject=>subject._id==id)
     if(target){
         return target.name.ru
     } else {
@@ -16,7 +16,7 @@ export function getAuthor(id, sign){
 }
 
 export function getThemes(sub, thems, sign){
-    let target = sign.subjects.find(subject=>subject.id==sub)
+    let target = sign.subjects.find(subject=>subject._id==sub)
     if(target){
         let themes = []
         thems.forEach(item=>{

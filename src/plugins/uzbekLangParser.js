@@ -1,7 +1,7 @@
 export default function uzbekLangParser(ctx, mode){
     const words = ctx.split('')
     const result = []
-    if(mode == 'latin'){
+    if(mode == 'lotin'){
         words.forEach(word => {
             switch(word){
                 case 'A':

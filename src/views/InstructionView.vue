@@ -38,7 +38,7 @@ import { mapGetters } from 'vuex';
 
 export default {
     mounted() {
-        if(!this.currentSign.id){
+        if(!this.currentSign){
           return this.$router.push('/')
         }
     },

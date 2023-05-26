@@ -201,16 +201,16 @@ export default {
                 }
                 
                 if(question.type=='basic-question' || question.type=='question-with-images'){
-                    if(question.type=='question-with-images'){
-                        if(!question.imagePreview.length){
-                            this.errors.push({type: 'image', ctx: `Не прикриплена картинка в вопросе, ID вопроса: ${question.id}`})
-                        }
-                    }
-                    question.answers.forEach((answer, x)=>{
-                        if(question.type=='question-with-images' && !answer.imagePreview.length){
-                            this.errors.push({type: 'image', ctx: `Не прикриплена картинка в ответе, ID вопроса: ${question.id}, № ответа: ${x+1}`})
-                        }
-                    })
+                    // if(question.type=='question-with-images'){
+                    //     if(!question.imagePreview.length){
+                    //         this.errors.push({type: 'image', ctx: `Не прикриплена картинка в вопросе, ID вопроса: ${question.id}`})
+                    //     }
+                    // }
+                    // question.answers.forEach((answer, x)=>{
+                    //     if(question.type=='question-with-images' && !answer.imagePreview.length){
+                    //         this.errors.push({type: 'image', ctx: `Не прикриплена картинка в ответе, ID вопроса: ${question.id}, № ответа: ${x+1}`})
+                    //     }
+                    // })
                 } else if(question.type=='question-with-field'){
                         if(!question.imagePreview.length){
                             this.errors.push({type: 'image', ctx: `Не прикриплена картинка в вопросе, ID вопроса: ${question.id}`})
@@ -309,7 +309,9 @@ export default {
                                 history,
                                 questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
                                 status: {...this.currentTest.status, isSigned: true},
-                                signedDate
+                            }
+                            if(!this.currentTest.status.isSigned){
+                                testToSave.signedDate = signedDate
                             }
                             // изменение текущих тестов (isSigned, signedDate, history)
                             await operationFromStore('deleteTest',{id: this.currentTest.id})

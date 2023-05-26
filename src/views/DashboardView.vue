@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" v-if="currentSign">
     <div class="container">
       <div class="dashboard">
         <div class="dashboard__header d-flex justify-space-between align-center">
@@ -93,7 +93,7 @@ import { operationFromStore } from '@/services/localDB'
       }
     },
     mounted() {
-      if(!this.currentSign.id){
+      if(!this.currentSign){
         return this.$router.push('/')
       }
 

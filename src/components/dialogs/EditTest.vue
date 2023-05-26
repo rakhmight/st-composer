@@ -511,7 +511,7 @@ export default {
 
             if(this.currentSign.subjects.length){
                 this.themesList = []
-                let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+                let subject = this.currentSign.subjects.find(subject=> subject._id==this.subjectID)
                 subject.themes.forEach(theme=>{
                     this.themesList.push({
                         text: theme.name.ru,
@@ -596,12 +596,12 @@ export default {
             this.currentSign.subjects.forEach(subject=>{
                 this.subjectsList.push({
                     text: subject.name.ru,
-                    value: subject.id
+                    value: subject._id
                 })
             })
             this.themes = this.test.themes
 
-            let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
+            let subject = this.currentSign.subjects.find(subject=> subject._id==this.subjectID)
             subject.themes.forEach(theme=>{
                 this.themesList.push({
                     text: theme.name.ru,

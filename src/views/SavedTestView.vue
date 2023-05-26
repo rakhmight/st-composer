@@ -407,7 +407,7 @@ export default {
             this.loaderValue += 5
         }, 100)
 
-        if(!this.currentSign.id){
+        if(!this.currentSign){
             return this.$router.push('/')
         }
 

@@ -290,7 +290,7 @@ export default {
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
 
             if(this.parseMode=='lotin-kiril' && this.showParse && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
-                this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'latin')
+                this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'lotin')
             }
         },
         'answerCtx.uz_k'(){

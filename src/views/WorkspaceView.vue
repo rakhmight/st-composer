@@ -177,7 +177,7 @@ export default {
         Tools
     },
     mounted(){
-        if(!this.currentSign.id){
+        if(!this.currentSign){
             return this.$router.push('/')
         }
 
@@ -415,6 +415,7 @@ export default {
             }else{
                 this.currentQuestion = {}
             }
+            this.switchCurrentQuestion = true
 
             const mapTarget = this.mapQuestions.find(map=>map.id==id)
             const mapIndex = this.mapQuestions.indexOf(mapTarget)
@@ -435,11 +436,12 @@ export default {
                         this.questions[index].ball = ctx
                         this.questions[index].lastModified = getCurrentDate()
                     }else if(type=='theme'){
+                        
                         this.questions[index].theme = ctx
                         this.questions[index].lastModified = getCurrentDate()
-                        if(this.allowToSaveTheme){
-                            //this.saveProcess({forcedSave:true})
-                        }
+                        // if(this.allowToSaveTheme){
+                        //     this.saveProcess({forcedSave:true})
+                        // }
                     }else if(type=='difficulty'){
                         this.questions[index].difficulty = ctx
                         this.questions[index].lastModified = getCurrentDate()

@@ -57,7 +57,7 @@
                             <td><div>Языки</div></td>
                             <td><div class="text-end"><b>{{ getLanguages(test.languagesSettings.languages) }}</b></div></td>
                         </tr>
-                        <tr v-if="test.remarks" style="color:#ff4500">
+                        <tr v-if="test.remarks && test.remarks.length" style="color:#ff4500">
                             <td><div>Количество ошибок</div></td>
                             <td><div class="text-end"><b>{{ test.remarks.length }}</b></div></td>
                         </tr>

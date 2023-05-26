@@ -202,7 +202,8 @@
                     style="width:100%; gap:15px"
                     class="d-flex flex-row"
                     >
-                        <v-textarea
+                    
+                    <v-textarea
                         dense
                         outlined
                         placeholder="Саволни тасвирлаб беринг"
@@ -211,8 +212,8 @@
                         v-model="questionCtx.uz_k"
                         style="width: 100%;"
                         spellcheck="false"
-                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='lotin-kiril'"
-                        ></v-textarea>
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && parseMode=='lotin-kiril'"
+                    ></v-textarea>
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
                             <v-img
@@ -281,7 +282,7 @@
                 dense
                 v-model="theme"
                 prepend-icon="mdi-alpha-t-box-outline"
-                style="position:releative; z-index:999"
+                style="position:releative; z-index:5"
                 ></v-select>
 
                 <v-select
@@ -292,7 +293,7 @@
                 dense
                 v-model="difficulty"
                 prepend-icon="mdi-chart-line"
-                style="position:releative; z-index:999"
+                style="position:releative; z-index:5"
                 ></v-select>
             </div>
             <div class="d-flex justify-center" style="position: relative;">
@@ -547,7 +548,7 @@ export default {
         this.difficultys[2].text = this.currentLang.workspaceView[19]
 
         // даю темам названия из подписи
-        const subject = this.currentSign.subjects.find(subject=> subject.id == this.testOptions.subjectID)
+        const subject = this.currentSign.subjects.find(subject=> subject._id == this.testOptions.subjectID)
         if(subject){
             this.themes.forEach((theme)=>{
                 let fTheme = subject.themes.find(item=> item.id==theme)
@@ -818,9 +819,13 @@ export default {
                 this.theme = this.currentQuestion.theme
                 if(this.currentQuestion.difficulty){
                     this.difficulty = this.currentQuestion.difficulty
+                } else {
+                    this.difficulty = undefined
                 }
                 if(this.currentQuestion.ball){
                     this.ball = this.currentQuestion.ball
+                } else {
+                    this.ball = this.testOptions.ballSystem.min
                 }
                 this.multipleAnswers = this.currentQuestion.multipleAnswers
                 this.answersCounter = 0
@@ -865,7 +870,7 @@ export default {
 
             if(this.parseMode=='lotin-kiril' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 ){
                 if(this.questionCtx.uz_l){
-                    this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'latin')
+                    this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'lotin')
                 } else {
                     this.questionCtx.uz_k = ''
                 }

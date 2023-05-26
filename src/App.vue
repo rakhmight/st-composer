@@ -1,6 +1,6 @@
 <template>
   <v-app v-if="!checkingTimers">
-    <header-component/>
+    <header-component v-if="currentSign"/>
 
     <v-main>
       <router-view/>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapMutations,mapGetters } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import HeaderComponent from "@/components/HeaderComponent.vue"
 import { initDB } from '@/services/localDB'
 import checkTimers from '@/services/checkTimers'
@@ -40,7 +40,7 @@ export default {
   methods: {
       ...mapMutations(['updateTestsCounter', 'updateWorkStatus', 'updateTestID', 'changeLang']),
   },
-  computed: mapGetters(['getTestID']),
+  computed: mapGetters(['getTestID', 'currentSign']),
   mounted() {
     // инициализация DB
     initDB()
