@@ -511,7 +511,7 @@ export default {
 
             if(this.currentSign.subjects.length){
                 this.themesList = []
-                let subject = this.currentSign.subjects.find(subject=> subject._id==this.subjectID)
+                let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
                 subject.themes.forEach(theme=>{
                     this.themesList.push({
                         text: theme.name.ru,
@@ -590,18 +590,30 @@ export default {
                 value: 'uz_k'
             })
         }
+        if(this.test.languagesSettings.languages[0]!='de'){
+            this.additionalLanguages.push({
+                text: 'Deutsch',
+                value: 'de'
+            })
+        }
+        if(this.test.languagesSettings.languages[0]!='fr'){
+            this.additionalLanguages.push({
+                text: 'French',
+                value: 'fr'
+            })
+        }
         this.choisedLanguages = this.test.languagesSettings.languages
 
         if(this.currentSign.subjects.length){
             this.currentSign.subjects.forEach(subject=>{
                 this.subjectsList.push({
                     text: subject.name.ru,
-                    value: subject._id
+                    value: subject.id
                 })
             })
             this.themes = this.test.themes
 
-            let subject = this.currentSign.subjects.find(subject=> subject._id==this.subjectID)
+            let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
             subject.themes.forEach(theme=>{
                 this.themesList.push({
                     text: theme.name.ru,

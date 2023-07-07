@@ -36,6 +36,66 @@
                     </div>
 
                     <div
+                    v-if="testOptions.languagesSettings.languages.indexOf('de')!=-1"
+                    style="width:100%; position: relative;"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="answer.isCurrect ? currentLang.workspaceView[39] : currentLang.workspaceView[40]"
+                        rows="2"
+                        prepend-icon="mdi-lightbulb-auto"
+                        v-model="answerCtx.de"
+                        :success="answer.isCurrect"
+                        ></v-textarea>
+                        <v-tooltip right>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="testOptions.languagesSettings.languages.length>1"
+                            src="@/assets/media/germany.png"
+                            width="22"
+                            height="22"
+                            class="mt-2"
+                            style="position:absolute; top:-18px;right:-10px"
+                            ></v-img>
+                        </template>
+                        <span>Antwortfeld auf <b><u>Deutsch</u></b></span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="testOptions.languagesSettings.languages.indexOf('fr')!=-1"
+                    style="width:100%; position: relative;"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="answer.isCurrect ? currentLang.workspaceView[39] : currentLang.workspaceView[40]"
+                        rows="2"
+                        prepend-icon="mdi-lightbulb-auto"
+                        v-model="answerCtx.fr"
+                        :success="answer.isCurrect"
+                        ></v-textarea>
+                        <v-tooltip right>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="testOptions.languagesSettings.languages.length>1"
+                            src="@/assets/media/france.png"
+                            width="22"
+                            height="22"
+                            class="mt-2"
+                            style="position:absolute; top:-18px;right:-10px"
+                            ></v-img>
+                        </template>
+                        <span>Champ de réponse en <b><u>français</u></b></span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
                     v-if="testOptions.languagesSettings.languages.indexOf('ru')!=-1"
                     style="width:100%; position: relative;"
                     >
@@ -281,6 +341,12 @@ export default {
     },
     watch:{
         'answerCtx.ru'(){
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+        },
+        'answerCtx.de'(){
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+        },
+        'answerCtx.fr'(){
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.eng'(){

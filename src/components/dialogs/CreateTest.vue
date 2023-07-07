@@ -239,6 +239,8 @@ export default {
                 {text:'English', value: 'eng'},
                 {text:"O'zbek", value: 'uz_l'},
                 {text:'Ўзбек', value: 'uz_k'},
+                {text:'Deutsch', value: 'de'},
+                {text:'French', value: 'fr'},
                 {text:'Другой', value: 'custom'},
             ],
             additionalLanguages:[],
@@ -254,7 +256,7 @@ export default {
         this.currentSign.subjects.forEach(subject=>{
             this.subjectsList.push({
                 text: subject.name.ru,
-                value: subject._id
+                value: subject.id
             })
         })
     },
@@ -431,7 +433,7 @@ export default {
 
             if(this.currentSign.subjects.length){
                 this.themesList = []
-                let subject = this.currentSign.subjects.find(subject=> subject._id==this.subjectID)
+                let subject = this.currentSign.subjects.find(subject=> subject.id==this.subjectID)
                 subject.themes.forEach(theme=>{
                     this.themesList.push({
                         text: theme.name.ru,
@@ -469,6 +471,8 @@ export default {
                 {text:'English', value: 'eng'},
                 {text:"O'zbek", value: 'uz_l'},
                 {text:'Ўзбек', value: 'uz_k'},
+                {text:'Deutsch', value: 'de'},
+                {text:'French', value: 'fr'}
             ]
 
             languages.forEach(lang=>{

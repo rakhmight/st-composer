@@ -59,7 +59,7 @@
                 :key="i"
                 class="d-flex flex-row align-center"
                 >
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='q-field-ru' || error.type=='q-field-custom' || error.type=='q-field-eng' || error.type=='q-field-uz_l' || error.type=='q-field-uz_k'">mdi-help-circle-outline</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='q-field-ru' || error.type=='q-field-custom' || error.type=='q-field-eng' || error.type=='q-field-uz_l' || error.type=='q-field-uz_k' || error.type=='q-field-fr' || error.type=='q-field-de'">mdi-help-circle-outline</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='a-field-ru' || error.type=='a-field-custom' || error.type=='a-field-eng' || error.type=='a-field-uz_l' || error.type=='a-field-uz_k'">mdi-lightbulb-auto</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='image'">mdi-camera</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='pos'">mdi-selection-ellipse-arrow-inside</v-icon>
@@ -73,6 +73,8 @@
                     <div style="width: 18px; height: 18px;">
                         <v-img src="@/assets/media/global.png" v-if="error.type=='q-field-custom' || error.type=='a-field-custom'"></v-img>
                         <v-img src="@/assets/media/russia.png" v-if="error.type=='q-field-ru' || error.type=='a-field-ru'"></v-img>
+                        <v-img src="@/assets/media/france.png" v-if="error.type=='q-field-fr' || error.type=='a-field-fr'"></v-img>
+                        <v-img src="@/assets/media/germany.png" v-if="error.type=='q-field-de' || error.type=='a-field-de'"></v-img>
                         <v-img src="@/assets/media/united-states.png" v-if="error.type=='q-field-eng' || error.type=='a-field-eng'"></v-img>
                         <v-img src="@/assets/media/uzbekistan.png" v-if="error.type=='q-field-uz_l' || error.type=='a-field-uz_l'"></v-img>
                         <v-img src="@/assets/media/uzbekistan.png" v-if="error.type=='q-field-uz_k' || error.type=='a-field-uz_k'"></v-img>
@@ -145,7 +147,7 @@ export default {
                     }
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
-                            if(!answer.answerCtx.custom){
+                            if(!answer.answerCtx.custom && !answer.imagePreview.length){
                                 this.errors.push({type: 'a-field-custom', ctx: `Не заполнено поле ответа на иностранном языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
                             }
                         })
@@ -157,7 +159,7 @@ export default {
                     }
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
-                            if(!answer.answerCtx.ru){
+                            if(!answer.answerCtx.ru && !answer.imagePreview.length){
                                 this.errors.push({type: 'a-field-ru', ctx: `Не заполнено поле ответа на русском языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
                             }
                         })
@@ -169,7 +171,7 @@ export default {
                     }
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
-                            if(!answer.answerCtx.eng){
+                            if(!answer.answerCtx.eng && !answer.imagePreview.length){
                                 this.errors.push({type: 'a-field-eng', ctx: `Не заполнено поле ответа на английском языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
                             }
                         })
@@ -181,7 +183,7 @@ export default {
                     }
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
-                            if(!answer.answerCtx.uz_l){
+                            if(!answer.answerCtx.uz_l && !answer.imagePreview.length){
                                 this.errors.push({type: 'a-field-uz_l', ctx: `Не заполнено поле ответа на узбекском (латиница) языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
                             }
                         })
@@ -193,8 +195,32 @@ export default {
                     }
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
-                            if(!answer.answerCtx.uz_k){
+                            if(!answer.answerCtx.uz_k && !answer.imagePreview.length){
                                 this.errors.push({type: 'a-field-uz_k', ctx: `Не заполнено поле ответа на узбекском (кирилица) языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
+                            }
+                        })
+                    }
+                }
+                if(this.currentTest.languagesSettings.languages.indexOf('fr')!=-1){
+                    if(!question.questionCtx.fr){
+                        this.errors.push({type: 'q-field-fr', ctx: `Не заполнено поле вопроса на французском языке, ID: ${question.id}`})
+                    }
+                    if(question.type=='basic-question' || question.type=='question-with-images'){
+                        question.answers.forEach((answer, x)=>{
+                            if(!answer.answerCtx.fr && !answer.imagePreview.length){
+                                this.errors.push({type: 'a-field-fr', ctx: `Не заполнено поле ответа на французском языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
+                            }
+                        })
+                    }
+                }
+                if(this.currentTest.languagesSettings.languages.indexOf('de')!=-1){
+                    if(!question.questionCtx.de){
+                        this.errors.push({type: 'q-field-de', ctx: `Не заполнено поле вопроса на немецком языке, ID: ${question.id}`})
+                    }
+                    if(question.type=='basic-question' || question.type=='question-with-images'){
+                        question.answers.forEach((answer, x)=>{
+                            if(!answer.answerCtx.de && !answer.imagePreview.length){
+                                this.errors.push({type: 'a-field-de', ctx: `Не заполнено поле ответа на немецком языке, ID вопроса: ${question.id}, № ответа: ${x+1}`})
                             }
                         })
                     }

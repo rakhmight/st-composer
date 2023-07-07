@@ -196,7 +196,7 @@ export default {
     },
 
     getSubject(id){
-      const subject = this.currentSign.subjects.find(subject=> subject._id==id)
+      const subject = this.currentSign.subjects.find(subject=> subject.id==id)
 
       if(subject){
         return subject.name.ru

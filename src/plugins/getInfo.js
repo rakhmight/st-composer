@@ -1,5 +1,5 @@
 export function getSubject(id, subjects, lang=undefined){
-    let target = subjects.find(subject=>subject._id==id)
+    let target = subjects.find(subject=>subject.id==id)
     if(target){
         return target.name.ru
     } else {
@@ -16,7 +16,7 @@ export function getAuthor(id, sign){
 }
 
 export function getThemes(sub, thems, sign){
-    let target = sign.subjects.find(subject=>subject._id==sub)
+    let target = sign.subjects.find(subject=>subject.id==sub)
     if(target){
         let themes = []
         thems.forEach(item=>{
@@ -47,6 +47,10 @@ export function getLanguages(langs){
             languages.push("O'zbek")
         } else if(lang=='uz_k'){
             languages.push('Ўзбек')
+        } else if(lang=='de'){
+            languages.push('Deutsch')
+        } else if(lang=='fr'){
+            languages.push('French')
         }
     })
     return languages.join(', ')

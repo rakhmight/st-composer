@@ -69,7 +69,6 @@
                     :parseMode="parseMode"
                     :showParse="showParse"
                     :switchCurrentQuestion="switchCurrentQuestion"
-                    :switchQuestion="switchQuestion"
                     :remarks="currentTest.remarks"
                     :removeRemark="removeRemark"
                     />
@@ -324,13 +323,11 @@ export default {
         blockAddQBtnFunc(){
             this.blockAddQBtn = true
         },
-        switchQuestion(){
-            this.switchCurrentQuestion = false
-        },
         changeCurrentQuestion(id){
             const target = this.questions.find(question => question.id == id)
             this.currentQuestion = target
-            this.switchCurrentQuestion = true
+            this.switchCurrentQuestion = !this.switchCurrentQuestion
+            console.log(id);
         },
         changeParseMode(mode){
             this.parseMode = mode
@@ -342,6 +339,8 @@ export default {
                 id: this.questionsCounter+1,
                 type,
                 questionCtx:{
+                    de: undefined,
+                    fr: undefined,
                     ru: undefined,
                     eng: undefined,
                     uz_l: undefined,
@@ -366,16 +365,16 @@ export default {
                 if(type=='question-with-images'){
                     question.imagePreview = ''
                     question.answers = [
-                        {id:1, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:true},
-                        {id:2, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
-                        {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}
+                        {id:1, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:true},
+                        {id:2, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
+                        {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
                     ]
                     this.currentTest.testInfo.qwi++
                 } else{
                     question.answers = [
-                        {id:1, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:true},
-                        {id:2, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false},
-                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined}, isCurrect:false}
+                        {id:1, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:true},
+                        {id:2, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
+                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
                     ]
                     this.currentTest.testInfo.bq++
                 }
@@ -412,10 +411,12 @@ export default {
                 this.currentQuestion = this.questions[index]
             }else if (this.questions[index-1]){
                 this.currentQuestion = this.questions[index-1]
+            }else if (this.questions[index+1]){
+                this.currentQuestion = this.questions[index+1]
             }else{
                 this.currentQuestion = {}
             }
-            this.switchCurrentQuestion = true
+            this.switchCurrentQuestion = !this.switchCurrentQuestion
 
             const mapTarget = this.mapQuestions.find(map=>map.id==id)
             const mapIndex = this.mapQuestions.indexOf(mapTarget)

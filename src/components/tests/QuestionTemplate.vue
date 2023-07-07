@@ -103,6 +103,66 @@
                         <span>Question field in <b><u>foreign</u></b> language</span>
                         </v-tooltip>
                     </div>
+                    
+                    <div
+                    v-if="testOptions.languagesSettings.languages.indexOf('de')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="currentLang.workspaceView[26]"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.de"
+                        style="width: 100%;"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="testOptions.languagesSettings.languages.length>1"
+                            src="@/assets/media/germany.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span>Fragefeld auf <b><u>Deutsch</u></b></span>
+                        </v-tooltip>
+                    </div>
+                    
+                    <div
+                    v-if="testOptions.languagesSettings.languages.indexOf('fr')!=-1"
+                    style="width:100%; gap:15px"
+                    class="d-flex flex-row"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="currentLang.workspaceView[26]"
+                        rows="2"
+                        prepend-icon="mdi-help-circle-outline"
+                        v-model="questionCtx.fr"
+                        style="width: 100%;"
+                        ></v-textarea>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="testOptions.languagesSettings.languages.length>1"
+                            src="@/assets/media/france.png"
+                            width="30"
+                            height="30"
+                            class="mt-2"
+                            ></v-img>
+                        </template>
+                        <span>Boîte à questions en <b><u>français</u></b></span>
+                        </v-tooltip>
+                    </div>
 
                     <div
                     v-if="testOptions.languagesSettings.languages.indexOf('ru')!=-1"
@@ -440,7 +500,6 @@ export default {
         deleteFunc: Function,
         questionFunc: Function,
         switchCurrentQuestion: Boolean,
-        switchQuestion: Function,
         remarks: undefined | Array,
         removeRemark: Function
     },
@@ -548,7 +607,7 @@ export default {
         this.difficultys[2].text = this.currentLang.workspaceView[19]
 
         // даю темам названия из подписи
-        const subject = this.currentSign.subjects.find(subject=> subject._id == this.testOptions.subjectID)
+        const subject = this.currentSign.subjects.find(subject=> subject.id == this.testOptions.subjectID)
         if(subject){
             this.themes.forEach((theme)=>{
                 let fTheme = subject.themes.find(item=> item.id==theme)
@@ -810,54 +869,60 @@ export default {
         },
 
         switchCurrentQuestion(){
-            if(this.switchCurrentQuestion){
-                this.switchCtx = true
-                if(this.currentQuestion.answers){ 
-                    this.answers = this.currentQuestion.answers
-                }
-                this.questionCtx = this.currentQuestion.questionCtx
-                this.theme = this.currentQuestion.theme
-                if(this.currentQuestion.difficulty){
-                    this.difficulty = this.currentQuestion.difficulty
-                } else {
-                    this.difficulty = undefined
-                }
-                if(this.currentQuestion.ball){
-                    this.ball = this.currentQuestion.ball
-                } else {
-                    this.ball = this.testOptions.ballSystem.min
-                }
-                this.multipleAnswers = this.currentQuestion.multipleAnswers
-                this.answersCounter = 0
-                this.file = ''
-                this.showPreview = false
-                if(this.currentQuestion.imagePreview){
-                    this.imagePreview = this.currentQuestion.imagePreview
-                    this.showPreview = true
-                } else {
-                    this.imagePreview = ''
-                    this.showPreview = false
-                }
-                this.errors =[]
-                if(this.currentQuestion.answer){
-                    this.answer = this.currentQuestion.answer
-                }
-                this.blockParse = false
-                this.imageLoader = false
-
-                this.initQuestion()
-                this.switchQuestion()
-                
-                setTimeout(()=>{
-                    this.switchCtx = false
-                },500)
+            console.log(this.switchCurrentQuestion);
+            console.log(1);
+            this.switchCtx = true
+            if(this.currentQuestion.answers){ 
+                this.answers = this.currentQuestion.answers
             }
+            this.questionCtx = this.currentQuestion.questionCtx
+            this.theme = this.currentQuestion.theme
+            if(this.currentQuestion.difficulty){
+                this.difficulty = this.currentQuestion.difficulty
+            } else {
+                this.difficulty = undefined
+            }
+            if(this.currentQuestion.ball){
+                this.ball = this.currentQuestion.ball
+            } else {
+                this.ball = this.testOptions.ballSystem.min
+            }
+            this.multipleAnswers = this.currentQuestion.multipleAnswers
+            this.answersCounter = 0
+            this.file = ''
+            this.showPreview = false
+            if(this.currentQuestion.imagePreview){
+                this.imagePreview = this.currentQuestion.imagePreview
+                this.showPreview = true
+            } else {
+                this.imagePreview = ''
+                this.showPreview = false
+            }
+            this.errors =[]
+            if(this.currentQuestion.answer){
+                this.answer = this.currentQuestion.answer
+            }
+            this.blockParse = false
+            this.imageLoader = false
+
+            this.initQuestion()
+            
+            setTimeout(()=>{
+                this.switchCtx = false
+            },500)
+        
         },
         currentQuestion(){
             this.switchCtx = true
             setTimeout(()=>{
                 this.switchCtx = false
             },500)
+        },
+        'questionCtx.fr'(){
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
+        },
+        'questionCtx.de'(){
+            this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.ru'(){
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
