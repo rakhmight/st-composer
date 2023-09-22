@@ -31,6 +31,17 @@
             <span>{{ currentLang.dashboardView[10] }}: {{ getDelTime() }} {{ currentLang.dashboardView[11] }}</span>
           </v-tooltip>
           <!--  -->
+          <v-tooltip left color="error" v-if="test.remarks && test.remarks.length">
+            <template v-slot:activator="{ on, attrs }">
+              <div class="clear mb-1" 
+                v-bind="attrs"
+                v-on="on"> 
+                  <v-icon size="20" color="#ff4500">mdi-alert-circle</v-icon>
+                  {{ test.remarks.length }}
+              </div>
+            </template>
+            <span>{{ currentLang.additional[2] }}: {{ test.remarks.length }}</span>
+          </v-tooltip>
 
         </div>
         <div class="work__info d-flex justify-content-center">
@@ -88,7 +99,7 @@
                   @click="uploadTest()"
                   >
                   <v-icon color="#0C2242" size="19">mdi-file-upload-outline</v-icon>
-                  <span class="ml-1">Скачать тест</span>
+                  <span class="ml-1">{{ currentLang.additional[1] }}</span>
                   </div>
                 </v-list>
             </v-menu>
@@ -200,7 +211,7 @@ export default {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", `test-${this.test.subjectID}.json`);
+        downloadAnchorNode.setAttribute("download", `test-${this.test.subjectID}-${data.fileDate}.json`);
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();
         downloadAnchorNode.remove();

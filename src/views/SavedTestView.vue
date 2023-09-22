@@ -36,7 +36,7 @@
                                                 #
                                             </th>
                                             <th class="text-left">
-                                                Вопрос
+                                                {{ currentLang.additional[36] }}
                                             </th>
                                         </tr>
                                     </thead>
@@ -54,7 +54,7 @@
                                             <td>
                                                 <p class="body-2 map-small" style="color:#484848">
                                                     <span v-if="question.questionCtx.ru || question.questionCtx.eng || question.questionCtx.uz_l || question.questionCtx.uz_k || question.questionCtx.custom">{{ getCurrentQuestion(question.questionCtx) }}</span>
-                                                    <span style="color:#888;" v-else>Не заполнено</span>
+                                                    <span style="color:#888;" v-else>{{ currentLang.additional[37] }}</span>
                                                 </p>
                                             </td>
                                         </tr>
@@ -254,8 +254,8 @@
                                 <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes ? getThemes(testParams.subjectID, testParams.themes) : 'null' }}</div>
                             </div>
                             <div class="d-flex flex-row mt-1">
-                                <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
-                                <div><span style="color:#bbb">Языки:</span> {{ testParams.languagesSettings ? getLanguages(testParams.languagesSettings.languages) : 'null' }}</div>
+                                <v-icon color="#fff" class="mr-1" size="19">mdi-translate</v-icon>
+                                <div><span style="color:#bbb">{{ currentLang.additional[0] }}:</span> {{ testParams.languagesSettings ? getLanguages(testParams.languagesSettings.languages) : 'null' }}</div>
                             </div>
                         </div>
 
@@ -346,6 +346,20 @@ export default {
     },
     computed: mapGetters(['getTestID', 'currentLang', 'currentSign']),
     methods:{
+        
+        getCurrentQuestion(question){
+            if(this.testParams.languagesSettings.languages[0] == 'ru'){
+                return question.ru
+            } else if(this.testParams.languagesSettings.languages[0] == 'eng'){
+                return question.eng
+            } else if(this.testParams.languagesSettings.languages[0] == 'uz_l'){
+                return question.uz_l
+            } else if(this.testParams.languagesSettings.languages[0] == 'uz_k'){
+                return question.uz_k
+            } else if(this.testParams.languagesSettings.languages[0] == 'custom'){
+                return question.custom
+            }
+        },
         getSubject(id){
             return getSubject(id, this.currentSign.subjects)
         },
@@ -387,13 +401,13 @@ export default {
     mounted() {
         // Loader
         this.loaderInterval = setInterval(() => {
-            if (this.loaderValue === 100) {
+            if (this.loaderValue == 100) {
                 clearInterval(this.loaderInterval)
             }
             this.loaderValue += 5
         }, 100)
 
-        if(!this.currentSign.id){
+        if(!this.currentSign){
             return this.$router.push('/')
         }
 

@@ -1,8 +1,8 @@
 const { defineConfig } = require('@vue/cli-service')
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+// const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 module.exports = defineConfig({
   configureWebpack:{
-    plugins: [new NodePolyfillPlugin()],
+    // plugins: [new NodePolyfillPlugin()],
     optimization: {
       splitChunks: {
         chunks: "all",
@@ -22,7 +22,7 @@ module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
   ],
-  pluginOptions:{
+  pluginOptions:{  
     electronBuilder:{
       builderOptions:{
         "productName": "Composer of ST",
@@ -46,7 +46,9 @@ module.exports = defineConfig({
         "mac" : {
           "icon" : "./public/icons/icon-stc.ico"
         }
-      }
+      },
+      externals: [],
+      nodeIntegration: true
     }
   },
 })

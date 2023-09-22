@@ -37,8 +37,8 @@
             v-on="on"
           >
             <v-icon
-            size="33"
-            >mdi-translate-variant</v-icon>
+            size="24"
+            >mdi-translate</v-icon>
           </v-btn>
         </template>
 
@@ -105,7 +105,12 @@ import { mapMutations, mapGetters } from 'vuex'
 export default {
     data() {
       return {
-        langs: [{lang: 'русский', short: 'ru'},{lang: "o'zbek", short: 'uz_l'}, {lang: "ўзбек", short: 'uz_k'},{lang: 'english', short: 'eng'}],
+        langs: [
+          {lang: 'русский', short: 'ru'},
+          {lang: "o'zbek", short: 'uz_l'},
+          // {lang: "ўзбек", short: 'uz_k'},
+          // {lang: 'english', short: 'eng'}
+        ],
         activeLang: 'ru'
       }
     },

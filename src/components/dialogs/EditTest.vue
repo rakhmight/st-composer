@@ -45,12 +45,12 @@
                             v-else
                             prepend-icon="mdi-pound"
                             :items="subjectsList"
-                            label="Выберите предмет"
+                            :label="currentLang.additional[5]"
                             outlined
                             dense
                             v-model="subjectID"
                             :error="subjectEr"
-                            no-data-text="В подписи нет предметов"
+                            :no-data-text="currentLang.additional[6]"
                             ></v-select>
 
                         <v-tooltip bottom>
@@ -69,8 +69,8 @@
                                 <v-icon v-else>mdi-playlist-check</v-icon>
                             </v-btn>
                         </template>
-                            <span v-if="!subjectManually">Набрать вручную</span>
-                            <span v-else>Выбрать из списка подписи</span>
+                            <span v-if="!subjectManually">{{ currentLang.additional[7] }}</span>
+                            <span v-else>{{ currentLang.additional[8] }}</span>
                         </v-tooltip>
                         </div>
                     </div>
@@ -92,12 +92,12 @@
                             v-else
                             prepend-icon="mdi-alpha-t-box-outline"
                             :items="themesList"
-                            label="Выберите темы"
+                            :label="currentLang.additional[9]"
                             outlined
                             dense
                             v-model="themes"
                             :error="themesEr"
-                            no-data-text="Сначала выберите предмет"
+                            :no-data-text="currentLang.additional[10]"
                             multiple
                             ></v-select>
                         </div>
@@ -115,7 +115,7 @@
                     </div>
                     <div>
                         <v-checkbox
-                        label="Мультиязычный тест"
+                        :label="currentLang.additional[13]"
                         v-model="multiLang"
                         ></v-checkbox>
                     </div>
@@ -124,7 +124,7 @@
                         <v-select
                         prepend-icon="mdi-translate"
                         :items="additionalLanguages"
-                        label="Дополнительные языки"
+                        :label="currentLang.additional[14]"
                         outlined
                         dense
                         multiple
@@ -572,12 +572,12 @@ export default {
                 value: 'ru'
             })
         }
-        if(this.test.languagesSettings.languages[0]!='eng'){
-            this.additionalLanguages.push({
-                text: 'English',
-                value: 'eng'
-            })
-        }
+        // if(this.test.languagesSettings.languages[0]!='eng'){
+        //     this.additionalLanguages.push({
+        //         text: 'English',
+        //         value: 'eng'
+        //     })
+        // }
         if(this.test.languagesSettings.languages[0]!='uz_l'){
             this.additionalLanguages.push({
                 text: "O'zbek",
@@ -590,6 +590,18 @@ export default {
                 value: 'uz_k'
             })
         }
+        // if(this.test.languagesSettings.languages[0]!='de'){
+        //     this.additionalLanguages.push({
+        //         text: 'Deutsch',
+        //         value: 'de'
+        //     })
+        // }
+        // if(this.test.languagesSettings.languages[0]!='fr'){
+        //     this.additionalLanguages.push({
+        //         text: 'French',
+        //         value: 'fr'
+        //     })
+        // }
         this.choisedLanguages = this.test.languagesSettings.languages
 
         if(this.currentSign.subjects.length){
@@ -631,6 +643,10 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .v-input--selection-controls{
     padding-top:0;
     margin-top:0
@@ -644,6 +660,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 .content__subject-box{
     padding: 30px;

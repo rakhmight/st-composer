@@ -6,7 +6,7 @@
                 <div style="position: relative">
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('custom')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('custom')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -14,7 +14,7 @@
                         outlined
                         :placeholder="answer.isCurrect ? 'Write the correct answer' : 'Write a distracting answer'"
                         rows="2"
-                        prepend-icon="mdi-lightbulb-auto"
+                        prepend-icon="mdi-lightbulb"
                         v-model="answerCtx.custom"
                         :success="answer.isCurrect"
                         ></v-textarea>
@@ -23,7 +23,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/global.png"
                             width="22"
                             height="22"
@@ -36,7 +36,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('ru')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('de')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -44,7 +44,67 @@
                         outlined
                         :placeholder="answer.isCurrect ? currentLang.workspaceView[39] : currentLang.workspaceView[40]"
                         rows="2"
-                        prepend-icon="mdi-lightbulb-auto"
+                        prepend-icon="mdi-lightbulb"
+                        v-model="answerCtx.de"
+                        :success="answer.isCurrect"
+                        ></v-textarea>
+                        <v-tooltip right>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="testOptions.languagesSettings.languages.length>1"
+                            src="@/assets/media/germany.png"
+                            width="22"
+                            height="22"
+                            class="mt-2"
+                            style="position:absolute; top:-18px;right:-10px"
+                            ></v-img>
+                        </template>
+                        <span>Antwortfeld auf <b><u>Deutsch</u></b></span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="testOptions.languagesSettings.languages.indexOf('fr')!=-1"
+                    style="width:100%; position: relative;"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="answer.isCurrect ? currentLang.workspaceView[39] : currentLang.workspaceView[40]"
+                        rows="2"
+                        prepend-icon="mdi-lightbulb"
+                        v-model="answerCtx.fr"
+                        :success="answer.isCurrect"
+                        ></v-textarea>
+                        <v-tooltip right>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-img
+                            v-bind="attrs"
+                            v-on="on"
+                            v-if="testOptions.languagesSettings.languages.length>1"
+                            src="@/assets/media/france.png"
+                            width="22"
+                            height="22"
+                            class="mt-2"
+                            style="position:absolute; top:-18px;right:-10px"
+                            ></v-img>
+                        </template>
+                        <span>Champ de réponse en <b><u>français</u></b></span>
+                        </v-tooltip>
+                    </div>
+
+                    <div
+                    v-if="testOptions.languagesSettings.languages.indexOf('ru')!=-1"
+                    style="width:100%; position: relative;"
+                    >
+                        <v-textarea
+                        dense
+                        outlined
+                        :placeholder="answer.isCurrect ? currentLang.workspaceView[39] : currentLang.workspaceView[40]"
+                        rows="2"
+                        prepend-icon="mdi-lightbulb"
                         v-model="answerCtx.ru"
                         :success="answer.isCurrect"
                         ></v-textarea>
@@ -53,7 +113,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/russia.png"
                             width="22"
                             height="22"
@@ -66,7 +126,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('eng')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('eng')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -74,7 +134,7 @@
                         outlined
                         :placeholder="answer.isCurrect ? 'Write the correct answer' : 'Write a distracting answer'"
                         rows="2"
-                        prepend-icon="mdi-lightbulb-auto"
+                        prepend-icon="mdi-lightbulb"
                         v-model="answerCtx.eng"
                         :success="answer.isCurrect"
                         spellcheck="false"
@@ -84,7 +144,7 @@
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/united-states.png"
                             width="22"
                             height="22"
@@ -97,7 +157,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('uz_l')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -105,17 +165,18 @@
                         outlined
                         :placeholder="answer.isCurrect ? `To'g'ri javobni yozing` : `Chalg'ituvchi javob yozing`"
                         rows="2"
-                        prepend-icon="mdi-lightbulb-auto"
+                        prepend-icon="mdi-lightbulb"
                         v-model="answerCtx.uz_l"
                         :success="answer.isCurrect"
                         spellcheck="false"
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='kiril-lotin'"
                         ></v-textarea>
                         <v-tooltip right>
                         <template v-slot:activator="{ on, attrs }">
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
                             width="22"
                             height="22"
@@ -128,7 +189,7 @@
                     </div>
 
                     <div
-                    v-if="currentTest.languagesSettings.languages.indexOf('uz_k')!=-1"
+                    v-if="testOptions.languagesSettings.languages.indexOf('uz_k')!=-1"
                     style="width:100%; position: relative;"
                     >
                         <v-textarea
@@ -136,17 +197,18 @@
                         outlined
                         :placeholder="answer.isCurrect ? `Тўғри жавобни ёзинг` : `Чалғитувчи жавоб ёзинг`"
                         rows="2"
-                        prepend-icon="mdi-lightbulb-auto"
+                        prepend-icon="mdi-lightbulb"
                         v-model="answerCtx.uz_k"
                         :success="answer.isCurrect"
                         spellcheck="false"
+                        :disabled="testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 && parseMode=='lotin-kiril'"
                         ></v-textarea>
                         <v-tooltip right>
                         <template v-slot:activator="{ on, attrs }">
                             <v-img
                             v-bind="attrs"
                             v-on="on"
-                            v-if="currentTest.languagesSettings.languages.length>1"
+                            v-if="testOptions.languagesSettings.languages.length>1"
                             src="@/assets/media/uzbekistan.png"
                             width="22"
                             height="22"
@@ -199,7 +261,7 @@
                     <v-icon
                     v-bind="attrs"
                     v-on="on"
-                    v-if="currentAnswer.id!=1 && currentAnswer.id!=2 && currentAnswer.id!=3"
+                    v-if="currentAnswer.id!=1 && currentAnswer.id!=2 && currentAnswer.id!=3 && currentAnswer.id!=4"
                     color="red"
                     @click="deleteAnswer"
                     size="25"
@@ -222,6 +284,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import uzbekLangParser from '@/plugins/uzbekLangParser'
+import { sanitizeString } from '@/utils/sanitizeString'
 
 export default {
     props:{
@@ -230,10 +293,10 @@ export default {
         answerFunc: Function,
         questionID: Number,
         isMultiple: Boolean,
-        currentTest: Object,
+        testOptions: Object,
 
         parseMode: String,
-        showParse: Boolean
+        showParse: Boolean,
     },
     data() {
         return {
@@ -279,26 +342,39 @@ export default {
     },
     watch:{
         'answerCtx.ru'(){
+            this.answerCtx.ru = sanitizeString(this.answerCtx.ru)
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+        },
+        'answerCtx.de'(){
+            this.answerCtx.de = sanitizeString(this.answerCtx.de)
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
+        },
+        'answerCtx.fr'(){
+            this.answerCtx.fr = sanitizeString(this.answerCtx.fr)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.eng'(){
+            this.answerCtx.eng = sanitizeString(this.answerCtx.eng)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.uz_l'(){
-            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
-
-            if(this.parseMode=='lotin-kiril' && this.showParse){
-                this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'latin')
+            if(this.parseMode=='lotin-kiril' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
+                this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'lotin')
             }
+
+            this.answerCtx.uz_l = sanitizeString(this.answerCtx.uz_l)
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.uz_k'(){
-            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
-
-            if(this.parseMode=='kiril-lotin' && this.showParse){
+            if(this.parseMode=='kiril-lotin' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
                 this.answerCtx.uz_l = uzbekLangParser(this.answerCtx.uz_k, 'kiril')
             }
+
+            this.answerCtx.uz_k = sanitizeString(this.answerCtx.uz_k)
+            this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.custom'(){
+            this.answerCtx.custom = sanitizeString(this.answerCtx.custom)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
 

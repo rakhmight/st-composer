@@ -47,6 +47,10 @@ export function getLanguages(langs){
             languages.push("O'zbek")
         } else if(lang=='uz_k'){
             languages.push('Ўзбек')
+        } else if(lang=='de'){
+            languages.push('Deutsch')
+        } else if(lang=='fr'){
+            languages.push('French')
         }
     })
     return languages.join(', ')

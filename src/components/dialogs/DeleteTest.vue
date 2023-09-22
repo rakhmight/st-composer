@@ -175,6 +175,11 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
+
 .delete-btn.theme--light.v-btn {
     color: rgb(255 255 255 / 87%);
 } 
@@ -184,6 +189,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 .content__subject-box{
     padding: 30px;

@@ -1,7 +1,66 @@
+import { sanitizeString } from '@/utils/sanitizeString'
+
 export default function uzbekLangParser(ctx, mode){
-    const words = ctx.split('')
+    let words = ctx.split('')
     const result = []
-    if(mode == 'latin'){
+    const quotes = []
+    const quotesPair = []
+    const wordsInQuotes = []
+
+    const wordsCopy = [...words]
+
+    words.filter((word, index) => {
+        if(word === `"`) quotes.push(index)
+    })
+
+    let counter = 0
+    let arrayID = 0
+    for(let quote of quotes){
+        if(counter < 2){
+            if(counter == 0){
+                quotesPair.push([quote])
+            } else {
+                quotesPair[arrayID].push(quote)
+            }
+            counter++
+        } else {
+            counter = 1
+            arrayID++
+
+            quotesPair.push([quote])
+        }
+
+        // if(counter!=2){
+        //     if(counter == 0){
+        //         quotesPair.push([quote])
+        //     } else {
+        //         quotesPair[arrayID].push(quote)
+        //     }
+
+        //     counter++
+        // } else {
+        //     arrayID++
+        //     counter = 0
+
+        //     console.log(1);
+        //     quotesPair.push([quote])
+        //     counter++
+        // }
+    }
+
+    for(let pair of quotesPair){
+        if(pair[1]){
+            const word = words.splice(pair[0]+1, (pair[1]-pair[0])-1)
+            // console.log(pair[0], pair[1]);
+            wordsInQuotes.push([word])
+            words = []
+            words = [...wordsCopy]
+        }
+    }
+    // console.log(quotesPair);
+    // console.log(wordsInQuotes);
+
+    if(mode == 'lotin'){
         words.forEach(word => {
             switch(word){
                 case 'A':
@@ -142,7 +201,7 @@ export default function uzbekLangParser(ctx, mode){
                     result.push('в');
                     break;
                 case 'x':
-                    result.push('Х');
+                    result.push('х');
                     break;
                 case 'y':
                     result.push('й');
@@ -160,6 +219,33 @@ export default function uzbekLangParser(ctx, mode){
                     break
             }
         });
+
+        // подстановка сохранённых слов
+        for(let i = 0; i!=wordsInQuotes.length; i++) {
+            const indexes = []
+
+            for(let j = quotesPair[i][0]+1; j!=quotesPair[i][1]; j++) {
+                indexes.push(j)
+            }
+            // console.log(indexes);
+            
+
+            wordsInQuotes[i].map((word) => {
+
+                let wCounter = 0
+                for(let w of word){
+                    console.log(w);
+                    console.log(indexes[wCounter]);
+
+                    result[indexes[wCounter]] = w
+
+                    wCounter++
+                }
+                // console.log(word[wi]);
+                // console.log(indexes[wi]);
+                // result[indexes[wi]] = word[wi]
+            })
+        }
 
         let string = result.join()
         string = string.replaceAll(',', '')
@@ -180,7 +266,9 @@ export default function uzbekLangParser(ctx, mode){
         string = string.replaceAll("Г'", 'Ғ')
         string = string.replaceAll("г'", 'ғ')
         string = string.replaceAll("'", 'ъ')
-        return string
+        string = string.replaceAll("'", 'ь')
+
+        return sanitizeString(string)
     } else if(mode == 'kiril'){
         words.forEach(word=>{
             switch(word){
@@ -268,6 +356,9 @@ export default function uzbekLangParser(ctx, mode){
                 case 'Ў':
                     result.push("O'");
                     break;
+                case 'Э':
+                    result.push('E');
+                    break;
                 case 'Ю':
                     result.push('Yu');
                     break;
@@ -277,7 +368,10 @@ export default function uzbekLangParser(ctx, mode){
                 case 'Ё':
                     result.push('Yo');
                     break;
-                case 'ъ':
+                case 'Ъ':
+                    result.push("'");
+                    break;
+                case 'Ь':
                     result.push("'");
                     break;
 
@@ -366,6 +460,9 @@ export default function uzbekLangParser(ctx, mode){
                 case 'ў':
                     result.push("o'");
                     break;
+                case 'э':
+                    result.push('e');
+                    break;
                 case 'ю':
                     result.push('yu');
                     break;
@@ -375,7 +472,12 @@ export default function uzbekLangParser(ctx, mode){
                 case 'ё':
                     result.push('yo');
                     break;
-
+                case 'ь':
+                    result.push("'");
+                    break;
+                case 'ъ':
+                    result.push("'");
+                    break;
 
                 case ',':
                     result.push('◘');
@@ -386,9 +488,36 @@ export default function uzbekLangParser(ctx, mode){
             }
         })
 
+        // подстановка сохранённых слов
+        for(let i = 0; i!=wordsInQuotes.length; i++) {
+            const indexes = []
+
+            for(let j = quotesPair[i][0]+1; j!=quotesPair[i][1]; j++) {
+                indexes.push(j)
+            }
+            // console.log(indexes);
+            
+
+            wordsInQuotes[i].map((word) => {
+
+                let wCounter = 0
+                for(let w of word){
+                    console.log(w);
+                    console.log(indexes[wCounter]);
+
+                    result[indexes[wCounter]] = w
+
+                    wCounter++
+                }
+                // console.log(word[wi]);
+                // console.log(indexes[wi]);
+                // result[indexes[wi]] = word[wi]
+            })
+        }
+
         let string = result.join()
         string = string.replaceAll(',', '')
         string = string.replaceAll('◘', ',')
-        return string
+        return sanitizeString(string)
     }
 }

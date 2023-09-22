@@ -15,7 +15,7 @@
             </v-btn>
         </template>
 
-        <v-card style="max-height: 600px;overflow-y: scroll;">
+        <v-card>
             <v-card-title
             class="text-h5 lighten-2 d-flex flex-row justify-space-between"
             >
@@ -42,12 +42,12 @@
                         v-else
                         prepend-icon="mdi-pound"
                         :items="subjectsList"
-                        label="Выберите предмет"
+                        :label="currentLang.additional[5]"
                         outlined
                         dense
                         v-model="subjectID"
                         :error="subjectIsEmpty"
-                        no-data-text="В подписи нет предметов"
+                        :no-data-text="currentLang.additional[6]"
                         ></v-select>
 
                         <v-tooltip bottom>
@@ -66,8 +66,8 @@
                                 <v-icon v-else>mdi-playlist-check</v-icon>
                             </v-btn>
                         </template>
-                            <span v-if="!subjectManually">Набрать вручную</span>
-                            <span v-else>Выбрать из списка подписи</span>
+                            <span v-if="!subjectManually">{{ currentLang.additional[7] }}</span>
+                            <span v-else>{{ currentLang.additional[8] }}</span>
                         </v-tooltip>
                     </div>
                     <div>
@@ -85,12 +85,12 @@
                         v-else
                         prepend-icon="mdi-alpha-t-box-outline"
                         :items="themesList"
-                        label="Выберите темы"
+                        :label="currentLang.additional[9]"
                         outlined
                         dense
                         v-model="subjectThemes"
                         :error="themesIsEmpty"
-                        no-data-text="Сначала выберите предмет"
+                        :no-data-text="currentLang.additional[10]"
                         multiple
                         ></v-select>
                     </div>
@@ -98,12 +98,12 @@
                         <v-select
                         prepend-icon="mdi-translate"
                         :items="generalLanguages"
-                        label="Выберите основной язык тестов."
+                        :label="currentLang.additional[11]"
                         outlined
                         dense
                         v-model="choisedLanguage"
                         :error="choisedLanguageError"
-                        hint="Внимание! В дальнейшем нельзя будет изменить!"
+                        :hint="currentLang.additional[12]"
                         ></v-select>
                     </div>
                     <div class="d-flex flex-row justify-space-between">
@@ -119,7 +119,7 @@
                     </div>
                     <div>
                         <v-checkbox
-                        label="Мультиязычный тест"
+                        :label="currentLang.additional[13]"
                         v-model="multiLang"
                         ></v-checkbox>
                     </div>
@@ -128,13 +128,13 @@
                         <v-select
                         prepend-icon="mdi-translate"
                         :items="additionalLanguages"
-                        label="Дополнительные языки"
+                        :label="currentLang.additional[14]"
                         outlined
                         dense
                         multiple
                         v-model="choisedLanguages"
                         v-show="multiLang"
-                        no-data-text="Сначала выберите основной язык"
+                        :no-data-text="currentLang.additional[15]"
                         :error="choisedLanguagesError"
                         ></v-select>
                     </div>
@@ -239,6 +239,8 @@ export default {
                 {text:'English', value: 'eng'},
                 {text:"O'zbek", value: 'uz_l'},
                 {text:'Ўзбек', value: 'uz_k'},
+                {text:'Deutsch', value: 'de'},
+                {text:'French', value: 'fr'},
                 {text:'Другой', value: 'custom'},
             ],
             additionalLanguages:[],
@@ -318,14 +320,14 @@ export default {
 
             if(!this.choisedLanguage){
                 this.choisedLanguageError = true
-                this.errors.push('Выберите основной язык тестов')
+                this.errors.push(this.currentLang.additional[68])
                 return
             }
 
             if(this.multiLang){
                 if(!this.choisedLanguages.length){
                     this.choisedLanguagesError = true
-                    this.errors.push('Выберите дополнительные')
+                    this.errors.push(this.currentLang.additional[69])
                     return
                 }
             }
@@ -364,7 +366,13 @@ export default {
                     history:[putToHistory('create', undefined)],
                     signedDate: undefined,
                     questions:[],
-                    signHash: this.currentSign.hash
+                    signHash: this.currentSign.hash,
+                    testInfo: {
+                        totalQuestions: 0,
+                        qwi: 0,
+                        qwf: 0,
+                        bq:0
+                    }
                 }
                 if(this.haveBall){
                     test.ballSystem = {
@@ -460,9 +468,8 @@ export default {
             this.additionalLanguages = []
             let languages = [
                 {text:'Русский', value: 'ru'},
-                {text:'English', value: 'eng'},
                 {text:"O'zbek", value: 'uz_l'},
-                {text:'Ўзбек', value: 'uz_k'},
+                {text:'Ўзбек', value: 'uz_k'}
             ]
 
             languages.forEach(lang=>{
@@ -501,6 +508,10 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .v-input--selection-controls{
     padding-top:0;
     margin-top:0
@@ -514,6 +525,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 .content__subject-box{
     padding: 30px 30px 0 30px;

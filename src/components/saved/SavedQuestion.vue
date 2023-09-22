@@ -47,6 +47,44 @@
                             </v-tooltip>
                         </div>
 
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('fr')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.fr">{{ question.questionCtx.fr }}</div>
+                            <div class="questionCtxEmpty" v-else>{{ currentLang.savedTestView[28] }}</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/france.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                            <span>Boîte à questions en <b><u>français</u></b></span>
+                            </v-tooltip>
+                        </div>
+
+                        <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('de')!=-1">
+                            <div class="questionCtx" v-if="question.questionCtx.de">{{ question.questionCtx.de }}</div>
+                            <div class="questionCtxEmpty" v-else>{{ currentLang.savedTestView[28] }}</div>
+                            <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                v-bind="attrs"
+                                v-on="on"
+                                src="@/assets/media/germany.png"
+                                width="30"
+                                height="30"
+                                class="mt-2 ml-2"
+                                v-if="testParams.languagesSettings.languages.length>1"
+                                ></v-img>
+                            </template>
+                            <span>Fragefeld auf <b><u>Deutsch</u></b></span>
+                            </v-tooltip>
+                        </div>
+
                         <div class="d-flex flex-row" style="width: 100%" v-if="testParams.languagesSettings.languages.indexOf('ru')!=-1">
                             <div class="questionCtx" v-if="question.questionCtx.ru">{{ question.questionCtx.ru }}</div>
                             <div class="questionCtxEmpty" v-else>{{ currentLang.savedTestView[28] }}</div>
@@ -209,7 +247,7 @@
                         <div class="d-flex flex-column" style="width: 100%; gap:15px">
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('custom')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.custom && !answer.isCurrect">{{ answer.answerCtx.custom }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.custom && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.custom && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.custom }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.custom">Not filled</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -228,9 +266,51 @@
                                 </v-tooltip>
                             </div>
 
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('fr')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.fr && !answer.isCurrect">{{ answer.answerCtx.fr }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.fr && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.fr }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.fr">{{ currentLang.savedTestView[37] }}</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/france.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span>Champ de réponse en <b><u>français</u></b></span>
+                                </v-tooltip>
+                            </div>
+
+                            <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('de')!=-1">
+                                <div class="answerCtx" v-if="answer.answerCtx.de && !answer.isCurrect">{{ answer.answerCtx.de }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.de && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.de }}</div>
+                                <div class="answerCtxEmpty" v-if="!answer.answerCtx.de">{{ currentLang.savedTestView[37] }}</div>
+                                <v-tooltip right>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-img
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    v-if="testParams.languagesSettings.languages.length>1"
+                                    src="@/assets/media/germany.png"
+                                    width="22"
+                                    height="22"
+                                    class="mt-2"
+                                    style="position:absolute; top:-18px;right:-10px"
+                                    ></v-img>
+                                </template>
+                                    <span>Antwortfeld auf <b><u>Deutsch</u></b></span>
+                                </v-tooltip>
+                            </div>
+
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('ru')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.ru && !answer.isCurrect">{{ answer.answerCtx.ru }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.ru && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.ru && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.ru }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.ru">{{ currentLang.savedTestView[37] }}</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -251,7 +331,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('eng')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.eng && !answer.isCurrect">{{ answer.answerCtx.eng }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.eng && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.eng && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.eng }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.eng">Not filled</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -272,7 +352,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('uz_l')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.uz_l && !answer.isCurrect">{{ answer.answerCtx.uz_l }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.uz_l && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_l && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.uz_l }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.uz_l">To'ldirilmagan</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">
@@ -293,7 +373,7 @@
 
                             <div style="position: relative;" v-if="testParams.languagesSettings.languages.indexOf('uz_k')!=-1">
                                 <div class="answerCtx" v-if="answer.answerCtx.uz_k && !answer.isCurrect">{{ answer.answerCtx.uz_k }}</div>
-                                <div class="answerCtx" v-if="answer.answerCtx.uz_k && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx }}</div>
+                                <div class="answerCtx" v-if="answer.answerCtx.uz_k && answer.isCurrect" style="border: 2px solid #51c551">{{ answer.answerCtx.uz_k }}</div>
                                 <div class="answerCtxEmpty" v-if="!answer.answerCtx.uz_k">Тўлдирилмаган</div>
                                 <v-tooltip right>
                                 <template v-slot:activator="{ on, attrs }">

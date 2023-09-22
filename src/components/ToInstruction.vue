@@ -4,7 +4,7 @@
     text
     class="caption"
     @click="goToInstruction"
-    :disabled="!asyncComplate"
+    :disabled="!asyncComplate || saveProcessFinally.value"
     >
        <v-icon v-if="currentRoute != 'dashboard'" size="20" class="mr-1" color="#fff">mdi-book-open-page-variant-outline</v-icon>
        <v-icon v-else size="20" class="mr-1" color="#0167ff">mdi-book-open-page-variant-outline</v-icon>
@@ -21,7 +21,8 @@ import { mapGetters } from 'vuex'
 export default {
     props:{
         saveFunc: Function,
-        asyncComplate: Boolean
+        asyncComplate: Boolean,
+        saveProcessFinally: Object
     },
     data() {
         return {

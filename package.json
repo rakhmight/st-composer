@@ -1,6 +1,6 @@
 {
   "name": "st-composer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -18,15 +18,18 @@
     "custom-electron-titlebar": "^3.2.10",
     "hybrid-crypto-js": "^0.2.4",
     "idb": "^7.1.1",
+    "node-fetch": "^2.7.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "vee-validate": "^2.2.15",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
     "vue-slider-component": "^3.2.24",
     "vuetify": "^2.6.0",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "word-extractor": "^1.0.4"
   },
   "devDependencies": {
+    "@mdi/font": "^7.2.96",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-unit-jest": "~5.0.0",
@@ -38,7 +41,6 @@
     "electron": "13.0.0",
     "electron-devtools-installer": "^3.1.0",
     "jest": "^27.0.5",
-    "material-design-icons-iconfont": "^6.7.0",
     "node-loader": "^2.0.0",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",

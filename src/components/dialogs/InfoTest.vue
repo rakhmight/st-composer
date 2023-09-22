@@ -33,12 +33,12 @@
                             <td>{{ currentLang.dashboardView[20] }}</td>
                             <td><div class="text-end"><b style="color:#0167FF">{{ test.creationDate.date }} {{ test.creationDate.time }}</b></div></td>
                         </tr>
-                        <tr>
+                        <tr v-if="test.lastModified">
                             <td><div v-if="test.lastModified">{{ currentLang.dashboardView[21] }}</div></td>
                             <td><div class="text-end" v-if="test.lastModified"><b style="color:#444">{{ test.lastModified.date }} {{ test.lastModified.time }}</b></div></td>
                         </tr>
-                        <tr>
-                            <td><div v-if="test.status.isSigned">Дата подписания</div></td>
+                        <tr v-if="test.status.isSigned">
+                            <td><div v-if="test.status.isSigned">{{ currentLang.additional[3] }}</div></td>
                             <td><div class="text-end" v-if="test.status.isSigned"><b style="color:#0C2242">{{ getDate(test.signedDate) }}</b></div></td>
                         </tr>
                         <tr>
@@ -54,36 +54,50 @@
                             <td><div class="text-end"><b>{{ getThemes(test.subjectID,test.themes) }}</b></div></td>
                         </tr>
                         <tr>
-                            <td><div>Языки</div></td>
+                            <td><div>{{ currentLang.additional[0] }}</div></td>
                             <td><div class="text-end"><b>{{ getLanguages(test.languagesSettings.languages) }}</b></div></td>
+                        </tr>
+                        <tr v-if="test.remarks && test.remarks.length" style="color:#ff4500">
+                            <td><div>{{ currentLang.additional[4] }}</div></td>
+                            <td><div class="text-end"><b>{{ test.remarks.length }}</b></div></td>
                         </tr>
                     </tbody>
                     </template>
                 </v-simple-table>
             </div>
 
-            <div class="mb-3" v-if="test.considerDifficulty">
-                <v-icon color="green">mdi-check-circle</v-icon>
-                {{ currentLang.dashboardView[25] }}
+            <div class="mb-3 d-flex flex-row align-center" v-if="test.considerDifficulty">
+                <v-icon color="green" size="19">mdi-check-circle</v-icon>
+                <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[25] }}</span>
             </div>
 
             <div class="mb-3" v-if="test.ballSystem">
-                <v-icon color="green">mdi-check-circle</v-icon>
-                {{ currentLang.dashboardView[26] }}
+                <div class="d-flex flex-row align-center">
+                    <v-icon color="green" size="19">mdi-check-circle</v-icon>
+                    <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[26] }}</span>
+                </div>
                 <div class="d-flex flex-row justify-space-between flex-wrap mt-1">
-                    <div><v-icon>mdi-minus</v-icon>{{ currentLang.dashboardView[27] }}: <b>{{ test.ballSystem.min }}</b></div>
-                    <div><v-icon>mdi-plus</v-icon>{{ currentLang.dashboardView[29] }}: <b>{{ test.ballSystem.max }}</b></div>
+                    <div class="d-flex flex-row align-center">
+                        <v-icon size="19">mdi-minus</v-icon>
+                        <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[27] }}: <b>{{ test.ballSystem.min }}</b></span>
+                    </div>
+                    <div class="d-flex flex-row align-center">
+                        <v-icon size="19">mdi-plus</v-icon>
+                        <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[29] }}: <b>{{ test.ballSystem.max }}</b></span>
+                    </div>
                 </div>
             </div>
 
             <div>
-                <v-icon>mdi-help-circle</v-icon>
-                {{ currentLang.dashboardView[30] }}: <b>{{ questions.length }}</b> <span v-if="questions.length">, {{ currentLang.dashboardView[31] }}:</span>
-                <div class="question-info" v-if="questions.length">
+                <div class="d-flex flex-row align-center">
+                    <v-icon size="19">mdi-help-circle</v-icon>
+                    <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[30] }}: <b>{{ questions }}</b> <span v-if="questions">, {{ currentLang.dashboardView[31] }}:</span></span>
+                </div>
+                <div class="question-info" v-if="questions">
                     <div>
-                        <div><span style="color:rgb(255, 99, 132)">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
-                        <div><span style="color:rgb(54, 162, 235)">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
-                        <div><span style="color:rgb(255, 205, 86)">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
+                        <div style="font-size: 0.95em;"><span style="color: #0d5fd8; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
+                        <div style="font-size: 0.95em;"><span style="color: #444; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
+                        <div style="font-size: 0.95em;"><span style="color: #0c2242; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
                     </div>
                     <div class="canvas-box">
                         <!-- Нужно создавать canvas с помощью скрипта -->
@@ -99,7 +113,6 @@
 <script>
 import Chart from 'chart.js/auto'
 import { mapGetters } from 'vuex'
-import encrypt from '@/plugins/encrypt'
 import { getSubject, getAuthor, getThemes, getLanguages } from '@/plugins/getInfo'
 
 export default {
@@ -113,10 +126,10 @@ export default {
             chartAvaible:false,
             testID: this.id,
 
-            questionsWithImages: 0,
-            questionWithField: 0,
-            basicQuestions: 0,
-            questions: []
+            questionsWithImages: this.test.testInfo.qwi,
+            questionWithField: this.test.testInfo.qwf,
+            basicQuestions: this.test.testInfo.bq,
+            questions: this.test.testInfo.totalQuestions
         }
     },
     computed: mapGetters(['currentLang', 'currentSign']),
@@ -137,24 +150,6 @@ export default {
             return getLanguages(langs)
         },
 
-        async calculateQuestions(){
-            const questions = await encrypt(this.test.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding)
-            this.questions = JSON.parse(questions)
-        
-            //Расчитать вопросы по их виду
-            if(this.questions.length){
-                for(let i =0; i!=this.questions.length; i++){
-                    if(this.questions[i].type=='basic-question'){
-                        this.basicQuestions++                    
-                    }else if(this.questions[i].type=='question-with-images'){
-                        this.questionsWithImages++
-                    }else if(this.questions[i].type=='question-with-field'){
-                        this.questionWithField++
-                    }
-                }
-            }
-        },
-
         getDate(date){
             if(date.getMonth() < 9){
                 return `${date.getDate()}.0${date.getMonth()+1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
@@ -163,12 +158,9 @@ export default {
             }
         }
     },
-    mounted() {
-        this.calculateQuestions()
-    },
     watch:{
         dialog(){
-            if(this.dialog && !this.chartAvaible && this.questions.length){
+            if(this.dialog && !this.chartAvaible && this.questions){
                 setTimeout(()=> {
                     const ctx = document.querySelector(`#questionsChart-${this.testID}`)
                     new Chart(ctx, {
@@ -182,9 +174,9 @@ export default {
                         datasets: [{
                             data: [this.basicQuestions, this.questionsWithImages, this.questionWithField],
                             backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(255, 205, 86)'
+                            '#0d5fd8',
+                            '#444',
+                            '#0c2242'
                             ],
                             hoverOffset: 4
                         }]
@@ -206,9 +198,16 @@ export default {
 </script>
 
 <style scoped>
+::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: #b9b9b9;
+}
 .dialog-content{
     width: 100%;
     padding: 30px;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden
 }
 
 .main-info{

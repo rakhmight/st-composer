@@ -12,7 +12,7 @@
             v-bind="attrs"
             v-on="on"
             @click="saveFunc({forcedSave:true})"
-            :disabled="!asyncComplate"
+            :disabled="!asyncComplate || saveProcessFinally.value"
             >
                 <v-icon size="20" class="mr-1">mdi-content-save-outline</v-icon>
                 {{ currentLang.workspaceView[45] }}
@@ -41,8 +41,9 @@
                                 outlined
                                 prepend-icon="mdi-comment-outline"
                                 v-model="comment"
-                                :placeholder="currentLang.workspaceView[48]"
+                                :placeholder="saveProcessFinally.value ? currentLang.additional[22] : currentLang.workspaceView[48]"
                                 :error="savingEr"
+                                :disabled="saveProcessFinally.value"
                                 >
                                 </v-textarea>
                             </div>
@@ -84,11 +85,19 @@
                 small
                 justify="center"
                 width="200"
-                :disabled="blockBtn"
+                :disabled="blockBtn || saveProcessFinally.value"
                 class="delete-btn"
                 @click="savingQuestions"
             >
-                {{ currentLang.workspaceView[50] }}
+                <span v-if="!saveProcessFinally.value">{{ currentLang.workspaceView[50] }}</span>
+                <v-progress-circular
+                v-else
+                :size="19"
+                :width="1"
+                color="#0167ff"
+                indeterminate
+                >
+                </v-progress-circular>
             </v-btn>
             </v-card-actions>
 
@@ -116,7 +125,8 @@ export default {
         testID: Number,
         saveFunc: Function,
 
-        asyncComplate: Boolean
+        asyncComplate: Boolean,
+        saveProcessFinally: Object
     },
     data() {
         return {
@@ -197,9 +207,6 @@ export default {
             })
             .then(()=>{
                 operationFromStore('addSaving', {data: output})
-                .then(()=>{
-                    this.saveFunc({newTest: test})
-                })
             })
             .catch(e=>{
                 console.error(this.currentLang.errors[0], e.message)
@@ -223,6 +230,11 @@ export default {
         comment(){
             this.errors = []
             this.savingEr = false
+        },
+        'saveProcessFinally.value'(){
+            if(this.saveProcessFinally.value){
+                this.dialog = false
+            }
         }
     }
 }

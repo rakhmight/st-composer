@@ -3,27 +3,14 @@
         <div class="container">
             <div class="instruction">
                 <div class="todo">
-                    <h3 style="text-align: center">ToDo'шечка:</h3>
-                    <ul>
-                        <li>заставить пахать перевод</li>
-                        <li>реализовать интерактивное задание связанное с рисованием</li>
-                        <li>да прибудет подпись! Локальное шифрование тестов при хранении на устройстве</li>
-                        <li>реализовать событие подписания теста (с full валидацией и оптимизацией тестов)</li>
-                        <li>отдельное хранилище в БД для подписанных тестов (уже зашифрованных 2 ключами)</li>
-                        <li>реализация возможности выгрузки теста и функционал автоудаления подписанных тестов в течении 10 дней</li>
-                        <li>работа со свободной подписью</li>
-                        <li>работа с импортом тестов</li>
-                        <li>исправить свои рукоблудства (баги)</li>
-                        <li>написать нормальную инструкцию</li>
-                    </ul>
-                </div>
+                    <h3 style="text-align: center">ToDo:</h3>
 
-                <div class="mt-10">
-                    Developed with <v-icon color="red">mdi-heart</v-icon> by Diyor Rakhimov
+                    <p style="color: black">Приношу свои извинения, но у меня не дотянулись руки, чтобы написать соответсвующию инструкцию по эксплуатации данного ПО. Эта программа написана на "скорую руку" и нелепо, но если <b>мне дадут время и ресурсы</b>, то в версии 2 система SmartTesting станет уникальной в своём роде. <br><br>Презентация SmartTesting v.2 доступна по ссылке: https://drive.google.com/file/d/1V3d5I723w4ZU8UJgNbQU0gBVwqiriGiq/view?usp=sharing</p>
                 </div>
 
                 <a
                 @click="$router.go(-1)"
+                class="mt-10"
                 >
                 Назад
                 </a>
@@ -38,7 +25,7 @@ import { mapGetters } from 'vuex';
 
 export default {
     mounted() {
-        if(!this.currentSign.id){
+        if(!this.currentSign){
           return this.$router.push('/')
         }
     },

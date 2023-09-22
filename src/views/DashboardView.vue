@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" v-if="currentSign">
     <div class="container">
       <div class="dashboard">
         <div class="dashboard__header d-flex justify-space-between align-center">
@@ -19,17 +19,10 @@
           </div>
           <div class="d-flex flex-row" style="gap: 15px">
             <div class="dashboard__import-btn">
-              <v-btn
-              small
-              color="#0C2242"
-              @click="importTest()"
-              >
-              <v-icon color="#fff" size="19">mdi-file-download-outline</v-icon>
-              <span style="color:#fff">Импортировать тест</span>
-              </v-btn>
+              <import-test :renderFunc="loadTests" />
             </div>
             <div class="dashboard__create-btn">
-              <create-test :renderFunc="loadTests"></create-test>
+              <create-test :renderFunc="loadTests" />
             </div>
           </div>
         </div>
@@ -41,7 +34,7 @@
             <h4 class="">{{ currentLang.dashboardView[1] }}</h4>
 
             <!-- INSTRUCTION -->
-            <to-instruction :asyncComplate="true"></to-instruction>
+            <to-instruction :asyncComplate="true" :saveProcessFinally="{value:false}"></to-instruction>
 
           </div>
 
@@ -56,8 +49,8 @@
 
           <div class="dashboard__saved" v-if="tests.length && !loader">
             <work-card
-            v-for="(test, i) in tests"
-            :key="i"
+            v-for="(test) in tests"
+            :key="test.id"
             :id="test.id"
             :status="test.status"
             :test="test"
@@ -88,6 +81,7 @@
 import WorkCard from '@/components/WorkCard.vue'
 import ToInstruction from '@/components/ToInstruction.vue'
 import CreateTest from '@/components/dialogs/CreateTest.vue'
+import ImportTest from '@/components/dialogs/ImportTest.vue'
 import { mapGetters, mapMutations } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
 
@@ -99,7 +93,7 @@ import { operationFromStore } from '@/services/localDB'
       }
     },
     mounted() {
-      if(!this.currentSign.id){
+      if(!this.currentSign){
         return this.$router.push('/')
       }
 
@@ -118,17 +112,14 @@ import { operationFromStore } from '@/services/localDB'
           this.clearSign()
           return this.$router.push('/')
         })
-      },
-
-      async importTest(){
-
       }
     },
     computed: mapGetters(['currentSign', 'currentLang']),
     components:{
       WorkCard,
       ToInstruction,
-      CreateTest
+      CreateTest,
+      ImportTest
     }
   }
 </script>
