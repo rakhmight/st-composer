@@ -69,6 +69,7 @@ const WordExtractor = require("word-extractor");
 import getCurrentDate from '@/plugins/getCurrentDate'
 import { sanitizeString } from '@/utils/sanitizeString'
 import { mapGetters } from 'vuex'
+import uzbekLangParser from '@/plugins/uzbekLangParser'
 
 export default {
     props: {
@@ -142,6 +143,8 @@ export default {
                     let currentQuestion = undefined
                     let nextStr = null
                     let nextAnswerIsCorrect = false
+
+                    let answersImg = []
                     for(let str of docData){
 
                         if(str.length){
@@ -155,14 +158,14 @@ export default {
                                     if(ctx.currentTest.languagesSettings.languages.indexOf(str)!=-1) currentLang = str
                                     else{
                                         ctx.fileError.status = true
-                                        ctx.fileError.msg = `Язык не подходит к языку теста: ${str}`
+                                        ctx.fileError.msg = `${ctx.currentLang.additional[89]}: ${str}`
                                         return
                                     }
                                     
                                 }
                                 else{
                                     ctx.fileError.status = true
-                                    ctx.fileError.msg = 'Не установлен язык теста'
+                                    ctx.fileError.msg = ctx.currentLang.additional[90]
                                     return
                                 }
 
@@ -173,7 +176,7 @@ export default {
                             if(str === rawData[1]){
                                 if(str !== ctx.currentTest.subjectID) {
                                     ctx.fileError.status = true
-                                    ctx.fileError.msg = 'ID предмета word файла не совпадает с текущим тестом'
+                                    ctx.fileError.msg = ctx.currentLang.additional[74]
                                     return
                                 }
 
@@ -188,12 +191,12 @@ export default {
                                         currentTheme = theme
                                     } else {
                                         ctx.fileError.status = true
-                                        ctx.fileError.msg = `В тесте нет такой темы: ${str}`
+                                        ctx.fileError.msg = `${ctx.currentLang.additional[91]}: ${str}`
                                         return
                                     }
                                 }else {
                                     ctx.fileError.status = true
-                                    ctx.fileError.msg = `Невалидное ID темы: ${str}`
+                                    ctx.fileError.msg = `${ctx.currentLang.additional[92]}: ${str}`
                                     return
                                 }
 
@@ -205,7 +208,7 @@ export default {
                                 const difficulty = str.replace('#', '')
                                 if(isNaN(+difficulty)){
                                     ctx.fileError.status = true
-                                    ctx.fileError.msg = `Невалидный уровень сложности: ${str}`
+                                    ctx.fileError.msg = `${ctx.currentLang.additional[75]}: ${str}`
                                     return
                                 }
 
@@ -225,6 +228,7 @@ export default {
 
                                 nextStr = 'question'
                                 questionsCounter += 1 
+                                answersImg = []
                                 continue
                             }
 
@@ -232,7 +236,7 @@ export default {
                                 const answer = str.replace('@', '')
                                 if(isNaN(+answer)){
                                     ctx.fileError.status = true
-                                    ctx.fileError.msg = `Невалидный ответ на вопрос: ${str}`
+                                    ctx.fileError.msg = `${ctx.currentLang.additional[76]}: ${str}`
                                     return
                                 }
 
@@ -255,6 +259,10 @@ export default {
                                 else if( currentLang === 'fr' ) questions[questionIndex].questionCtx.fr = str
                                 else if( currentLang === 'custom' ) questions[questionIndex].questionCtx.custom = str
 
+                                // uz parser
+                                if(currentLang === 'uz_k') questions[questionIndex].questionCtx.uz_l = uzbekLangParser(str, 'kiril')
+                                else if(currentLang === 'uz_l') questions[questionIndex].questionCtx.uz_k = uzbekLangParser(str, 'lotin')
+
                                 nextStr = null
                             }
                             else if(nextStr === 'answer'){
@@ -263,24 +271,36 @@ export default {
 
                                 str = sanitizeString(str)
 
-                                questions[questionIndex].answers.push({
-                                    imagePreview:'',
-                                    answerCtx: {
-                                        ru: currentLang === 'ru' ? str : undefined,
-                                        eng: currentLang === 'eng' ? str : undefined,
-                                        uz_l: currentLang === 'uz_l' ? str : undefined,
-                                        uz_k: currentLang === 'uz_k' ? str : undefined,
-                                        custom: currentLang === 'custom' ? str : undefined,
-                                        fr: currentLang === 'fr' ? str : undefined,
-                                        de: currentLang === 'de' ? str : undefined
-                                    },
-                                    isCurrect: nextAnswerIsCorrect
-                                })
+                                if(!answersImg.find(a => a == str)){
+                                    questions[questionIndex].answers.push({
+                                        imagePreview:'',
+                                        answerCtx: {
+                                            ru: currentLang === 'ru' ? str : undefined,
+                                            eng: currentLang === 'eng' ? str : undefined,
+                                            uz_l: currentLang === 'uz_l' ? str : undefined,
+                                            uz_k: currentLang === 'uz_k' ? str : undefined,
+                                            custom: currentLang === 'custom' ? str : undefined,
+                                            fr: currentLang === 'fr' ? str : undefined,
+                                            de: currentLang === 'de' ? str : undefined
+                                        },
+                                        isCurrect: nextAnswerIsCorrect
+                                    })
 
-                                nextStr = null
+                                    // uz parser
+                                    if(currentLang === 'uz_k') questions[questionIndex].answers[questions[questionIndex].answers.length-1].answerCtx.uz_l = uzbekLangParser(str, 'kiril')
+                                    else if(currentLang === 'uz_l') questions[questionIndex].answers[questions[questionIndex].answers.length-1].answerCtx.uz_k = uzbekLangParser(str, 'lotin')
+
+                                    nextStr = null
+                                    answersImg.push(str)
+                                } else {
+                                    ctx.fileError.status = true
+                                    ctx.fileError.msg = `${ctx.currentLang.additional[77]}: ${str}`
+                                    return
+                                }
                             } else {
+                                console.log(nextStr);
                                 ctx.fileError.status = true
-                                ctx.fileError.msg = `Неизвестная строка: ${str}`
+                                ctx.fileError.msg = `${ctx.currentLang.additional[78]}: ${str}`
                                 return
                             }
                         }
@@ -327,7 +347,7 @@ export default {
                         }
                     } else {
                         ctx.fileError.status = true
-                        ctx.fileError.msg = `Файл пустой, в нём нет вопросов.`
+                        ctx.fileError.msg = this.currentLang.additional[79]
                         return
                     }
 
@@ -348,7 +368,7 @@ export default {
 					reader.readAsArrayBuffer(this.wordFile)
 				} else{
                     this.fileError.status = true
-                    this.fileError.msg = 'Некорректный формат word файла'
+                    this.fileError.msg = this.currentLang.additional[80]
                     return
                 }
             } else {

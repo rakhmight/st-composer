@@ -63,7 +63,7 @@
                     mdi-check-circle-outline
                     </v-icon>
                 </template>
-                <span>Отметить как выполненное</span>
+                <span>{{ currentLang.additional[93] }}</span>
                 </v-tooltip>
             </div>
         </div>
@@ -335,15 +335,17 @@
                 indeterminate
                 ></v-progress-circular>
 
-                <v-select
-                :items="themesList"
-                :placeholder="currentLang.workspaceView[30]"
-                outlined
-                dense
-                v-model="theme"
-                prepend-icon="mdi-alpha-t-box-outline"
-                style="position:releative; z-index:5"
-                ></v-select>
+                <div style="max-width: 300px">
+                    <v-select
+                    :items="themesList"
+                    :placeholder="currentLang.workspaceView[30]"
+                    outlined
+                    dense
+                    v-model="theme"
+                    prepend-icon="mdi-alpha-t-box-outline"
+                    style="position:releative; z-index:5"
+                    ></v-select>
+                </div>
 
                 <v-select
                 v-if="testOptions.considerDifficulty"
@@ -936,28 +938,28 @@ export default {
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.uz_l'(){
+            if(this.parseMode=='lotin-kiril' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 ){
+                // if(this.questionCtx.uz_l){
+                    this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'lotin')
+                // } else {
+                //     this.questionCtx.uz_k = ''
+                // }
+            }
+            
             this.questionCtx.uz_l = sanitizeString(this.questionCtx.uz_l)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
-
-            if(this.parseMode=='lotin-kiril' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1 ){
-                if(this.questionCtx.uz_l){
-                    this.questionCtx.uz_k = uzbekLangParser(this.questionCtx.uz_l, 'lotin')
-                } else {
-                    this.questionCtx.uz_k = ''
-                }
-            }
         },
         'questionCtx.uz_k'(){
+            if(this.parseMode=='kiril-lotin' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
+                // if(this.questionCtx.uz_k){
+                    this.questionCtx.uz_l = uzbekLangParser(this.questionCtx.uz_k, 'kiril')
+                // } else {
+                //     this.questionCtx.uz_l = ''
+                // }
+            }
+
             this.questionCtx.uz_k = sanitizeString(this.questionCtx.uz_k)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
-
-            if(this.parseMode=='kiril-lotin' && this.showParse && this.testOptions.languagesSettings.languages.indexOf('uz_l')!=-1 && this.testOptions.languagesSettings.languages.indexOf('uz_k')!=-1){
-                if(this.questionCtx.uz_k){
-                    this.questionCtx.uz_l = uzbekLangParser(this.questionCtx.uz_k, 'kiril')
-                } else {
-                    this.questionCtx.uz_l = ''
-                }
-            }
         },
         'questionCtx.custom'(){
             this.questionCtx.custom = sanitizeString(this.questionCtx.custom)
@@ -1112,5 +1114,10 @@ export default {
     right: 0;
     cursor: pointer;
     z-index: 9;
+}
+.v-select-list{
+    width: 600px;
+    overflow-y: auto;
+    max-height: 250px;
 }
 </style>

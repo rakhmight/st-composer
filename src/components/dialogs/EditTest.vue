@@ -29,7 +29,7 @@
                     
                     <div class="d-flex flex-column">
                         <label class="body-2">{{ currentLang.dashboardView[47] }}:</label>
-                        <div class="d-flex flex-row mt-2">
+                        <div class="d-flex flex-row mt-2" style="width:600px">
                             <v-text-field
                             dense
                             outlined
@@ -679,5 +679,11 @@ export default {
 }
 .v-card__actions{
     padding: 15px;
+}
+
+.v-select-list{
+    width: 607px;
+    overflow-y: auto;
+    max-height: 250px;
 }
 </style>

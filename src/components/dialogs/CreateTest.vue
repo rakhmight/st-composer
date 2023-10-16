@@ -27,7 +27,7 @@
 
             <div class="dialog-content">
                 <div class="content__subject-box flex-column">
-                    <div class="d-flex flex-row">
+                    <div class="d-flex flex-row" style="width:640px">
                         <v-text-field
                         dense
                         outlined
@@ -556,5 +556,11 @@ export default {
 .test-errors-box{
     width: 100%;
     padding: 0 15px;
+}
+
+.v-select-list{
+    width: 607px;
+    overflow-y: auto;
+    max-height: 250px;
 }
 </style>

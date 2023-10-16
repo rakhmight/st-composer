@@ -60,12 +60,14 @@
                 class="d-flex flex-row align-center"
                 >
                     <v-icon size="19" color="#e83b07" v-if="error.type=='q-field-ru' || error.type=='q-field-custom' || error.type=='q-field-eng' || error.type=='q-field-uz_l' || error.type=='q-field-uz_k' || error.type=='q-field-fr' || error.type=='q-field-de'">mdi-help-circle-outline</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='a-field-ru' || error.type=='a-field-custom' || error.type=='a-field-eng' || error.type=='a-field-uz_l' || error.type=='a-field-uz_k'">mdi-lightbulb-auto</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='a-field-ru' || error.type=='a-field-custom' || error.type=='a-field-eng' || error.type=='a-field-uz_l' || error.type=='a-field-uz_k'">mdi-lightbulb</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='image'">mdi-camera</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='pos'">mdi-selection-ellipse-arrow-inside</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='theme'">mdi-alpha-t-box-outline</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='difficulty'">mdi-chart-line</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='remarks'">mdi-alert-circle-outline</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-scale-unbalanced</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-lightbulb-multiple</v-icon>
                     <p
                     class="text-body-1 mr-2 ml-2"
                     style="color: #000;"
@@ -255,6 +257,187 @@ export default {
                         this.errors.push({type: 'difficulty', ctx: `${this.currentLang.additional[66]}: ${question.id}`})
                     }
                 }
+
+                // проверка на пропорциональность ответов
+                // проверка на одинаковые ответы
+                if(question.type=='basic-question' || question.type=='question-with-images'){
+                    const answersLength = question.answers.map((answer) => {
+                        return {
+                            ru: answer.answerCtx.ru ? answer.answerCtx.ru.length : null,
+                            eng: answer.answerCtx.eng ? answer.answerCtx.eng.length : null,
+                            uz_l: answer.answerCtx.uz_l ? answer.answerCtx.uz_l.length : null,
+                            uz_k: answer.answerCtx.uz_k ? answer.answerCtx.uz_k.length : null,
+                            custom: answer.answerCtx.custom ? answer.answerCtx.custom.length : null,
+                            de: answer.answerCtx.de ? answer.answerCtx.de.length : null,
+                            fr: answer.answerCtx.fr ? answer.answerCtx.fr.length : null,
+                        }
+                    })
+                    const answersImages = question.answers.map((answer) => {
+                        return {
+                            ru: answer.answerCtx.ru ? answer.answerCtx.ru : null,
+                            eng: answer.answerCtx.eng ? answer.answerCtx.eng : null,
+                            uz_l: answer.answerCtx.uz_l ? answer.answerCtx.uz_l : null,
+                            uz_k: answer.answerCtx.uz_k ? answer.answerCtx.uz_k : null,
+                            custom: answer.answerCtx.custom ? answer.answerCtx.custom : null,
+                            de: answer.answerCtx.de ? answer.answerCtx.de : null,
+                            fr: answer.answerCtx.fr ? answer.answerCtx.fr : null,
+                        }
+                    })
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('ru')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.ru)
+                        const answersImagesByLang = answersImages.map(answer => answer.ru)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[82]}: ${question.id}`})
+                    }
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('eng')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.eng)
+                        const answersImagesByLang = answersImages.map(answer => answer.eng)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[83]}: ${question.id}`})
+                    }
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.uz_l)
+                        const answersImagesByLang = answersImages.map(answer => answer.uz_l)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[84]}: ${question.id}`})
+                    }
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.uz_k)
+                        const answersImagesByLang = answersImages.map(answer => answer.uz_k)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[85]}: ${question.id}`})
+                    }
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.custom)
+                        const answersImagesByLang = answersImages.map(answer => answer.custom)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[86]}: ${question.id}`})
+                    }
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('de')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.de)
+                        const answersImagesByLang = answersImages.map(answer => answer.de)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[87]}: ${question.id}`})
+                    }
+
+                    if(this.currentTest.languagesSettings.languages.indexOf('fr')!=-1){
+                        const answersByLang = answersLength.map(answer => answer.fr)
+                        const answersImagesByLang = answersImages.map(answer => answer.fr)
+                        let hasDouble = false
+
+                        for(let f = 0; f!=answersImagesByLang.length; f++){
+                            for(let s = 0; s!=answersImagesByLang.length; s++){
+                                if(f!=s && answersImagesByLang[f]){
+                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                        hasDouble = true
+                                        this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
+                                    }
+                                }
+                            }
+                        }
+
+                        const maxLength = Math.max(...answersByLang)
+                        const minLength = Math.min(...answersByLang)
+
+                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[88]}: ${question.id}`})
+                    }
+                }
+
             })
 
             // проверка на remarks
