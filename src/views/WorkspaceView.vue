@@ -541,6 +541,60 @@ export default {
         },
 
         async saveProcess(params){
+
+            // Counting questions by themes & difficulty
+            const qByThemesAndDifficulty = []
+
+            if(this.currentTest.considerDifficulty){
+                    this.questions.map(question => {
+                        const target = qByThemesAndDifficulty.find(item => item.theme == question.theme)
+
+                        if(target){
+                            const index = qByThemesAndDifficulty.indexOf(target)
+                            if(question.difficulty == 1) qByThemesAndDifficulty[index].easy++
+                            if(question.difficulty == 2) qByThemesAndDifficulty[index].medium++
+                            if(question.difficulty == 3) qByThemesAndDifficulty[index].hard++
+                            qByThemesAndDifficulty[index].count++
+                        } else {
+                            if(question.theme){
+                                qByThemesAndDifficulty.push({
+                                    theme: question.theme,
+                                    easy: question.difficulty == 1 ? 1 : 0,
+                                    medium: question.difficulty == 2 ? 1 : 0,
+                                    hard: question.difficulty == 3 ? 1 : 0,
+                                    count: 1
+                                })
+                            }
+                        }
+                    })
+            } else {
+                    this.questions.map(question => {
+                        const target = qByThemesAndDifficulty.find(item => item.theme == question.theme)
+
+                        if(target){
+                            const index = qByThemesAndDifficulty.indexOf(target)
+                            qByThemesAndDifficulty[index].count++
+                        } else {
+                            if(question.theme){
+                                qByThemesAndDifficulty.push({
+                                    theme: question.theme,
+                                    count: 1
+                                })
+                            }
+                        }
+                    })
+            }
+
+            const newTestInfo = {
+                    totalQuestions: this.currentTest.testInfo.totalQuestions,
+                    qwi: this.currentTest.testInfo.qwi,
+                    qwf: this.currentTest.testInfo.qwf,
+                    bq: this.currentTest.testInfo.bq,
+                    qbThDif: qByThemesAndDifficulty
+            }
+            this.currentTest.testInfo = newTestInfo
+
+            // saving process
             if(params){
                 if(params.route){
                     // блокируем автосохранение
@@ -590,7 +644,6 @@ export default {
                 } else{
                     this.saveProcessFinally.ctx = this.currentLang.additional[35] 
                 }
-
                 
                 setTimeout(async()=>{
 

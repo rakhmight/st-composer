@@ -90,18 +90,60 @@
 
             <div>
                 <div class="d-flex flex-row align-center">
-                    <v-icon size="19">mdi-help-circle</v-icon>
+                    <v-icon size="19" color="var(--main-color)">mdi-help-circle</v-icon>
                     <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.dashboardView[30] }}: <b>{{ questions }}</b> <span v-if="questions">, {{ currentLang.dashboardView[31] }}:</span></span>
                 </div>
                 <div class="question-info" v-if="questions">
-                    <div>
-                        <div style="font-size: 0.95em;"><span style="color: #0d5fd8; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
-                        <div style="font-size: 0.95em;"><span style="color: #444; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
-                        <div style="font-size: 0.95em;"><span style="color: #0c2242; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
+                    <div class="d-flex flex-column" style="gap: 20px">
+                        <div>
+                            <div style="font-size: 0.95em;"><span style="color: #0d5fd8; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[32] }}: <b>{{ basicQuestions }}</b></div>
+                            <div style="font-size: 0.95em;"><span style="color: #444; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[33] }}: <b>{{ questionsWithImages }}</b></div>
+                            <div style="font-size: 0.95em;"><span style="color: #0c2242; font-size: 0.8em;">►</span> {{ currentLang.dashboardView[34] }}: <b>{{ questionWithField }}</b></div>
+                        </div>
+
+                        <v-divider v-if="test.testInfo.qbThDif && test.testInfo.qbThDif.length"></v-divider>
+
+                        <div v-if="test.testInfo.qbThDif && test.testInfo.qbThDif.length">
+                            <div class="d-flex flex-row align-center mb-1">
+                                <v-icon size="19" color="var(--main-color)">mdi-alpha-t-box-outline</v-icon>
+                                <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.additional[95] }}</span>
+                            </div>
+                            <div style="font-size: 0.95em;" v-for="(item, i) in test.testInfo.qbThDif" :key="i">
+                                <span style="color: var(--main-color)">{{ i+1 }}.</span> {{ getThemeName(item.theme) }}: <b>{{ item.count }}</b>
+                            </div>
+                        </div>
                     </div>
                     <div class="canvas-box">
                         <!-- Нужно создавать canvas с помощью скрипта -->
                         <canvas :id="`questionsChart-${testID}`" width="250" height="250"></canvas>
+                    </div>
+                </div>
+
+                <div v-if="test.testInfo.qbThDif && test.testInfo.qbThDif.length">
+                    <v-divider v-if="test.testInfo.qbThDif[0].easy" class="mt-4 mb-4"></v-divider>
+                </div>
+
+                <div v-if="test.testInfo.qbThDif && test.testInfo.qbThDif.length && test.considerDifficulty" class="w-100">
+                    <div v-if="test.testInfo.qbThDif[0].easy">
+                        <div class="d-flex flex-row align-center mb-1">
+                            <v-icon size="19" color="var(--main-color)">mdi-chart-line</v-icon>
+                            <span class="ml-1" style="font-size: 0.95em;">{{ currentLang.additional[96] }}</span>
+                        </div>
+                        
+                        <div style="font-size: 0.95em; gap: 5px" class="d-flex flex-column">
+                            <v-simple-table dense class="w-100">
+                                <tbody>
+                                    <tr v-for="(item, i) in test.testInfo.qbThDif" :key="i">
+                                        <td><span style="color: var(--main-color)">{{ i+1 }}.</span> {{ getThemeName(item.theme) }}:</td>
+                                        <td>
+                                            <p style="font-size: 1em; color: black">• {{ currentLang.additional[97] }}: <b>{{ item.easy }}</b></p>
+                                            <p style="font-size: 1em; color: black">• {{ currentLang.additional[98] }}: <b>{{ item.medium }}</b></p>
+                                            <p style="font-size: 1em; color: black">• {{ currentLang.additional[99] }}: <b>{{ item.hard }}</b></p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-simple-table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,7 +155,7 @@
 <script>
 import Chart from 'chart.js/auto'
 import { mapGetters } from 'vuex'
-import { getSubject, getAuthor, getThemes, getLanguages } from '@/plugins/getInfo'
+import { getSubject, getAuthor, getThemes, getLanguages, getTheme } from '@/plugins/getInfo'
 
 export default {
     props:{
@@ -134,6 +176,9 @@ export default {
     },
     computed: mapGetters(['currentLang', 'currentSign']),
     methods:{
+        getThemeName(theme){
+            return getTheme(this.test.subjectID, theme, this.currentSign)
+        },
         getAuthor (id){
             return getAuthor(id, this.currentSign)
         },

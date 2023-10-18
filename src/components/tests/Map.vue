@@ -57,7 +57,7 @@
                         </thead>
                         <tbody>
                             <tr style="cursor: pointer;"
-                            v-for="(question,i) in mapQuestions"
+                            v-for="question in mapQuestions"
                             :key="question.id"
                             class="map-orient"
                             @click="changeCurrentQuestion(question.id)"
@@ -161,7 +161,8 @@
                                         </v-tooltip>
                                     </div>
                                 </td>
-                                <td >{{ i+1 }}</td>
+                                <!-- <td >{{ i+1 }}</td> -->
+                                <td >{{ question.id }}</td>
                                 <td>
                                     <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap,'map-full':showFullMap}">
                                         <span v-if="getCurrentQuestion(question.questionCtx)">{{ getCurrentQuestion(question.questionCtx) }}</span>

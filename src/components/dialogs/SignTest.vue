@@ -68,6 +68,7 @@
                     <v-icon size="19" color="#e83b07" v-if="error.type=='remarks'">mdi-alert-circle-outline</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-scale-unbalanced</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-lightbulb-multiple</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='question-doubled'">mdi-help-box-multiple-outline</v-icon>
                     <p
                     class="text-body-1 mr-2 ml-2"
                     style="color: #000;"
@@ -141,6 +142,7 @@ export default {
             this.errors = []
             this.signProcedure = true
             this.checkingLoader = true
+
             // проверка на незаполненные поля и не отмеченные темы, сложность
             this.questions.forEach(question=>{
                 if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
@@ -438,6 +440,150 @@ export default {
                     }
                 }
 
+                // TODO: проверка на одинаковые вопросы с одинаковыми ответами
+                if(question.type=='basic-question' || question.type=='question-with-images'){
+                    if(this.currentTest.languagesSettings.languages.indexOf('ru')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.ru == question.questionCtx.ru) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.ru == dqa.answerCtx.ru)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                    if(this.currentTest.languagesSettings.languages.indexOf('eng')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.eng == question.questionCtx.eng) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.eng == dqa.answerCtx.eng)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                    if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.uz_l == question.questionCtx.uz_l) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_l == dqa.answerCtx.uz_l)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                    if(this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.uz_k == question.questionCtx.uz_k) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_k == dqa.answerCtx.uz_k)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                    if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.custom == question.questionCtx.custom) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.custom == dqa.answerCtx.custom)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                    if(this.currentTest.languagesSettings.languages.indexOf('fr')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.fr == question.questionCtx.fr) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.fr == dqa.answerCtx.fr)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                    if(this.currentTest.languagesSettings.languages.indexOf('de')!=-1){
+                        const duplicateQuestions = []
+                        this.questions.map(checkedQ => {
+                            if(checkedQ.questionCtx.de == question.questionCtx.de) duplicateQuestions.push(checkedQ)
+                    })
+
+                        if(duplicateQuestions.length){
+                            duplicateQuestions.map(dq=>{
+                                let duplicateAnswersCounter = 0
+                                dq.answers.map((dqa)=>{
+                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.de == dqa.answerCtx.de)
+                                    if(duplicateAnswer){
+                                        duplicateAnswersCounter++
+                                    }
+                                })
+
+                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                            })
+                        }
+                    }
+                }
+
             })
 
             // проверка на remarks
@@ -482,6 +628,8 @@ export default {
                         }
                     })
 
+                    
+
                     const test = {
                         id: this.currentTest.id,
                         fileDate: signedDate.getTime(),
@@ -494,7 +642,7 @@ export default {
                             ballSystem: this.currentTest.ballSystem,
                             considerDifficulty: this.currentTest.considerDifficulty,
                         },
-                        testInfo: this.currentTest.testInfo, 
+                        testInfo: this.currentTest.testInfo,
                         questions: data,
                         history: [
                             {date: this.currentTest.history[0].date.full, type: 'create'},
@@ -518,7 +666,7 @@ export default {
                                 ...this.currentTest,
                                 history,
                                 questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
-                                status: {...this.currentTest.status, isSigned: true},
+                                status: {...this.currentTest.status, isSigned: true}
                             }
                             if(!this.currentTest.status.isSigned){
                                 testToSave.signedDate = signedDate

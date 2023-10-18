@@ -15,6 +15,15 @@ export function getAuthor(id, sign){
     }
 }
 
+export function getTheme(sub, theme, sign) {
+    const target = sign.subjects.find(subject => subject.id == sub)
+
+    if(target) {
+        const themeTarget = target.themes.find(th => th.id == theme)
+        if(themeTarget) return themeTarget.name.ru
+    }
+}
+
 export function getThemes(sub, thems, sign){
     let target = sign.subjects.find(subject=>subject.id==sub)
     if(target){
