@@ -221,6 +221,7 @@
         :questions="questions"
         :saveProcessFinally="saveProcessFinally"
         :remarks="remarks"
+        :saveProcess="saveProcess"
         />
 
         <import-word-file

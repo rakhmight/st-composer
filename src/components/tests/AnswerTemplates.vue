@@ -268,7 +268,7 @@
                     class="mt-5"
                     >mdi-close-circle</v-icon>
                 </template>
-                <span>Убрать ответ</span>
+                <span>{{ currentLang.additional[101] }}</span>
                 </v-tooltip>
             </div>
         </div>
@@ -284,7 +284,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import uzbekLangParser from '@/plugins/uzbekLangParser'
-import { sanitizeString } from '@/utils/sanitizeString'
+// import { sanitizeString } from '@/utils/sanitizeString'
 
 export default {
     props:{
@@ -342,19 +342,19 @@ export default {
     },
     watch:{
         'answerCtx.ru'(){
-            this.answerCtx.ru = sanitizeString(this.answerCtx.ru)
+            // this.answerCtx.ru = sanitizeString(this.answerCtx.ru)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.de'(){
-            this.answerCtx.de = sanitizeString(this.answerCtx.de)
+            // this.answerCtx.de = sanitizeString(this.answerCtx.de)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.fr'(){
-            this.answerCtx.fr = sanitizeString(this.answerCtx.fr)
+            // this.answerCtx.fr = sanitizeString(this.answerCtx.fr)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.eng'(){
-            this.answerCtx.eng = sanitizeString(this.answerCtx.eng)
+            // this.answerCtx.eng = sanitizeString(this.answerCtx.eng)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.uz_l'(){
@@ -362,7 +362,7 @@ export default {
                 this.answerCtx.uz_k = uzbekLangParser(this.answerCtx.uz_l, 'lotin')
             }
 
-            this.answerCtx.uz_l = sanitizeString(this.answerCtx.uz_l)
+            // this.answerCtx.uz_l = sanitizeString(this.answerCtx.uz_l)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.uz_k'(){
@@ -370,11 +370,11 @@ export default {
                 this.answerCtx.uz_l = uzbekLangParser(this.answerCtx.uz_k, 'kiril')
             }
 
-            this.answerCtx.uz_k = sanitizeString(this.answerCtx.uz_k)
+            // this.answerCtx.uz_k = sanitizeString(this.answerCtx.uz_k)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
         'answerCtx.custom'(){
-            this.answerCtx.custom = sanitizeString(this.answerCtx.custom)
+            // this.answerCtx.custom = sanitizeString(this.answerCtx.custom)
             this.answerFunc('answerCtx', this.answerCtx, this.questionID, this.currentAnswer.id)
         },
 

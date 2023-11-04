@@ -149,160 +149,164 @@ export default {
 
                         if(str.length){
                             str = str.replace(/ +/g, ' ').trim()
-                            rawData.push(str)
+                            
+                            if(str.length){
+                                rawData.push(str)
 
-                            // Language
-                            if(str === rawData[0]){
+                                // Language
+                                if(str === rawData[0]){
 
-                                if(str === 'ru' || str === 'uz_l' || str === 'uz_k' || str === 'de' || str === 'fr' || str === 'eng' || str === 'custom'){
-                                    if(ctx.currentTest.languagesSettings.languages.indexOf(str)!=-1) currentLang = str
-                                    else{
-                                        ctx.fileError.status = true
-                                        ctx.fileError.msg = `${ctx.currentLang.additional[89]}: ${str}`
-                                        return
-                                    }
-                                    
+                                        if(str === 'ru' || str === 'uz_l' || str === 'uz_k' || str === 'de' || str === 'fr' || str === 'eng' || str === 'custom'){
+                                            if(ctx.currentTest.languagesSettings.languages.indexOf(str)!=-1) currentLang = str
+                                            else{
+                                                ctx.fileError.status = true
+                                                ctx.fileError.msg = `${ctx.currentLang.additional[89]}: ${str}`
+                                                return
+                                            }
+                                            
+                                        }
+                                        else{
+                                            ctx.fileError.status = true
+                                            ctx.fileError.msg = ctx.currentLang.additional[90]
+                                            return
+                                        }
+
+                                        continue
                                 }
-                                else{
+                                
+                                // Subject ID
+                                if(str === rawData[1]){
+                                        if(str !== ctx.currentTest.subjectID) {
+                                            ctx.fileError.status = true
+                                            ctx.fileError.msg = ctx.currentLang.additional[74]
+                                            return
+                                        }
+
+                                        continue
+                                }
+
+                                // Theme ID
+                                if(str[0]==='&'){
+                                        const theme = str.replace('&', '')
+                                        if(!isNaN(+theme)){
+                                            if(ctx.currentTest.themes.indexOf(+theme)!=-1){
+                                                currentTheme = theme
+                                            } else {
+                                                ctx.fileError.status = true
+                                                ctx.fileError.msg = `${ctx.currentLang.additional[91]}: ${str}`
+                                                return
+                                            }
+                                        }else {
+                                            ctx.fileError.status = true
+                                            ctx.fileError.msg = `${ctx.currentLang.additional[92]}: ${str}`
+                                            return
+                                        }
+
+                                        continue
+                                }
+
+                                // Question ID & difficulty
+                                if(str[0]==='#'){
+                                        const difficulty = str.replace('#', '')
+                                        if(isNaN(+difficulty)){
+                                            ctx.fileError.status = true
+                                            ctx.fileError.msg = `${ctx.currentLang.additional[75]}: ${str}`
+                                            return
+                                        }
+
+                                        currentQuestion = questionsCounter
+                                        questions.push({
+                                            id: currentQuestion,
+                                            questionCtx: { ...ctx.questionCtxTemp },
+                                            type: 'question-with-images',
+                                            theme: +currentTheme,
+                                            difficulty: +difficulty,
+                                            ball:0.01,
+                                            multipleAnswers: false,
+                                            lastModified: getCurrentDate(),
+                                            imagePreview: '',
+                                            answers: []
+                                        })
+
+                                        nextStr = 'question'
+                                        questionsCounter += 1 
+                                        answersImg = []
+                                        continue
+                                }
+
+                                if(str[0]==='@'){
+                                        const answer = str.replace('@', '')
+                                        if(isNaN(+answer)){
+                                            ctx.fileError.status = true
+                                            ctx.fileError.msg = `${ctx.currentLang.additional[76]}: ${str}`
+                                            return
+                                        }
+
+                                        nextAnswerIsCorrect = answer > 0
+                                        nextStr = 'answer'
+                                        continue
+                                }
+
+                                if(nextStr === 'question'){
+                                        const question = questions.find(q => q.id === currentQuestion)
+                                        const questionIndex = questions.indexOf(question)
+
+                                        str = sanitizeString(str)
+
+                                        if( currentLang === 'ru' ) questions[questionIndex].questionCtx.ru = str
+                                        else if( currentLang === 'uz_k' ) questions[questionIndex].questionCtx.uz_k = str
+                                        else if( currentLang === 'uz_l' ) questions[questionIndex].questionCtx.uz_l = str
+                                        else if( currentLang === 'eng' ) questions[questionIndex].questionCtx.eng = str
+                                        else if( currentLang === 'de' ) questions[questionIndex].questionCtx.de = str
+                                        else if( currentLang === 'fr' ) questions[questionIndex].questionCtx.fr = str
+                                        else if( currentLang === 'custom' ) questions[questionIndex].questionCtx.custom = str
+
+                                        // uz parser
+                                        if(currentLang === 'uz_k') questions[questionIndex].questionCtx.uz_l = uzbekLangParser(str, 'kiril')
+                                        else if(currentLang === 'uz_l') questions[questionIndex].questionCtx.uz_k = uzbekLangParser(str, 'lotin')
+
+                                        nextStr = null
+                                }
+                                else if(nextStr === 'answer'){
+                                        const question = questions.find(q => q.id === currentQuestion)
+                                        const questionIndex = questions.indexOf(question)
+
+                                        str = sanitizeString(str)
+
+                                        if(!answersImg.find(a => a == str)){
+                                            questions[questionIndex].answers.push({
+                                                imagePreview:'',
+                                                answerCtx: {
+                                                    ru: currentLang === 'ru' ? str : undefined,
+                                                    eng: currentLang === 'eng' ? str : undefined,
+                                                    uz_l: currentLang === 'uz_l' ? str : undefined,
+                                                    uz_k: currentLang === 'uz_k' ? str : undefined,
+                                                    custom: currentLang === 'custom' ? str : undefined,
+                                                    fr: currentLang === 'fr' ? str : undefined,
+                                                    de: currentLang === 'de' ? str : undefined
+                                                },
+                                                isCurrect: nextAnswerIsCorrect
+                                            })
+
+                                            // uz parser
+                                            if(currentLang === 'uz_k') questions[questionIndex].answers[questions[questionIndex].answers.length-1].answerCtx.uz_l = uzbekLangParser(str, 'kiril')
+                                            else if(currentLang === 'uz_l') questions[questionIndex].answers[questions[questionIndex].answers.length-1].answerCtx.uz_k = uzbekLangParser(str, 'lotin')
+
+                                            nextStr = null
+                                            answersImg.push(str)
+                                        } else {
+                                            ctx.fileError.status = true
+                                            ctx.fileError.msg = `${ctx.currentLang.additional[77]}: ${str}`
+                                            return
+                                        }
+                                } else {
+                                    console.log(nextStr);
                                     ctx.fileError.status = true
-                                    ctx.fileError.msg = ctx.currentLang.additional[90]
+                                    ctx.fileError.msg = `${ctx.currentLang.additional[78]}: ${str}`
                                     return
                                 }
-
-                                continue
                             }
                             
-                            // Subject ID
-                            if(str === rawData[1]){
-                                if(str !== ctx.currentTest.subjectID) {
-                                    ctx.fileError.status = true
-                                    ctx.fileError.msg = ctx.currentLang.additional[74]
-                                    return
-                                }
-
-                                continue
-                            }
-
-                            // Theme ID
-                            if(str[0]==='&'){
-                                const theme = str.replace('&', '')
-                                if(!isNaN(+theme)){
-                                    if(ctx.currentTest.themes.indexOf(+theme)!=-1){
-                                        currentTheme = theme
-                                    } else {
-                                        ctx.fileError.status = true
-                                        ctx.fileError.msg = `${ctx.currentLang.additional[91]}: ${str}`
-                                        return
-                                    }
-                                }else {
-                                    ctx.fileError.status = true
-                                    ctx.fileError.msg = `${ctx.currentLang.additional[92]}: ${str}`
-                                    return
-                                }
-
-                                continue
-                            }
-
-                            // Question ID & difficulty
-                            if(str[0]==='#'){
-                                const difficulty = str.replace('#', '')
-                                if(isNaN(+difficulty)){
-                                    ctx.fileError.status = true
-                                    ctx.fileError.msg = `${ctx.currentLang.additional[75]}: ${str}`
-                                    return
-                                }
-
-                                currentQuestion = questionsCounter
-                                questions.push({
-                                    id: currentQuestion,
-                                    questionCtx: { ...ctx.questionCtxTemp },
-                                    type: 'question-with-images',
-                                    theme: +currentTheme,
-                                    difficulty: +difficulty,
-                                    ball:0.01,
-                                    multipleAnswers: false,
-                                    lastModified: getCurrentDate(),
-                                    imagePreview: '',
-                                    answers: []
-                                })
-
-                                nextStr = 'question'
-                                questionsCounter += 1 
-                                answersImg = []
-                                continue
-                            }
-
-                            if(str[0]==='@'){
-                                const answer = str.replace('@', '')
-                                if(isNaN(+answer)){
-                                    ctx.fileError.status = true
-                                    ctx.fileError.msg = `${ctx.currentLang.additional[76]}: ${str}`
-                                    return
-                                }
-
-                                nextAnswerIsCorrect = answer > 0
-                                nextStr = 'answer'
-                                continue
-                            }
-
-                            if(nextStr === 'question'){
-                                const question = questions.find(q => q.id === currentQuestion)
-                                const questionIndex = questions.indexOf(question)
-
-                                str = sanitizeString(str)
-
-                                if( currentLang === 'ru' ) questions[questionIndex].questionCtx.ru = str
-                                else if( currentLang === 'uz_k' ) questions[questionIndex].questionCtx.uz_k = str
-                                else if( currentLang === 'uz_l' ) questions[questionIndex].questionCtx.uz_l = str
-                                else if( currentLang === 'eng' ) questions[questionIndex].questionCtx.eng = str
-                                else if( currentLang === 'de' ) questions[questionIndex].questionCtx.de = str
-                                else if( currentLang === 'fr' ) questions[questionIndex].questionCtx.fr = str
-                                else if( currentLang === 'custom' ) questions[questionIndex].questionCtx.custom = str
-
-                                // uz parser
-                                if(currentLang === 'uz_k') questions[questionIndex].questionCtx.uz_l = uzbekLangParser(str, 'kiril')
-                                else if(currentLang === 'uz_l') questions[questionIndex].questionCtx.uz_k = uzbekLangParser(str, 'lotin')
-
-                                nextStr = null
-                            }
-                            else if(nextStr === 'answer'){
-                                const question = questions.find(q => q.id === currentQuestion)
-                                const questionIndex = questions.indexOf(question)
-
-                                str = sanitizeString(str)
-
-                                if(!answersImg.find(a => a == str)){
-                                    questions[questionIndex].answers.push({
-                                        imagePreview:'',
-                                        answerCtx: {
-                                            ru: currentLang === 'ru' ? str : undefined,
-                                            eng: currentLang === 'eng' ? str : undefined,
-                                            uz_l: currentLang === 'uz_l' ? str : undefined,
-                                            uz_k: currentLang === 'uz_k' ? str : undefined,
-                                            custom: currentLang === 'custom' ? str : undefined,
-                                            fr: currentLang === 'fr' ? str : undefined,
-                                            de: currentLang === 'de' ? str : undefined
-                                        },
-                                        isCurrect: nextAnswerIsCorrect
-                                    })
-
-                                    // uz parser
-                                    if(currentLang === 'uz_k') questions[questionIndex].answers[questions[questionIndex].answers.length-1].answerCtx.uz_l = uzbekLangParser(str, 'kiril')
-                                    else if(currentLang === 'uz_l') questions[questionIndex].answers[questions[questionIndex].answers.length-1].answerCtx.uz_k = uzbekLangParser(str, 'lotin')
-
-                                    nextStr = null
-                                    answersImg.push(str)
-                                } else {
-                                    ctx.fileError.status = true
-                                    ctx.fileError.msg = `${ctx.currentLang.additional[77]}: ${str}`
-                                    return
-                                }
-                            } else {
-                                console.log(nextStr);
-                                ctx.fileError.status = true
-                                ctx.fileError.msg = `${ctx.currentLang.additional[78]}: ${str}`
-                                return
-                            }
                         }
                     }
 

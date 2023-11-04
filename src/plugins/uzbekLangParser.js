@@ -261,6 +261,8 @@ export default function uzbekLangParser(ctx, mode){
             string = string.replaceAll('Сҳ', 'Ш')
             string = string.replaceAll('сҳ', 'ш')
             string = string.replaceAll('Cҳ', 'Ч')
+            string = string.replaceAll('Тс', 'Ц')
+            string = string.replaceAll('тс', 'ц')
             string = string.replaceAll('cҳ', 'ч')
             string = string.replaceAll("О'", 'Ў')
             string = string.replaceAll("о'", 'ў')
@@ -374,6 +376,9 @@ export default function uzbekLangParser(ctx, mode){
                     case 'Ь':
                         result.push("");
                         break;
+                    case 'Ц':
+                        result.push("Ts");
+                        break;
     
                         
                     case 'а':
@@ -477,6 +482,9 @@ export default function uzbekLangParser(ctx, mode){
                         break;
                     case 'ъ':
                         result.push("'");
+                        break;
+                    case 'ц':
+                        result.push("ts");
                         break;
     
                     case ',':

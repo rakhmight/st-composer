@@ -66,9 +66,9 @@
                     <v-icon size="19" color="#e83b07" v-if="error.type=='theme'">mdi-alpha-t-box-outline</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='difficulty'">mdi-chart-line</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='remarks'">mdi-alert-circle-outline</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-scale-unbalanced</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-lightbulb-multiple</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='question-doubled'">mdi-help-box-multiple-outline</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-alert</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-repeat</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='question-doubled'">mdi-ab-testing</v-icon>
                     <p
                     class="text-body-1 mr-2 ml-2"
                     style="color: #000;"
@@ -110,6 +110,7 @@ import asyncCrypt from '@/plugins/asyncCrypt'
 import { mapGetters } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
 import crypt from '@/plugins/crypt'
+import { sanitizeString } from '@/utils/sanitizeString'
 
 export default {
     props:{
@@ -118,7 +119,8 @@ export default {
         questions: Array,
         stopSavingLoop: Function,
         saveProcessFinally: Object,
-        remarks: undefined | Array
+        remarks: undefined | Array,
+        saveProcess: Function
     },
     data(){
         return {
@@ -145,14 +147,26 @@ export default {
 
             // проверка на незаполненные поля и не отмеченные темы, сложность
             this.questions.forEach(question=>{
+                const qIndex = this.questions.indexOf(question)
+
                 if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
                     if(!question.questionCtx.custom){
                         this.errors.push({type: 'q-field-custom', ctx: `${this.currentLang.additional[46]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.custom = sanitizeString(this.questions[qIndex].questionCtx.custom)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
+                            const aIndex = question.answers.indexOf(answer)
+
                             if(!answer.answerCtx.custom && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.custom && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-custom', ctx: `${this.currentLang.additional[47]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.custom){
+                                this.questions[qIndex].answers[aIndex].answerCtx.custom = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.custom)
                             }
                         })
                     }
@@ -161,11 +175,20 @@ export default {
                     if(!question.questionCtx.ru){
                         this.errors.push({type: 'q-field-ru', ctx: `${this.currentLang.additional[49]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.ru = sanitizeString(this.questions[qIndex].questionCtx.ru)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
-                            console.log(answer);
+                            const aIndex = question.answers.indexOf(answer)
+                            
                             if(!answer.answerCtx.ru && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.ru && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-ru', ctx: `${this.currentLang.additional[50]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.ru){
+                                this.questions[qIndex].answers[aIndex].answerCtx.ru = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.ru)
                             }
                         })
                     }
@@ -174,10 +197,20 @@ export default {
                     if(!question.questionCtx.eng){
                         this.errors.push({type: 'q-field-eng', ctx: `${this.currentLang.additional[51]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.eng = sanitizeString(this.questions[qIndex].questionCtx.eng)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
+                            const aIndex = question.answers.indexOf(answer)
+
                             if(!answer.answerCtx.eng && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.eng && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-eng', ctx: `${this.currentLang.additional[52]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.eng){
+                                this.questions[qIndex].answers[aIndex].answerCtx.eng = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.eng)
                             }
                         })
                     }
@@ -186,10 +219,20 @@ export default {
                     if(!question.questionCtx.uz_l){
                         this.errors.push({type: 'q-field-uz_l', ctx: `${this.currentLang.additional[53]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.uz_l = sanitizeString(this.questions[qIndex].questionCtx.uz_l)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
+                            const aIndex = question.answers.indexOf(answer)
+
                             if(!answer.answerCtx.uz_l && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.uz_l && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-uz_l', ctx: `${this.currentLang.additional[54]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.uz_l){
+                                this.questions[qIndex].answers[aIndex].answerCtx.uz_l = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.uz_l)
                             }
                         })
                     }
@@ -198,10 +241,20 @@ export default {
                     if(!question.questionCtx.uz_k){
                         this.errors.push({type: 'q-field-uz_k', ctx: `${this.currentLang.additional[55]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.uz_k = sanitizeString(this.questions[qIndex].questionCtx.uz_k)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
+                            const aIndex = question.answers.indexOf(answer)
+
                             if(!answer.answerCtx.uz_k && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.uz_k && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-uz_k', ctx: `${this.currentLang.additional[56]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.uz_k){
+                                this.questions[qIndex].answers[aIndex].answerCtx.uz_k = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.uz_k)
                             }
                         })
                     }
@@ -210,10 +263,20 @@ export default {
                     if(!question.questionCtx.fr){
                         this.errors.push({type: 'q-field-fr', ctx: `${this.currentLang.additional[57]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.fr = sanitizeString(this.questions[qIndex].questionCtx.fr)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
+                            const aIndex = question.answers.indexOf(answer)
+
                             if(!answer.answerCtx.fr && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.fr && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-fr', ctx: `${this.currentLang.additional[58]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.fr){
+                                this.questions[qIndex].answers[aIndex].answerCtx.fr = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.fr)
                             }
                         })
                     }
@@ -222,10 +285,20 @@ export default {
                     if(!question.questionCtx.de){
                         this.errors.push({type: 'q-field-de', ctx: `${this.currentLang.additional[59]}: ${question.id}`})
                     }
+                    else {
+                        this.questions[qIndex].questionCtx.de = sanitizeString(this.questions[qIndex].questionCtx.de)
+                    }
+
                     if(question.type=='basic-question' || question.type=='question-with-images'){
                         question.answers.forEach((answer, x)=>{
+                            const aIndex = question.answers.indexOf(answer)
+
                             if(!answer.answerCtx.de && answer.imagePreview && !answer.imagePreview.length || !answer.answerCtx.de && !answer.imagePreview){
                                 this.errors.push({type: 'a-field-de', ctx: `${this.currentLang.additional[60]}: ${question.id}, ${this.currentLang.additional[48]}: ${x+1}`})
+                            }
+
+                            if(answer.answerCtx.de){
+                                this.questions[qIndex].answers[aIndex].answerCtx.de = sanitizeString(this.questions[qIndex].answers[aIndex].answerCtx.de)
                             }
                         })
                     }
@@ -305,7 +378,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[82]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[82]}: ${question.id}`})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('eng')!=-1){
@@ -327,7 +400,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[83]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[83]}: ${question.id}`})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1){
@@ -349,7 +422,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[84]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[84]}: ${question.id}`})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
@@ -371,7 +444,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[85]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[85]}: ${question.id}`})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
@@ -392,7 +465,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[86]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[86]}: ${question.id}`})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('de')!=-1){
@@ -414,7 +487,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[87]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[87]}: ${question.id}`})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('fr')!=-1){
@@ -436,7 +509,7 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>30) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[88]}: ${question.id}`})
+                        if(maxLength-minLength>50) this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[88]}: ${question.id}`})
                     }
                 }
 
@@ -445,8 +518,10 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('ru')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.ru == question.questionCtx.ru) duplicateQuestions.push(checkedQ)
-                    })
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.ru == question.questionCtx.ru) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
@@ -465,8 +540,10 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('eng')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.eng == question.questionCtx.eng) duplicateQuestions.push(checkedQ)
-                    })
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.eng == question.questionCtx.eng) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
@@ -485,8 +562,10 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.uz_l == question.questionCtx.uz_l) duplicateQuestions.push(checkedQ)
-                    })
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.uz_l == question.questionCtx.uz_l) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
@@ -505,11 +584,14 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.uz_k == question.questionCtx.uz_k) duplicateQuestions.push(checkedQ)
-                    })
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.uz_k == question.questionCtx.uz_k) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
+                                console.log(dq);
                                 let duplicateAnswersCounter = 0
                                 dq.answers.map((dqa)=>{
                                     const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_k == dqa.answerCtx.uz_k)
@@ -525,8 +607,11 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.custom == question.questionCtx.custom) duplicateQuestions.push(checkedQ)
-                    })
+                            
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.custom == question.questionCtx.custom) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
@@ -545,8 +630,10 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('fr')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.fr == question.questionCtx.fr) duplicateQuestions.push(checkedQ)
-                    })
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.fr == question.questionCtx.fr) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
@@ -565,8 +652,10 @@ export default {
                     if(this.currentTest.languagesSettings.languages.indexOf('de')!=-1){
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
-                            if(checkedQ.questionCtx.de == question.questionCtx.de) duplicateQuestions.push(checkedQ)
-                    })
+                            if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
+                                if(checkedQ.questionCtx.de == question.questionCtx.de) duplicateQuestions.push(checkedQ)
+                            }
+                        })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
@@ -601,6 +690,7 @@ export default {
 
             // остановка авто сохранения
             this.blockBtn = true
+            // this.saveProcess({forcedSave:true, manual: true})
             this.stopSavingLoop()
 
             setTimeout(async ()=>{
@@ -627,8 +717,6 @@ export default {
                             usefulHistory.push({date: item.date.full, type: 'import'})
                         }
                     })
-
-                    
 
                     const test = {
                         id: this.currentTest.id,

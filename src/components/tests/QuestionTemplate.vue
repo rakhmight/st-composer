@@ -337,6 +337,7 @@
 
                 <div style="max-width: 300px">
                     <v-select
+                    menuProps="auto"
                     :items="themesList"
                     :placeholder="currentLang.workspaceView[30]"
                     outlined
@@ -413,7 +414,7 @@
                     <v-icon>mdi-plus</v-icon>
                     </v-btn>
                 </template>
-                <span>Добавить ответ</span>
+                <span>{{ currentLang.additional[100] }}</span>
                 </v-tooltip>
             </div>
             <v-alert
@@ -491,7 +492,7 @@ import AnswerTemplates from './AnswerTemplates.vue'
 import VueSlider from 'vue-slider-component'
 import uzbekLangParser from '@/plugins/uzbekLangParser'
 import 'vue-slider-component/theme/default.css'
-import { sanitizeString } from '@/utils/sanitizeString'
+// import { sanitizeString } from '@/utils/sanitizeString'
 
 export default {
     props:{
@@ -922,19 +923,19 @@ export default {
             },500)
         },
         'questionCtx.fr'(){
-            this.questionCtx.fr = sanitizeString(this.questionCtx.fr)
+            // this.questionCtx.fr = sanitizeString(this.questionCtx.fr)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.de'(){
-            this.questionCtx.de = sanitizeString(this.questionCtx.de)
+            // this.questionCtx.de = sanitizeString(this.questionCtx.de)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.ru'(){
-            this.questionCtx.ru = sanitizeString(this.questionCtx.ru)
+            // this.questionCtx.ru = sanitizeString(this.questionCtx.ru)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.eng'(){
-            this.questionCtx.eng = sanitizeString(this.questionCtx.eng)
+            // this.questionCtx.eng = sanitizeString(this.questionCtx.eng)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.uz_l'(){
@@ -946,7 +947,7 @@ export default {
                 // }
             }
             
-            this.questionCtx.uz_l = sanitizeString(this.questionCtx.uz_l)
+            // this.questionCtx.uz_l = sanitizeString(this.questionCtx.uz_l)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.uz_k'(){
@@ -958,11 +959,11 @@ export default {
                 // }
             }
 
-            this.questionCtx.uz_k = sanitizeString(this.questionCtx.uz_k)
+            // this.questionCtx.uz_k = sanitizeString(this.questionCtx.uz_k)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         'questionCtx.custom'(){
-            this.questionCtx.custom = sanitizeString(this.questionCtx.custom)
+            // this.questionCtx.custom = sanitizeString(this.questionCtx.custom)
             this.questionFunc('questionCtx', this.questionCtx, this.currentQuestion.id)
         },
         ball(){

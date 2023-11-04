@@ -29,7 +29,7 @@
                     
                     <div class="d-flex flex-column">
                         <label class="body-2">{{ currentLang.dashboardView[47] }}:</label>
-                        <div class="d-flex flex-row mt-2" style="width:600px">
+                        <div class="d-flex flex-row mt-2">
                             <v-text-field
                             dense
                             outlined
@@ -43,6 +43,7 @@
                             </v-text-field>
                             <v-select
                             v-else
+                            menuProps="auto"
                             prepend-icon="mdi-pound"
                             :items="subjectsList"
                             :label="currentLang.additional[5]"
@@ -51,6 +52,7 @@
                             v-model="subjectID"
                             :error="subjectEr"
                             :no-data-text="currentLang.additional[6]"
+                            style="max-width: 95%"
                             ></v-select>
 
                         <v-tooltip bottom>
@@ -90,6 +92,7 @@
                             </v-text-field>
                             <v-select
                             v-else
+                            menuProps="auto"                            
                             prepend-icon="mdi-alpha-t-box-outline"
                             :items="themesList"
                             :label="currentLang.additional[9]"
@@ -682,8 +685,7 @@ export default {
 }
 
 .v-select-list{
-    width: 607px;
     overflow-y: auto;
-    max-height: 250px;
+    max-height: 200px;
 }
 </style>

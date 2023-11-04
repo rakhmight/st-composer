@@ -27,7 +27,7 @@
 
             <div class="dialog-content">
                 <div class="content__subject-box flex-column">
-                    <div class="d-flex flex-row" style="width:640px">
+                    <div class="d-flex flex-row">
                         <v-text-field
                         dense
                         outlined
@@ -40,6 +40,7 @@
                         </v-text-field>
                         <v-select
                         v-else
+                        menuProps="auto"
                         prepend-icon="mdi-pound"
                         :items="subjectsList"
                         :label="currentLang.additional[5]"
@@ -48,6 +49,7 @@
                         v-model="subjectID"
                         :error="subjectIsEmpty"
                         :no-data-text="currentLang.additional[6]"
+                        style="max-width: 95%; height: 100%"
                         ></v-select>
 
                         <v-tooltip bottom>
@@ -83,6 +85,7 @@
                         </v-text-field>
                         <v-select
                         v-else
+                        menuProps="auto"
                         prepend-icon="mdi-alpha-t-box-outline"
                         :items="themesList"
                         :label="currentLang.additional[9]"
@@ -270,7 +273,7 @@ export default {
                 this.maxBall = ctx
             }else if(type=='currect'){
                 this.ballIsCurrect = ctx
-            }
+            }//l
         },
 
         createTest(){
@@ -559,8 +562,7 @@ export default {
 }
 
 .v-select-list{
-    width: 607px;
     overflow-y: auto;
-    max-height: 250px;
+    max-height: 200px;
 }
 </style>
