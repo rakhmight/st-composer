@@ -105,6 +105,7 @@
                   class="dashboard__btn flex align-center"
                   style="cursor: pointer;"
                   @click="exportTest()"
+                  v-if="!test.status.isSigned"
                   >
                   <v-icon color="#0C2242" size="19">mdi-file-export</v-icon>
                   <span class="ml-1">{{ currentLang.additional[104] }}</span>
