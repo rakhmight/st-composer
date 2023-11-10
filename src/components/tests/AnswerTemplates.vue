@@ -220,13 +220,14 @@
                         </v-tooltip>
                     </div>
 
+                    
                     <v-checkbox
-                    v-if="isMultiple && currentAnswer.id!=1"
+                    v-if="isMultiple && currentAnswer.id!=1 || currentAnswer.id==1 && !answers.find(a=>a.isCurrect)"
                     v-model="isCurrect"
                     color="success"
                     hide-details
                     style="position: absolute; top:35px;"
-                ></v-checkbox>
+                    ></v-checkbox>
                 </div>
 
                 <div v-if="questionType=='question-with-images'" style="position: relative;">
@@ -297,6 +298,7 @@ export default {
 
         parseMode: String,
         showParse: Boolean,
+        answers: Array
     },
     data() {
         return {

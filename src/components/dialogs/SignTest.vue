@@ -69,6 +69,7 @@
                     <v-icon size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-alert</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-repeat</v-icon>
                     <v-icon size="19" color="#e83b07" v-if="error.type=='question-doubled'">mdi-ab-testing</v-icon>
+                    <v-icon size="19" color="#e83b07" v-if="error.type=='correct-answer'">mdi-alpha-a</v-icon>
                     <p
                     class="text-body-1 mr-2 ml-2"
                     style="color: #000;"
@@ -141,10 +142,109 @@ export default {
             } else{
                 this.emptyTestError = false
             }
-            this.errors = []
             this.signProcedure = true
             this.checkingLoader = true
 
+            this.checkingError()
+
+            if(this.errors.length){
+                this.checkingLoader = false
+                return
+            }
+
+            // остановка авто сохранения
+            this.blockBtn = true
+            // this.saveProcess({forcedSave:true, manual: true})
+            this.stopSavingLoop()
+
+            setTimeout(async ()=>{
+                if(!this.currentTest.status.isSigned){
+                    const date = new Date()
+                    const timer = {
+                        id: date.getTime(),
+                        date: new Date(),
+                        testID: this.currentTest.id
+                    }
+                    // добавление нов элемента в БД timers
+                    await operationFromStore('addTimer', {data: timer})
+                }
+
+                await asyncCrypt(JSON.stringify(this.questions), this.currentSign.keys.assymetric.publicKey.toString('utf8'))
+                .then(async (data)=>{
+                    // сборка теста для выгрузки
+                    const signedDate = new Date()
+                    const usefulHistory = []
+                    this.currentTest.history.forEach(item=>{
+                        if(item.type=='signed' || item.type=='rejected-inspector' || item.type=='rejected-admin'){
+                            usefulHistory.push(item)
+                        }else if(item.type=='import'){
+                            usefulHistory.push({date: item.date.full, type: 'import'})
+                        }
+                    })
+
+                    const test = {
+                        id: this.currentTest.id,
+                        fileDate: signedDate.getTime(),
+                        author: this.currentSign.id,
+                        signHash: this.currentSign.hash,
+                        params:{
+                            themes: this.currentTest.themes,
+                            subject: this.currentTest.subjectID,
+                            languagesSettings: this.currentTest.languagesSettings,
+                            ballSystem: this.currentTest.ballSystem,
+                            considerDifficulty: this.currentTest.considerDifficulty,
+                        },
+                        testInfo: this.currentTest.testInfo,
+                        questions: data,
+                        history: [
+                            {date: this.currentTest.history[0].date.full, type: 'create'},
+                            {date: signedDate, type: 'signed'},
+                            ...usefulHistory
+                        ]
+                    }
+
+                    if(this.currentTest.testImage){
+                        test.testImage = this.currentTest.testImage
+                    }
+
+                    // Удаление прежнего signed
+                    await operationFromStore('deleteSigned', {id: this.currentTest.id})
+                    .then(async ()=>{
+                    // добавление теста в БД signed
+                    await operationFromStore('addSigned', {data: test})
+                        .then(async ()=>{
+                            const history = [...this.currentTest.history, {date: signedDate, type: 'signed'}]
+                            const testToSave = {
+                                ...this.currentTest,
+                                history,
+                                questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
+                                status: {...this.currentTest.status, isSigned: true}
+                            }
+                            if(!this.currentTest.status.isSigned){
+                                testToSave.signedDate = signedDate
+                            }
+                            // изменение текущих тестов (isSigned, signedDate, history)
+                            await operationFromStore('deleteTest',{id: this.currentTest.id})
+                            .then(async ()=>{
+                                await operationFromStore('addTest',{data: testToSave})
+                                .then(()=>{
+                                    this.checkingLoader = false
+                                    this.success = true
+                                    console.info('(i) process is saved after signing')
+
+                                    setTimeout(()=>{
+                                        this.$router.push('/dashboard')
+                                    },3000)
+                                })
+                            })
+                        })
+                    })
+                })
+            }, 400)
+        },
+
+        checkingError(){
+            this.errors = []
             // проверка на незаполненные поля и не отмеченные темы, сложность
             this.questions.forEach(question=>{
                 const qIndex = this.questions.indexOf(question)
@@ -335,6 +435,7 @@ export default {
 
                 // проверка на пропорциональность ответов
                 // проверка на одинаковые ответы
+                // TODO: проверка на существование правильного ответа в вопросе
                 if(question.type=='basic-question' || question.type=='question-with-images'){
                     const answersLength = question.answers.map((answer) => {
                         return {
@@ -358,6 +459,11 @@ export default {
                             fr: answer.answerCtx.fr ? answer.answerCtx.fr : null,
                         }
                     })
+                    
+                    let hasCorrectAnswer = question.answers.find(a => a.isCurrect)
+                    if(!hasCorrectAnswer){
+                        this.errors.push({type: 'correct-answer', ctx: `${this.currentLang.additional[102]}: ${question.id}`})
+                    }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('ru')!=-1){
                         const answersByLang = answersLength.map(answer => answer.ru)
@@ -513,7 +619,7 @@ export default {
                     }
                 }
 
-                // TODO: проверка на одинаковые вопросы с одинаковыми ответами
+                // проверка на одинаковые вопросы с одинаковыми ответами
                 if(question.type=='basic-question' || question.type=='question-with-images'){
                     if(this.currentTest.languagesSettings.languages.indexOf('ru')!=-1){
                         const duplicateQuestions = []
@@ -673,113 +779,22 @@ export default {
                     }
                 }
 
+
             })
 
             // проверка на remarks
             if(this.remarks){
                 if(this.remarks.length){
-                   
                     this.errors.push({type: 'remarks', ctx: this.currentLang.additional[67]}) 
                 }
             }
-
-            if(this.errors.length){
-                this.checkingLoader = false
-                return
-            }
-
-            // остановка авто сохранения
-            this.blockBtn = true
-            // this.saveProcess({forcedSave:true, manual: true})
-            this.stopSavingLoop()
-
-            setTimeout(async ()=>{
-                if(!this.currentTest.status.isSigned){
-                    const date = new Date()
-                    const timer = {
-                        id: date.getTime(),
-                        date: new Date(),
-                        testID: this.currentTest.id
-                    }
-                    // добавление нов элемента в БД timers
-                    await operationFromStore('addTimer', {data: timer})
-                }
-
-                await asyncCrypt(JSON.stringify(this.questions), this.currentSign.keys.assymetric.publicKey.toString('utf8'))
-                .then(async (data)=>{
-                    // сборка теста для выгрузки
-                    const signedDate = new Date()
-                    const usefulHistory = []
-                    this.currentTest.history.forEach(item=>{
-                        if(item.type=='signed' || item.type=='rejected-inspector' || item.type=='rejected-admin'){
-                            usefulHistory.push(item)
-                        }else if(item.type=='import'){
-                            usefulHistory.push({date: item.date.full, type: 'import'})
-                        }
-                    })
-
-                    const test = {
-                        id: this.currentTest.id,
-                        fileDate: signedDate.getTime(),
-                        author: this.currentSign.id,
-                        signHash: this.currentSign.hash,
-                        params:{
-                            themes: this.currentTest.themes,
-                            subject: this.currentTest.subjectID,
-                            languagesSettings: this.currentTest.languagesSettings,
-                            ballSystem: this.currentTest.ballSystem,
-                            considerDifficulty: this.currentTest.considerDifficulty,
-                        },
-                        testInfo: this.currentTest.testInfo,
-                        questions: data,
-                        history: [
-                            {date: this.currentTest.history[0].date.full, type: 'create'},
-                            {date: signedDate, type: 'signed'},
-                            ...usefulHistory
-                        ]
-                    }
-
-                    if(this.currentTest.testImage){
-                        test.testImage = this.currentTest.testImage
-                    }
-
-                    // Удаление прежнего signed
-                    await operationFromStore('deleteSigned', {id: this.currentTest.id})
-                    .then(async ()=>{
-                    // добавление теста в БД signed
-                    await operationFromStore('addSigned', {data: test})
-                        .then(async ()=>{
-                            const history = [...this.currentTest.history, {date: signedDate, type: 'signed'}]
-                            const testToSave = {
-                                ...this.currentTest,
-                                history,
-                                questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
-                                status: {...this.currentTest.status, isSigned: true}
-                            }
-                            if(!this.currentTest.status.isSigned){
-                                testToSave.signedDate = signedDate
-                            }
-                            // изменение текущих тестов (isSigned, signedDate, history)
-                            await operationFromStore('deleteTest',{id: this.currentTest.id})
-                            .then(async ()=>{
-                                await operationFromStore('addTest',{data: testToSave})
-                                .then(()=>{
-                                    this.checkingLoader = false
-                                    this.success = true
-                                    console.info('(i) process is saved after signing')
-
-                                    setTimeout(()=>{
-                                        this.$router.push('/dashboard')
-                                    },3000)
-                                })
-                            })
-                        })
-                    })
-                })
-            }, 400)
         }
     },
     watch:{
+        currentLang(){
+            console.log(1);
+            this.checkingError()
+        },
         'saveProcessFinally.value'(){
             if(this.saveProcessFinally.value){
                 this.dialog = false

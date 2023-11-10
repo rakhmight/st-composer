@@ -75,7 +75,7 @@
       <div class="work__menu d-flex justify-space-between">
         <v-tooltip bottom color="#00000073">
           <template v-slot:activator="{ on, attrs }">
-            <v-menu offset-y max-width="140" v-bind="attrs" v-on="on">
+            <v-menu offset-y max-width="200" v-bind="attrs" v-on="on">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     height="31"
@@ -93,13 +93,21 @@
                   <test-history :test="currentTest"/>
                   <delete-test :test="currentTest" :renderFunc="renderTests" />
                   <div
-                  class="dashboard__btn"
+                  class="dashboard__btn flex align-center"
                   style="cursor: pointer;"
                   v-if="test.status.isSigned"
                   @click="uploadTest()"
                   >
                   <v-icon color="#0C2242" size="19">mdi-file-upload-outline</v-icon>
                   <span class="ml-1">{{ currentLang.additional[1] }}</span>
+                  </div>
+                  <div
+                  class="dashboard__btn flex align-center"
+                  style="cursor: pointer;"
+                  @click="exportTest()"
+                  >
+                  <v-icon color="#0C2242" size="19">mdi-file-export</v-icon>
+                  <span class="ml-1">{{ currentLang.additional[104] }}</span>
                   </div>
                 </v-list>
             </v-menu>
@@ -212,6 +220,43 @@ export default {
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
         downloadAnchorNode.setAttribute("download", `test-${this.test.subjectID}-${data.fileDate}.json`);
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+      })
+    },
+
+    async exportTest(){
+      await operationFromStore('getByTestID', { id: this.test.id })
+      .then(data=>{
+        const fileDate = Date.now()
+        const test = {
+          id: data.id,
+          author: data.author,
+          questions: data.questions,
+          params: {
+            subject: data.subjectID,
+            themes: data.themes,
+            languagesSettings: data.languagesSettings,
+          },
+          fileDate,
+          history: data.history,
+          testInfo: data.testInfo,
+          signHash: data.signHash,
+          status: {
+              inProcess: true,
+              isDeleted: false,
+              isSigned: false
+          }
+        }
+
+        if(data.ballSystem) test.params.ballSystem = data.ballSystem
+        if(data.considerDifficulty) test.params.considerDifficulty = data.considerDifficulty
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(test));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `exported-test-${this.test.subjectID}-${Date.now()}.json`);
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();
         downloadAnchorNode.remove();

@@ -444,6 +444,7 @@
                 :isMultiple="multipleAnswers"
                 :parseMode="parseMode"
                 :showParse="showParse"
+                :answers="answers"
                 />
             </div>
         </div>

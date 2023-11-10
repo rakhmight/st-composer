@@ -92,13 +92,13 @@ export default {
 
             reader.addEventListener("load", function () {
                 const sign = JSON.parse(reader.result)
-                if(sign.id){
+                if(sign.id && typeof sign.id == 'string' && sign.keys && typeof sign.keys == 'object' && sign.keys.symmetric && sign.keys.assymetric && typeof sign.keys.symmetric == 'object' && typeof sign.keys.assymetric == 'object' && sign.subjects && Array.isArray(sign.subjects) && sign.hash && typeof sign.hash == 'string' && sign.fullName && typeof sign.fullName == 'string'){
                     this.setSign(sign)
                     this.$router.push('/dashboard')
                     return
                 } else {
                     this.signFileError.status = true
-                    this.signFileError.msg = 'Некорректный формат подписи'
+                    this.signFileError.msg = this.currentLang.additional[105]
                     return
                 }
 			}.bind(this), false)
