@@ -4,6 +4,10 @@
             <component :is="currentTab"></component>
         </div>
 
+        <div style="position: absolute; bottom: 15px; left: 15px; color: #777; font-size: small;">
+            v. {{ version }}
+        </div>
+
         <div style="position: absolute; bottom: 15px; right: 30px;">
             <v-menu
             offset-y
@@ -55,6 +59,7 @@ export default {
     },
     data(){
         return {
+            version: undefined,
             langs: [
             {lang: 'русский', short: 'ru'},
             {lang: "o'zbek", short: 'uz_l'},
@@ -76,6 +81,8 @@ export default {
       }
     },
     mounted(){
+        this.version = process.env.VUE_APP_VERSION
+
         if(this.currentSign){
             this.$router.push('/dashboard')
         }

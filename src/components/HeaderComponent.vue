@@ -18,7 +18,7 @@
         </v-img>
         <div class="d-flex flex-column">
           <h4 class="header__title">{{ currentLang.header[0] }}</h4>
-          <p>{{ currentLang.header[1] }}</p>
+          <p>{{ currentLang.header[1] }} | v. {{ version }}</p>
         </div>
       </div>
     
@@ -105,6 +105,7 @@ import { mapMutations, mapGetters } from 'vuex'
 export default {
     data() {
       return {
+        version: undefined,
         langs: [
           {lang: 'русский', short: 'ru'},
           {lang: "o'zbek", short: 'uz_l'},
@@ -131,6 +132,7 @@ export default {
       }
     },
     mounted(){
+      this.version = process.env.VUE_APP_VERSION
       // Languages в LS
       let language = localStorage.getItem('language')
       if(language){

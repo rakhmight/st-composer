@@ -129,13 +129,13 @@ export default {
                 if(this.currentSign.id != this.testToImport.author){
                     this.loader = false
                     this.fileError.value = true
-                    this.fileError.msg = 'Вы не являетесь автором тестов'
+                    this.fileError.msg = this.currentLang.additional[106]
                     return
                 }
                 if(this.currentSign.signHash != this.testToImport.signhash){
                     this.loader = false
                     this.fileError.value = true
-                    this.fileError.msg = 'Не совпадает подпись'
+                    this.fileError.msg = this.currentLang.additional[107]
                     return
                 }
 
@@ -231,13 +231,13 @@ export default {
                 // куча проверок
                 if(test){
                     //if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' && test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object' && test.remarks && typeof test.remarks == 'object' && test.testImage && typeof test.testImage == 'string'){
-                    if(test.author && typeof test.author == 'string' && test.author == this.currentSign.id && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' &&test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object'){
+                    if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' &&test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object'){
                         this.blockBtn = false
                         this.testToImport = test
                         return
                     } else {
                         this.fileError.status = true
-                        this.fileError.msg = 'Некорректный формат теста'
+                        this.fileError.msg = this.currentLang.additional[108]
                         return
                     }
                 }
@@ -248,7 +248,7 @@ export default {
 					reader.readAsText(this.testFile)
 				} else{
                     this.fileError.status = true
-                    this.fileError.msg = 'Некорректный формат теста'
+                    this.fileError.msg = this.currentLang.additional[108]
                     return
                 }
             } else {

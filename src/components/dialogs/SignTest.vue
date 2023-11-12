@@ -1,7 +1,7 @@
 <template>
     <v-dialog
         v-model="dialog"
-        width="700"
+        width="750"
         >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -53,23 +53,24 @@
                 <v-icon color="#0c2242" size="40">mdi-check</v-icon>
                 <span class="text-h6">{{ currentLang.additional[45] }}</span>
             </div>
-            <div class="dialog-content mt-5 mb-5 pr-5 pl-5" v-if="!checkingLoader && errors.length && !emptyTestError">
+            <div class="dialog-content mt-5 mb-5 pr-5 pl-5 d-flex flex-column" style="gap: 7px" v-if="!checkingLoader && errors.length && !emptyTestError">
                 <div
                 v-for="(error, i) in errors"
                 :key="i"
-                class="d-flex flex-row align-center"
+                class="d-flex flex-row align-start"
                 >
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='q-field-ru' || error.type=='q-field-custom' || error.type=='q-field-eng' || error.type=='q-field-uz_l' || error.type=='q-field-uz_k' || error.type=='q-field-fr' || error.type=='q-field-de'">mdi-help-circle-outline</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='a-field-ru' || error.type=='a-field-custom' || error.type=='a-field-eng' || error.type=='a-field-uz_l' || error.type=='a-field-uz_k'">mdi-lightbulb</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='image'">mdi-camera</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='pos'">mdi-selection-ellipse-arrow-inside</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='theme'">mdi-alpha-t-box-outline</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='difficulty'">mdi-chart-line</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='remarks'">mdi-alert-circle-outline</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-alert</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-repeat</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='question-doubled'">mdi-ab-testing</v-icon>
-                    <v-icon size="19" color="#e83b07" v-if="error.type=='correct-answer'">mdi-alpha-a</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='q-field-ru' || error.type=='q-field-custom' || error.type=='q-field-eng' || error.type=='q-field-uz_l' || error.type=='q-field-uz_k' || error.type=='q-field-fr' || error.type=='q-field-de'">mdi-help-circle-outline</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='a-field-ru' || error.type=='a-field-custom' || error.type=='a-field-eng' || error.type=='a-field-uz_l' || error.type=='a-field-uz_k'">mdi-lightbulb</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='image'">mdi-camera</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='pos'">mdi-selection-ellipse-arrow-inside</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='theme'">mdi-alpha-t-box-outline</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='difficulty'">mdi-chart-line</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='remarks'">mdi-alert-circle-outline</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='answers-proportional'">mdi-alert</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='answers-doubled'">mdi-repeat</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='question-doubled'">mdi-ab-testing</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='correct-answer'">mdi-alpha-a</v-icon>
+                    <v-icon style="margin-top: 2px;" size="19" color="#e83b07" v-if="error.type=='question-similar'">mdi-percent</v-icon>
                     <p
                     class="text-body-1 mr-2 ml-2"
                     style="color: #000;"
@@ -112,6 +113,7 @@ import { mapGetters } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
 import crypt from '@/plugins/crypt'
 import { sanitizeString } from '@/utils/sanitizeString'
+import { stringsMatching, prepareString } from '@/utils/stringsMatching'
 
 export default {
     props:{
@@ -245,6 +247,7 @@ export default {
 
         checkingError(){
             this.errors = []
+
             // проверка на незаполненные поля и не отмеченные темы, сложность
             this.questions.forEach(question=>{
                 const qIndex = this.questions.indexOf(question)
@@ -435,7 +438,7 @@ export default {
 
                 // проверка на пропорциональность ответов
                 // проверка на одинаковые ответы
-                // TODO: проверка на существование правильного ответа в вопросе
+                // проверка на существование правильного ответа в вопросе
                 if(question.type=='basic-question' || question.type=='question-with-images'){
                     const answersLength = question.answers.map((answer) => {
                         return {
@@ -473,7 +476,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -495,7 +498,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -517,7 +520,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -539,7 +542,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -561,7 +564,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -582,7 +585,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -604,7 +607,7 @@ export default {
                         for(let f = 0; f!=answersImagesByLang.length; f++){
                             for(let s = 0; s!=answersImagesByLang.length; s++){
                                 if(f!=s && answersImagesByLang[f]){
-                                    if(answersImagesByLang[f] == answersImagesByLang[s] && !hasDouble){
+                                    if(prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s]) && !hasDouble){
                                         hasDouble = true
                                         this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                     }
@@ -625,21 +628,29 @@ export default {
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.ru == question.questionCtx.ru) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.ru, question.questionCtx.ru, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.ru == dqa.answerCtx.ru)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.ru.toLowerCase() == dqa.answerCtx.ru.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
+                                        
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.ru, dqa.answerCtx.ru, 80)) similarAnswersCounter++
+                                        })
+                                    })
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[109]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }
@@ -647,21 +658,29 @@ export default {
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.eng == question.questionCtx.eng) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.eng, question.questionCtx.eng, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.eng == dqa.answerCtx.eng)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.eng.toLowerCase() == dqa.answerCtx.eng.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.eng, dqa.answerCtx.eng, 80)) similarAnswersCounter++
+                                        })
+                                    })
+
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[110]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }
@@ -669,21 +688,29 @@ export default {
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.uz_l == question.questionCtx.uz_l) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.uz_l, question.questionCtx.uz_l, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_l == dqa.answerCtx.uz_l)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_l.toLowerCase() == dqa.answerCtx.uz_l.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.uz_l, dqa.answerCtx.uz_l, 80)) similarAnswersCounter++
+                                        })
+                                    })
+
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[111]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }
@@ -691,22 +718,29 @@ export default {
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.uz_k == question.questionCtx.uz_k) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.uz_k, question.questionCtx.uz_k, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                console.log(dq);
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_k == dqa.answerCtx.uz_k)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.uz_k.toLowerCase() == dqa.answerCtx.uz_k.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.uz_k, dqa.answerCtx.uz_k, 80)) similarAnswersCounter++
+                                        })
+                                    })
+
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[112]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }
@@ -715,21 +749,29 @@ export default {
                         this.questions.map(checkedQ => {
                             
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.custom == question.questionCtx.custom) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.custom, question.questionCtx.custom, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.custom == dqa.answerCtx.custom)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.custom.toLowerCase() == dqa.answerCtx.custom.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.custom, dqa.answerCtx.custom, 80)) similarAnswersCounter++
+                                        })
+                                    })
+
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[113]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }
@@ -737,21 +779,29 @@ export default {
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.fr == question.questionCtx.fr) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.fr, question.questionCtx.fr, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.fr == dqa.answerCtx.fr)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.fr.toLowerCase() == dqa.answerCtx.fr.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.fr, dqa.answerCtx.fr, 80)) similarAnswersCounter++
+                                        })
+                                    })
+
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[114]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }
@@ -759,21 +809,29 @@ export default {
                         const duplicateQuestions = []
                         this.questions.map(checkedQ => {
                             if(checkedQ.type=='basic-question' || checkedQ.type=='question-with-images'){
-                                if(checkedQ.questionCtx.de == question.questionCtx.de) duplicateQuestions.push(checkedQ)
+                                if(stringsMatching(checkedQ.questionCtx.de, question.questionCtx.de, 90)) duplicateQuestions.push(checkedQ)
                             }
                         })
 
                         if(duplicateQuestions.length){
                             duplicateQuestions.map(dq=>{
-                                let duplicateAnswersCounter = 0
-                                dq.answers.map((dqa)=>{
-                                    const duplicateAnswer = question.answers.find(a => a.answerCtx.de == dqa.answerCtx.de)
-                                    if(duplicateAnswer){
-                                        duplicateAnswersCounter++
-                                    }
-                                })
+                                if(dq.id != question.id){
+                                    let duplicateAnswersCounter = 0
+                                    let similarAnswersCounter = 0
+                                    dq.answers.map((dqa)=>{
+                                        const duplicateAnswer = question.answers.find(a => a.answerCtx.de.toLowerCase() == dqa.answerCtx.de.toLowerCase())
+                                        if(duplicateAnswer){
+                                            duplicateAnswersCounter++
+                                        }
 
-                                if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                        question.answers.map(a => {
+                                            if(stringsMatching(a.answerCtx.de, dqa.answerCtx.de, 80)) similarAnswersCounter++
+                                        })
+                                    })
+
+                                    if(duplicateAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
+                                    if(similarAnswersCounter > 2 && question.id != dq.id) this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[115]}: ${question.id} ~ ${dq.id}`})
+                                }
                             })
                         }
                     }

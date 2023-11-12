@@ -2,7 +2,7 @@ import lang from '@/utils/lang'
 
 export default {
     state: {
-        language: lang.ru
+        language: lang.uz_l
     },
     getters: {
         currentLang(state){
