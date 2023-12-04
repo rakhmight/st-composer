@@ -251,7 +251,7 @@
                             </div>
                             <div class="d-flex flex-row mt-1">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-pound</v-icon>
-                                <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes ? getThemes(testParams.subjectID, testParams.themes) : 'null' }}</div>
+                                <div><span style="color:#bbb">{{ currentLang.savedTestView[14] }}:</span> {{ testParams.themes && testParams.themes.length ? getThemes(testParams.subjectID, testParams.themes).join(', ') : 'null' }}</div>
                             </div>
                             <div class="d-flex flex-row mt-1">
                                 <v-icon color="#fff" class="mr-1" size="19">mdi-translate</v-icon>

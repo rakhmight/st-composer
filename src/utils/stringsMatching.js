@@ -3,9 +3,13 @@ const levenshtein = require('js-levenshtein');
 export function stringsMatching(testStr, checkedStr, percent){
     if(testStr && checkedStr){
         const tokenSize = prepareString(checkedStr).length % 2 === 0 ? 2 : 3
-        const tokenizedTestStr = tokenization(testStr, tokenSize)
-        const tokenizedCheckedStr = tokenization(checkedStr, tokenSize)
-    
+        const preparedTokenizedData = () =>{
+            if(testStr.length >= checkedStr.length) return { tokenizedTestStr: tokenization(testStr, tokenSize), tokenizedCheckedStr: tokenization(checkedStr, tokenSize) }
+            else return { tokenizedTestStr: tokenization(checkedStr, tokenSize), tokenizedCheckedStr: tokenization(testStr, tokenSize) }
+        }
+        
+        const { tokenizedTestStr, tokenizedCheckedStr } = preparedTokenizedData()
+        
         const matchSet = tokenizedTestStr.map(testToken => {
             const target = tokenizedCheckedStr.find(checkedToken => checkedToken === testToken)
 
@@ -19,13 +23,12 @@ export function stringsMatching(testStr, checkedStr, percent){
         const numberOfCoincidences = matchSet.filter(value => value)
         const probabilityOfSimilarity= numberOfCoincidences.length*100/tokenizedTestStr.length
         const levenshteinAlg = levenshtein(prepareString(testStr), prepareString(checkedStr))
-        // console.log(probabilityOfSimilarity, levenshteinAlg);
         if(probabilityOfSimilarity > percent) return true
         else {
             if(probabilityOfSimilarity > 20){
-                if(levenshteinAlg < 15) return true
+                if(levenshteinAlg <= 7) return true
                 else false
-            } else false
+            } else return false
         }
     }
 }

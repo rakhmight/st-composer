@@ -26,6 +26,7 @@ export default function restoreSaved(id, saving, params){
         }
 
         test.questions = saving.questions
+        test.testInfo = saving.testInfo
         test.lastModified = getCurrentDate()
         test.history.push(putToHistory('restore', saving.date.date))
 

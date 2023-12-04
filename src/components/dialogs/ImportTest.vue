@@ -92,7 +92,6 @@
 
 <script>
 import putToHistory from '@/services/putToHistory'
-import getCurrentDate from '@/plugins/getCurrentDate'
 import { operationFromStore } from '@/services/localDB'
 import { mapGetters, mapMutations } from 'vuex'
 
@@ -179,15 +178,21 @@ export default {
                     status: {
                         inProcess: true,
                         isDeleted: false,
-                        isSigned: false
+                        isSigned: false,
+                        isExported: true
                     },
                     signedDate: undefined,
-                    creationDate: getCurrentDate(),
+                    creationDate: {
+                        ...this.testToImport.fileDate,
+                        full: new Date(this.testToImport.fileDate.full)
+                    },
                     lastModified: undefined
                 }
 
                 if(this.testToImport.remarks) newTestInDb.remarks = this.testToImport.remarks
                 if(this.testToImport.testImage) newTestInDb.testImage = this.testToImport.testImage
+
+                console.log(newTestInDb);
                 
                 this.updateTestsCounter(this.currentTestsCounter+1)
 
@@ -231,7 +236,7 @@ export default {
                 // куча проверок
                 if(test){
                     //if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' && test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object' && test.remarks && typeof test.remarks == 'object' && test.testImage && typeof test.testImage == 'string'){
-                    if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' &&test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object'){
+                    if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'object' && test.history && typeof test.history == 'object' &&test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object'){
                         this.blockBtn = false
                         this.testToImport = test
                         return

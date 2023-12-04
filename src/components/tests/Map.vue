@@ -56,137 +56,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="cursor: pointer;"
+                        
+                            <map-item
                             v-for="question in mapQuestions"
                             :key="question.id"
-                            class="map-orient"
-                            @click="changeCurrentQuestion(question.id)"
-                            >
-                                <td style="width:20px">
-                                    <div v-if="remarks">
-                                        <v-tooltip bottom v-if="question.type=='basic-question' && !remarks.find(remark=>remark.question==question.id)">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                            >
-                                            mdi-text
-                                            </v-icon>
-                                        </template>
-                                        <span>{{ currentLang.workspaceView[13] }}</span>
-                                        </v-tooltip>
+                            :changeCurrentQuestion="changeCurrentQuestion"
+                            :question="question"
+                            :remarks="remarks"
+                            :getCurrentQuestion="getCurrentQuestion"
+                            :getCurrentAnswer="getCurrentAnswer"
+                            :currentQuestion="currentQuestion"
+                            :showFullMap="showFullMap"
+                            />
 
-                                        <v-tooltip bottom v-if="question.type=='question-with-images' && !remarks.find(remark=>remark.question==question.id)">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                            >
-                                            mdi-image-outline
-                                            </v-icon>
-                                        </template>
-                                        <span>{{ currentLang.workspaceView[14] }}</span>
-                                        </v-tooltip>
-
-                                        <v-tooltip bottom v-if="question.type=='question-with-field' && !remarks.find(remark=>remark.question==question.id)">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                            >
-                                            mdi-selection-ellipse-arrow-inside
-                                            </v-icon>
-                                        </template>
-                                        <span>{{ currentLang.workspaceView[15] }}</span>
-                                        </v-tooltip>
-
-                                        
-                                        <v-tooltip bottom v-if="remarks.find(remark=>remark.question==question.id)">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="'red'"
-                                            >
-                                            mdi-alert-circle-outline
-                                            </v-icon>
-                                        </template>
-                                        <span v-if="question.type=='basic-question'">{{ currentLang.workspaceView[13] }}</span>
-                                        <span v-if="question.type=='question-with-images'">{{ currentLang.workspaceView[14] }}</span>
-                                        <span v-if="question.type=='question-with-field'">{{ currentLang.workspaceView[15] }}</span>
-                                        </v-tooltip>
-                                    </div>
-
-                                    <div v-else>
-                                        <v-tooltip bottom v-if="question.type=='basic-question'">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                            >
-                                            mdi-text
-                                            </v-icon>
-                                        </template>
-                                        <span>{{ currentLang.workspaceView[13] }}</span>
-                                        </v-tooltip>
-
-                                        <v-tooltip bottom v-if="question.type=='question-with-images'">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                            >
-                                            mdi-image-outline
-                                            </v-icon>
-                                        </template>
-                                        <span>{{ currentLang.workspaceView[14] }}</span>
-                                        </v-tooltip>
-
-                                        <v-tooltip bottom v-if="question.type=='question-with-field'">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            :color="currentQuestion.id==question.id ? '#0167FF' : '#888'"
-                                            >
-                                            mdi-selection-ellipse-arrow-inside
-                                            </v-icon>
-                                        </template>
-                                        <span>{{ currentLang.workspaceView[15] }}</span>
-                                        </v-tooltip>
-                                    </div>
-                                </td>
-                                <!-- <td >{{ i+1 }}</td> -->
-                                <td >{{ question.id }}</td>
-                                <td>
-                                    <p class="body-2" style="color:#484848" :class="{'map-small': !showFullMap,'map-full':showFullMap}">
-                                        <span v-if="getCurrentQuestion(question.questionCtx)">{{ getCurrentQuestion(question.questionCtx) }}</span>
-                                        <span style="color:#888;" v-else>{{ currentLang.workspaceView[4] }}</span>
-                                    </p>
-                                </td>
-                                <td v-if="showFullMap" style="min-width:20vw; max-width:20vw; word-break: break-all;">
-                                    <p
-                                    v-for="(answer, i) in question.answers"
-                                    :key="i"
-                                    class="body-2"
-                                    :style="answer.isCurrect ? 'color:green' : 'color:#484848'"
-                                    >
-                                        <span v-if="getCurrentAnswer(answer.answerCtx)">{{ `${i+1}) ` }} {{ getCurrentAnswer(answer.answerCtx) }}</span>
-                                        <span v-else style="color:#B3B3B3">{{ `${i+1}) ` }}{{ currentLang.workspaceView[4] }}</span>
-                                    </p>
-                                    <p
-                                    v-if="question.type=='question-with-field'"
-                                    >
-                                        <span v-if="question.answer[1].x" style="color: green">{{ currentLang.workspaceView[5] }}</span>
-                                        <span v-else>{{ currentLang.workspaceView[6] }}</span>
-                                    </p>
-                                </td>
-                            </tr>
+                            
                         </tbody>
                         </template>
                     </v-simple-table>
@@ -202,6 +85,7 @@
             </div>
         </div>
 
+        
         <v-btn
         small
         width="270"
@@ -214,6 +98,14 @@
             <span :style="!loader ? 'color: #fff' : 'color: #888'">{{ currentLang.workspaceView[7] }}</span>
         </v-btn>
 
+        <import-word-file
+        :saveProcessFinally="saveProcessFinally"
+        :loader="loader"
+        :currentTest="currentTest"
+        :questionsCounter="questionsCounter"
+        :addQuestionsFromWordFile="addQuestionsFromWordFile"
+        />
+
         <sign-test
         :loader="loader"
         :stopSavingLoop="stopSavingLoop"
@@ -222,14 +114,9 @@
         :saveProcessFinally="saveProcessFinally"
         :remarks="remarks"
         :saveProcess="saveProcess"
-        />
-
-        <import-word-file
-        :saveProcessFinally="saveProcessFinally"
-        :loader="loader"
-        :currentTest="currentTest"
-        :questionsCounter="questionsCounter"
-        :addQuestionsFromWordFile="addQuestionsFromWordFile"
+        :remarksHandler="remarksHandler"
+        :changeCurrentQuestion="changeCurrentQuestion"
+        :currentQuestion="currentQuestion"
         />
     </div>
 </template>
@@ -238,6 +125,7 @@
 import { mapGetters } from 'vuex'
 import SignTest from '@/components/dialogs/SignTest.vue'
 import ImportWordFile from '@/components/dialogs/ImportWordFile.vue'
+import MapItem from './MapItem.vue'
 
 export default {
     props:{
@@ -255,7 +143,8 @@ export default {
         saveProcessFinally: Object,
         remarks: undefined | Array,
         questionsCounter: Number,
-        addQuestionsFromWordFile: Function
+        addQuestionsFromWordFile: Function,
+        remarksHandler: Function
     },
     data(){
         return {
@@ -264,7 +153,8 @@ export default {
     },
     components:{
         SignTest,
-        ImportWordFile
+        ImportWordFile,
+        MapItem
     },
     computed: mapGetters(['currentLang']),
     methods:{

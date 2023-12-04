@@ -18,6 +18,7 @@
                 :remarks="currentTest.remarks"
                 :questionsCounter="questionsCounter"
                 :addQuestionsFromWordFile="addQuestionsFromWordFile"
+                :remarksHandler="remarksHandler"
                 />
 
                 <div class="workspace__sidebar-box"></div>
@@ -296,6 +297,25 @@ export default {
     methods:{
         ...mapMutations(['clearSign']),
 
+        remarksHandler(type, data){
+            if(!this.currentTest.remarks) this.currentTest.remarks = []
+            const target = this.currentTest.remarks.find(remark => remark.question == data.question && remark.type == data.type)
+
+            if(type == 'add'){
+                if(!target) this.currentTest.remarks.push({ ...data })
+                else {
+                    const index = this.currentTest.remarks.indexOf(target)
+                    if(this.currentTest.remarks[index].msg != data.msg) this.currentTest.remarks[index].msg = data.msg
+                }
+            }
+            else if(type == 'remove') {
+                if(target){
+                    const index = this.currentTest.remarks.indexOf(target)
+                    this.currentTest.remarks.splice(index, 1)
+                }
+            }
+        },
+
         addQuestionsFromWordFile(questions){
             const oldQuestionsLength = this.questions.length
             this.questions.push(...questions)
@@ -424,6 +444,23 @@ export default {
 
         deleteQuestion(id){
             const target = this.questions.find(question=> question.id==id)
+
+            // Удалить его remarks
+            if(this.currentTest.remarks && this.currentTest.remarks.length){
+                const deletedRemarks = []
+                const remarks = []
+
+                this.currentTest.remarks.map(remark => {
+                    if(remark.question == id){
+                        const remarkIndex = this.currentTest.remarks.indexOf(remark)
+                        deletedRemarks.push({ question: id, type: this.currentTest.remarks[remarkIndex].type })
+                    }
+                })
+
+                // TODO:
+                this.currentTest.remarks = this.currentTest.remarks.filter(remark => !(deletedRemarks.find(dr => dr.question == remark.question && dr.type == remark.type)))
+                
+            }
             
             this.currentTest.testInfo.totalQuestions--
             if(target.type=='basic-question'){
@@ -705,7 +742,7 @@ export default {
 .workspace__map{
     min-width: 100%;
     min-height: 30vh;
-    max-height: 60vh;
+    max-height: 54vh;
     background-color: aliceblue;
     border-radius: 0 0 5px 5px;
     overflow-y: scroll;

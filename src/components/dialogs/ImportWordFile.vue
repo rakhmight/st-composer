@@ -9,7 +9,7 @@
             v-on="on"
             small
             width="270"
-            color="#0c2242"
+            color="#2f5286"
             class="mt-5"
             :disabled="loader || saveProcessFinally.value"
             >
@@ -30,22 +30,41 @@
 
             <!-- CONTENT -->
             <div style="padding: 30px">
-                <v-file-input
-                style="width: 100%;"
-                accept="application/doc"
-                show-size
-                counter
-                clearable
-                :label="currentLang.additional[72]"
-                dense
-                outlined
-                v-model="wordFile"
-                @change="handleWordUpload()"
-                :error="fileError.status"
-                :error-messages="fileError.msg"
-                :loading="loadFile"
-                color="var(--main-color)"
-                ></v-file-input>                
+                <div class="d-flex" style="gap: 15px">
+                    <v-file-input
+                    style="width: 100%;"
+                    accept="application/doc"
+                    show-size
+                    counter
+                    clearable
+                    :label="currentLang.additional[72]"
+                    dense
+                    outlined
+                    v-model="wordFile"
+                    @change="handleWordUpload()"
+                    :error="fileError.status"
+                    :error-messages="fileError.msg"
+                    :loading="loadFile"
+                    color="var(--main-color)"
+                    ></v-file-input>
+
+                    <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                        class="mt-1"
+                        color="#0167FF"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        icon
+                        @click="copySubjectID()"
+                        >
+                            <v-icon size="20">mdi-content-copy</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Скопировать ID предмета</span>
+                    </v-tooltip>  
+                </div>          
 
                 <div class="mt-3">
                     <v-alert
@@ -106,6 +125,10 @@ export default {
         }
     },
     methods: {
+        copySubjectID(){
+            navigator.clipboard.writeText(this.currentTest.subjectID)
+        },
+
         handleWordUpload(){
             this.blockBtn = true
             this.loadFile = true
@@ -146,6 +169,7 @@ export default {
 
                     let answersImg = []
                     for(let str of docData){
+                        console.log(str);
 
                         if(str.length){
                             str = str.replace(/ +/g, ' ').trim()

@@ -58,7 +58,7 @@
                             v-on="on"
                             @click="goToSaved(saved.id)"
                             >
-                                <v-icon color="#444">
+                                <v-icon color="#444" small>
                                     mdi-eye-outline
                                 </v-icon>
                             </v-btn>
@@ -71,10 +71,10 @@
                 </template>
             </v-simple-table>
 
-            <div v-if="!saves.length && !loader" class="d-flex flex-column align-center">
+            <div v-if="!saves.length && !loader" class="d-flex flex-column align-center justify-center" style="height: 25vh">
                 <v-img
-                max-height="120"
-                max-width="120"
+                max-height="80"
+                max-width="80"
                 src="@/assets/media/spider-web.png"
                 contain
                 transition="scale-transition"
@@ -139,6 +139,7 @@ export default {
 
 .dialog-content{
     width: 100%;
+    min-height: 30vh;
     padding: 30px;
     overflow-y: scroll;
 }

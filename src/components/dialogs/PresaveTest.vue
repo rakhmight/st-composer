@@ -210,6 +210,7 @@ export default {
                 output={
                     id: +_id,
                     questions: test.questions,
+                    testInfo: test.testInfo,
                     comment: this.comment,
                     date: getCurrentDate(),
                     params,

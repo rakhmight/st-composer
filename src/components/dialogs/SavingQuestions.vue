@@ -199,7 +199,8 @@ export default {
                     questions: questionsData,
                     comment: this.comment,
                     date: getCurrentDate(),
-                    params
+                    params,
+                    testInfo: test.testInfo
                 }
 
                 // Внесение сохранения в историю теста

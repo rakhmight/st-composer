@@ -139,6 +139,7 @@ export default {
                 })
                 .then(()=>{
                     operationFromStore('deleteTest',{id: this.test.id})
+                    operationFromStore('deleteSavings',{testID: this.test.id})
                     operationFromStore('addTest',{data:test})
                 })
                 .catch(e=>{

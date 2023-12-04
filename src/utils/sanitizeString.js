@@ -4,8 +4,9 @@ export const sanitizeString = (str) => {
         // убераем пробелы
         str = str.replace(/ +/g, ' ').trim()
 
-        //TODO: Убираем повторяющиеся спец символы: По отдельности
+        // Убираем повторяющиеся спец символы: По отдельности
         str = str.replace(/\◘{2,}/g, '◘')
+        // str = str.replace(/\�/g, '')
         str = str.replace(/\•{2,}/g, '•')
         str = str.replace(/\~{2,}/g, '~')
         str = str.replace(/\^{2,}/g, '^')

@@ -50,7 +50,15 @@
             v-if="remarks.find(remark=>remark.question==currentQuestion.id)"
             >
                 <v-icon color="#de2f13">mdi-alert-circle-outline</v-icon>
-                <span style="font-size: 0.95em;width:100%">{{ getRemark() }}</span>
+                <div class="d-flex flex-column w-full" style="gap: 5px">
+                    <p
+                    v-for="remark in getRemarks()"
+                    :key="remark.type"
+                    style="font-size: 0.95em; color: #de2f13"
+                    >
+                    • {{ remark.msg }}
+                    </p>
+                </div>
                 <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                     <v-icon
@@ -59,6 +67,7 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="removeRemark('question', currentQuestion.id)"
+                    v-if="remarks.find(remark=>remark.question==currentQuestion.id).type == 'question' || remarks.find(remark=>remark.question==currentQuestion.id).type == 'global'"
                     >
                     mdi-check-circle-outline
                     </v-icon>
@@ -322,9 +331,9 @@
                 dense
                 min-width="100%"
                 prepend-icon="mdi-camera"
+                v-model="fileName"
                 @change="handleFileUpload( $event )"
-                @click:clear="imagePreview=''"
-                @click="imagePreview=''"
+                @click:clear="clearFileInput()"
                 ></v-file-input>
                 <v-progress-circular
                 v-if="currentQuestion.type=='question-with-images' && imageLoader || currentQuestion.type=='question-with-field' && imageLoader "
@@ -361,7 +370,7 @@
             </div>
             <div class="d-flex justify-center" style="position: relative;">
                 <div class="delete-pic" v-show="showPreview" v-if="currentQuestion.type=='question-with-images'">
-                    <v-icon color="red" @click="imagePreview=''" size="25" v-show="showPreview">mdi-close-circle</v-icon>
+                    <v-icon color="red" @click="clearFileInput()" size="25" v-show="showPreview">mdi-close-circle</v-icon>
                 </div>
                 <v-img v-if="currentQuestion.type=='question-with-images'" width="600" height="300" contain v-bind:src="imagePreview" v-show="showPreview" class="mb-3"/>
             </div>
@@ -519,6 +528,7 @@ export default {
                 value => !value || value.size < 20000000 || this.currentLang.workspaceView[16],
             ],
 			file: '',
+            fileName: undefined,
             showPreview: false,
             imagePreview: this.currentQuestion.imagePreview,
             errors:[],
@@ -630,9 +640,16 @@ export default {
         this.initQuestion()
     },
     methods:{
-        getRemark(){
-            const remark = this.remarks.find(remark => remark.question==this.currentQuestion.id)
-            return remark.msg
+        clearFileInput(){
+            this.fileName = undefined
+            this.imagePreview=''
+        },
+        getRemarks(){
+            const remarks = []
+            this.remarks.map(remark => {
+                if(remark.question==this.currentQuestion.id) remarks.push(remark)
+            })
+            return remarks
         },
         initQuestion(){
             // Счётчик ответов

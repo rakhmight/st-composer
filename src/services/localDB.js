@@ -65,6 +65,9 @@ export async function operationFromStore(type, params) {
       return result
     }else if(type=='deleteTest'){
       await tests.delete(params.id)
+    }else if(type=='getAllTestsFromDB'){
+      const result = await tests.getAll()
+      return result
     }
 
     
@@ -86,6 +89,17 @@ export async function operationFromStore(type, params) {
       return result
     }else if(type=='deleteSaving'){
       await savings.delete(params.id)
+    }else if(type=='deleteSavings'){
+      let result = await savings.getAll()
+
+      const operation = await Promise.all(result.map(async (saving) => {
+        if(saving.testID == params.testID){
+          const state = await savings.delete(saving.id)
+          return state
+        }
+      }))
+
+      return operation
     }
 
     // Timers

@@ -13,4 +13,21 @@ export default async function checkTimers(){
             }
         })
     })
+    
+    operationFromStore('getAllTestsFromDB')
+    .then(tests => {
+        tests.forEach(async (test)=>{
+            if(!test.status.isSigned){
+                if(!test.status.isExported){
+                    if(new Date(test.creationDate.full.getTime()+5184000000)<new Date()){
+                        await operationFromStore('deleteTest', { id: test.id })
+                    }
+                } else {
+                    if(new Date(test.creationDate.full.getTime()+864000000)<new Date()) {
+                        await operationFromStore('deleteTest', { id: test.id })
+                    }
+                }
+            }
+        })
+    })
 }

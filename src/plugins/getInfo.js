@@ -24,11 +24,11 @@ export function getTheme(sub, theme, sign) {
     }
 }
 
-export function getThemes(sub, thems, sign){
+export function getThemes(sub, themesList, sign){
     let target = sign.subjects.find(subject=>subject.id==sub)
     if(target){
         let themes = []
-        thems.forEach(item=>{
+        themesList.forEach(item=>{
             let ThTarget = target.themes.find(theme=> theme.id==item)
             if(ThTarget){
                 themes.push(ThTarget.name.ru)
@@ -37,9 +37,9 @@ export function getThemes(sub, thems, sign){
             }
         })
 
-        return themes.join(', ')
+        return themes
     } else {
-        return thems.join(', ')
+        return themesList
     }
 }
 

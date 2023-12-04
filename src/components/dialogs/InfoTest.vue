@@ -51,7 +51,15 @@
                         </tr>
                         <tr>
                             <td><div>{{ currentLang.dashboardView[24] }}</div></td>
-                            <td><div class="text-end"><b>{{ getThemes(test.subjectID,test.themes) }}</b></div></td>
+                            <td>
+                                <div
+                                v-for="(theme, i) in getThemes(test.subjectID,test.themes)"
+                                :key="theme"
+                                class="text-end"
+                                >
+                                    <b>{{ i+1 }}. {{ theme }}</b>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td><div>{{ currentLang.additional[0] }}</div></td>
@@ -60,6 +68,14 @@
                         <tr v-if="test.remarks && test.remarks.length" style="color:#ff4500">
                             <td><div>{{ currentLang.additional[4] }}</div></td>
                             <td><div class="text-end"><b>{{ test.remarks.length }}</b></div></td>
+                        </tr>
+                        <tr style="color:#888">
+                            <td><div>{{ currentLang.additional[116] }}</div></td>
+                            <td><div class="text-end"><b>{{ test.status.isSigned ? getDelTime() : getMainDelTime() }} {{ currentLang.additional[117] }}</b></div></td>
+                        </tr>
+                        <tr v-if="test.status.isExported" style="color:rgb(0, 119, 255)">
+                            <td></td>
+                            <td><div class="text-end"><b>{{ currentLang.additional[118] }}</b></div></td>
                         </tr>
                     </tbody>
                     </template>
@@ -201,6 +217,20 @@ export default {
             } else{
                 return `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
             }
+        },        
+        
+        getMainDelTime(){
+            if(this.test.status.isExported){
+                let time = (this.test.creationDate.full.getTime()+864000000) - new Date()
+                return Math.round(time / 86400000)
+            } else {
+                let time = (this.test.creationDate.full.getTime()+5184000000) - new Date()
+                return Math.round(time / 86400000)
+            }
+        },
+        getDelTime(){
+            let time = (this.test.signedDate.getTime()+1296000000) - new Date()
+            return Math.round(time / 86400000)
         }
     },
     watch:{

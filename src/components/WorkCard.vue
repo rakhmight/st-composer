@@ -1,61 +1,84 @@
 <template>
     <div class="work" v-if="!status.isDeleted">
       <div class="work__content d-flex">
-        <div class="work__logo d-flex flex-column justify-content-center justify-center">
-          <v-img
-          v-if="!status.isSigned"
-          src="@/assets/media/work.png"
-          contain
-          max-width="40"
-          style="opacity: 0.5;"
-          ></v-img>
+        <div class="w-full h-full d-flex flex-column">
+          <div class="work__logo">
+            <v-img
+            v-if="!status.isSigned && !status.isExported"
+            src="@/assets/media/work.png"
+            contain
+            max-width="35"
+            style="opacity: 0.5;"
+            ></v-img>
+            <v-img
+            v-if="!status.isSigned && status.isExported"
+            src="@/assets/media/exported.png"
+            contain
+            max-width="35"
+            style="opacity: 0.5;"
+            ></v-img>
 
-          <!-- isSigned -->
-          <v-img
-          v-if="status.isSigned"
-          src="@/assets/media/work-complete.png"
-          contain
-          max-width="40"
-          style="opacity: 0.9;"
-          ></v-img>
+            <!-- isSigned -->
+            <v-img
+            v-if="status.isSigned"
+            src="@/assets/media/work-complete.png"
+            contain
+            max-width="35"
+            style="opacity: 0.9;"
+            ></v-img>
+          </div>
 
-          <v-tooltip left color="error" v-if="status.isSigned">
-            <template v-slot:activator="{ on, attrs }">
-              <div class="clear mb-1" 
-                v-bind="attrs"
-                v-on="on"> 
-                  <v-icon size="20" color="#ff4500">mdi-delete</v-icon>
-                  {{ getDelTime() }}
-              </div>
-            </template>
-            <span>{{ currentLang.dashboardView[10] }}: {{ getDelTime() }} {{ currentLang.dashboardView[11] }}</span>
-          </v-tooltip>
-          <!--  -->
-          <v-tooltip left color="error" v-if="test.remarks && test.remarks.length">
-            <template v-slot:activator="{ on, attrs }">
-              <div class="clear mb-1" 
-                v-bind="attrs"
-                v-on="on"> 
-                  <v-icon size="20" color="#ff4500">mdi-alert-circle</v-icon>
-                  {{ test.remarks.length }}
-              </div>
-            </template>
-            <span>{{ currentLang.additional[2] }}: {{ test.remarks.length }}</span>
-          </v-tooltip>
+          <div class="d-flex" style="gap: 7px">
+            <v-tooltip left color="error" v-if="status.isSigned">
+              <template v-slot:activator="{ on, attrs }">
+                <div class="clear mb-1" 
+                  v-bind="attrs"
+                  v-on="on"> 
+                    <v-icon size="16" color="#ff4500">mdi-delete</v-icon>
+                    {{ getDelTime() }}
+                </div>
+              </template>
+              <span>{{ currentLang.dashboardView[10] }}: {{ getDelTime() }} {{ currentLang.dashboardView[11] }}</span>
+            </v-tooltip>
+            
+            <v-tooltip left color="info" v-else>
+              <template v-slot:activator="{ on, attrs }">
+                <div class="del-info mb-1" 
+                  v-bind="attrs"
+                  v-on="on"> 
+                    <v-icon size="16" color="#888">mdi-delete</v-icon>
+                    {{ getMainDelTime() }}
+                </div>
+              </template>
+              <span>{{ currentLang.dashboardView[10] }}: {{ getMainDelTime() }} {{ currentLang.dashboardView[11] }}</span>
+            </v-tooltip>
+            <!--  -->
+            <v-tooltip left color="error" v-if="test.remarks && test.remarks.length">
+              <template v-slot:activator="{ on, attrs }">
+                <div class="clear mb-1" 
+                  v-bind="attrs"
+                  v-on="on"> 
+                    <v-icon size="16" color="#ff4500">mdi-alert-circle</v-icon>
+                    {{ test.remarks.length }}
+                </div>
+              </template>
+              <span>{{ currentLang.additional[2] }}: {{ test.remarks.length }}</span>
+            </v-tooltip>
+          </div>
 
         </div>
         <div class="work__info d-flex justify-content-center">
           <table>
             <tr style="overflow-x: hidden;">
               <td>{{ currentLang.dashboardView[12] }}:</td>
-              <td style="color:#0167FF;"><div style="width:91px;overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">{{ getSubject(test.subjectID) }}</div></td>
+              <td style="color:#0167FF;text-align: left;"><div style="width:91px;overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;"> {{ getSubject(test.subjectID) }}</div></td>
             </tr>
             <tr>
               <td style="opacity:0">space</td>
             </tr>
             <tr>
               <td>{{ currentLang.dashboardView[13] }}:</td>
-              <td style="color:#0167FF">{{ test.creationDate.date }}</td>
+              <td style="color:#0167FF;">{{ test.creationDate.date }}</td>
             </tr>
             <tr v-if="!status.isSigned">
               <td>{{ currentLang.dashboardView[14] }}:</td>
@@ -164,6 +187,7 @@ import TestHistory from './dialogs/TestHistory.vue'
 import DeleteTest from '@/components/dialogs/DeleteTest.vue'
 import { mapMutations, mapGetters } from 'vuex'
 import { operationFromStore } from '@/services/localDB'
+import getCurrentDate from '@/plugins/getCurrentDate'
 
 export default {
   props:{
@@ -188,6 +212,15 @@ export default {
         return `${this.test.signedDate.getDate()}.0${this.test.signedDate.getMonth()+1}.${this.test.signedDate.getFullYear()}`
       } else{
         return `${this.test.signedDate.getDate()}.${this.test.signedDate.getMonth()+1}.${this.test.signedDate.getFullYear()}`
+      }
+    },
+    getMainDelTime(){
+      if(this.test.status.isExported){
+        let time = (this.test.creationDate.full.getTime()+864000000) - new Date()
+        return Math.round(time / 86400000)
+      } else {
+        let time = (this.test.creationDate.full.getTime()+5184000000) - new Date()
+        return Math.round(time / 86400000)
       }
     },
     getDelTime(){
@@ -230,7 +263,7 @@ export default {
     async exportTest(){
       await operationFromStore('getByTestID', { id: this.test.id })
       .then(data=>{
-        const fileDate = Date.now()
+        const fileDate = getCurrentDate()
         const test = {
           id: data.id,
           author: data.author,
@@ -247,12 +280,14 @@ export default {
           status: {
               inProcess: true,
               isDeleted: false,
-              isSigned: false
+              isSigned: false,
+              isExported: true
           }
         }
 
         if(data.ballSystem) test.params.ballSystem = data.ballSystem
         if(data.considerDifficulty) test.params.considerDifficulty = data.considerDifficulty
+        if(data.remarks && data.remarks.length) test.remarks = data.remarks
 
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(test));
         const downloadAnchorNode = document.createElement('a');
@@ -302,10 +337,15 @@ padding: 15px 10px 0;
 .work__logo{
   height: 100%;
   width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 .work__info{
   width: 100%;
   margin-left: 15px;
+  overflow: hidden;
 }
 
 .work__menu{
@@ -327,11 +367,21 @@ background-color: rgb(224, 224, 224);
 .work__info>table{
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 
 .clear{
-  font-size: 0.8em;
-  color:#ff4500
+  font-size: 0.75em;
+  color:#ff4500;
+  display: flex;
+  align-items: center;
+  gap: 4px
+}
+.del-info{
+  font-size: 0.75em;
+  color:#888;
+  display: flex;
+  align-items: center;
+  gap: 4px
 }
 </style>

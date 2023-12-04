@@ -222,7 +222,7 @@
 
                     
                     <v-checkbox
-                    v-if="isMultiple && currentAnswer.id!=1 || currentAnswer.id==1 && !answers.find(a=>a.isCurrect)"
+                    v-if="isMultiple && currentAnswer.id!=1 || currentAnswer.id==1 && !answers.find(a=>a.isCurrect) || currentAnswer.id==1 && answers.find(a=>a.isCurrect) && !isCurrect && isMultiple"
                     v-model="isCurrect"
                     color="success"
                     hide-details
@@ -240,9 +240,9 @@
                         dense
                         min-width="100%"
                         prepend-icon="mdi-camera"
+                        v-model="fileName"
                         @change="handleFileUpload( $event )"
-                        @click:clear="imagePreview=''"
-                        @click="imagePreview=''"
+                        @click:clear="clearFileInput()"
                     ></v-file-input>
                     
                     <v-progress-circular
@@ -275,7 +275,7 @@
         </div>
         <div class="d-flex justify-center" v-if="questionType=='question-with-images'"  style="position: relative;">
             <div class="delete-pic" v-show="showPreview">
-                <v-icon color="red" @click="imagePreview=''" size="25" v-show="showPreview">mdi-close-circle</v-icon>
+                <v-icon color="red" @click="clearFileInput()" size="25" v-show="showPreview">mdi-close-circle</v-icon>
             </div>
             <v-img width="300" height="150" contain v-bind:src="imagePreview" v-show="showPreview"/>
         </div>
@@ -306,6 +306,7 @@ export default {
                 value => !value || value.size < 20000000 || this.currentLang.workspaceView[16],
             ],
 			file: '',
+            fileName: undefined,
             showPreview: false,
             imagePreview: this.answer.imagePreview,
 
@@ -318,6 +319,10 @@ export default {
     },
     computed: mapGetters(['currentLang']),
     methods: {
+        clearFileInput(){
+            this.fileName = undefined
+            this.imagePreview=''
+        },
 		handleFileUpload( event ){
 			this.file = event
 			let reader  = new FileReader()
