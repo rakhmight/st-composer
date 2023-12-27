@@ -123,11 +123,11 @@ export default {
         questions: Array,
         stopSavingLoop: Function,
         saveProcessFinally: Object,
-        remarks: undefined | Array,
         saveProcess: Function,
         remarksHandler: Function,
         changeCurrentQuestion: Function,
-        currentQuestion: Object
+        currentQuestion: Object,
+        removeRemarks: Function
     },
     data(){
         return {
@@ -151,8 +151,10 @@ export default {
             this.signProcedure = true
             this.checkingLoader = true
             this.blockBtn = true
+            
+            this.removeRemarks()              
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.checkingError()
 
                 if(this.errors.length){
@@ -180,77 +182,77 @@ export default {
 
                     await asyncCrypt(JSON.stringify(this.questions), this.currentSign.keys.assymetric.publicKey.toString('utf8'))
                     .then(async (data)=>{
-                        // сборка теста для выгрузки
-                        const signedDate = new Date()
-                        const usefulHistory = []
-                        this.currentTest.history.forEach(item=>{
-                            if(item.type=='signed' || item.type=='rejected-inspector' || item.type=='rejected-admin'){
-                                usefulHistory.push(item)
-                            }else if(item.type=='import'){
-                                usefulHistory.push({date: item.date.full, type: 'import'})
+                            // сборка теста для выгрузки
+                            const signedDate = new Date()
+                            const usefulHistory = []
+                            this.currentTest.history.forEach(item=>{
+                                if(item.type=='signed' || item.type=='rejected-inspector' || item.type=='rejected-admin'){
+                                    usefulHistory.push(item)
+                                }else if(item.type=='import'){
+                                    usefulHistory.push({date: item.date.full, type: 'import'})
+                                }
+                            })
+
+                            const test = {
+                                id: this.currentTest.id,
+                                fileDate: signedDate.getTime(),
+                                author: this.currentSign.id,
+                                signHash: this.currentSign.hash,
+                                params:{
+                                    themes: this.currentTest.themes,
+                                    subject: this.currentTest.subjectID,
+                                    languagesSettings: this.currentTest.languagesSettings,
+                                    ballSystem: this.currentTest.ballSystem,
+                                    considerDifficulty: this.currentTest.considerDifficulty,
+                                },
+                                testInfo: this.currentTest.testInfo,
+                                questions: data,
+                                history: [
+                                    {date: this.currentTest.history[0].date.full, type: 'create'},
+                                    {date: signedDate, type: 'signed'},
+                                    ...usefulHistory
+                                ]
                             }
-                        })
 
-                        const test = {
-                            id: this.currentTest.id,
-                            fileDate: signedDate.getTime(),
-                            author: this.currentSign.id,
-                            signHash: this.currentSign.hash,
-                            params:{
-                                themes: this.currentTest.themes,
-                                subject: this.currentTest.subjectID,
-                                languagesSettings: this.currentTest.languagesSettings,
-                                ballSystem: this.currentTest.ballSystem,
-                                considerDifficulty: this.currentTest.considerDifficulty,
-                            },
-                            testInfo: this.currentTest.testInfo,
-                            questions: data,
-                            history: [
-                                {date: this.currentTest.history[0].date.full, type: 'create'},
-                                {date: signedDate, type: 'signed'},
-                                ...usefulHistory
-                            ]
-                        }
+                            if(this.currentTest.testImage){
+                                test.testImage = this.currentTest.testImage
+                            }
 
-                        if(this.currentTest.testImage){
-                            test.testImage = this.currentTest.testImage
-                        }
-
-                        // Удаление прежнего signed
-                        await operationFromStore('deleteSigned', {id: this.currentTest.id})
-                        .then(async ()=>{
-                        // добавление теста в БД signed
-                        await operationFromStore('addSigned', {data: test})
+                            // Удаление прежнего signed
+                            await operationFromStore('deleteSigned', {id: this.currentTest.id})
                             .then(async ()=>{
-                                const history = [...this.currentTest.history, {date: signedDate, type: 'signed'}]
-                                const testToSave = {
-                                    ...this.currentTest,
-                                    history,
-                                    questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
-                                    status: {...this.currentTest.status, isSigned: true}
-                                }
-                                if(!this.currentTest.status.isSigned){
-                                    testToSave.signedDate = signedDate
-                                }
-                                // изменение текущих тестов (isSigned, signedDate, history)
-                                await operationFromStore('deleteTest',{id: this.currentTest.id})
+                            // добавление теста в БД signed
+                            await operationFromStore('addSigned', {data: test})
                                 .then(async ()=>{
-                                    await operationFromStore('addTest',{data: testToSave})
-                                    .then(()=>{
-                                        this.checkingLoader = false
-                                        this.success = true
-                                        console.info('(i) process is saved after signing')
+                                    const history = [...this.currentTest.history, {date: signedDate, type: 'signed'}]
+                                    const testToSave = {
+                                        ...this.currentTest,
+                                        history,
+                                        questions: crypt(this.questions, this.currentSign.keys.symmetric.key, this.currentSign.keys.symmetric.iv, this.currentSign.keys.symmetric.algorithm,this.currentSign.keys.symmetric.notation,this.currentSign.keys.symmetric.encoding),
+                                        status: {...this.currentTest.status, isSigned: true}
+                                    }
+                                    if(!this.currentTest.status.isSigned){
+                                        testToSave.signedDate = signedDate
+                                    }
+                                    // изменение текущих тестов (isSigned, signedDate, history)
+                                    await operationFromStore('deleteTest',{id: this.currentTest.id})
+                                    .then(async ()=>{
+                                        await operationFromStore('addTest',{data: testToSave})
+                                        .then(()=>{
+                                            this.checkingLoader = false
+                                            this.success = true
+                                            console.info('(i) process is saved after signing')
 
-                                        setTimeout(()=>{
-                                            this.$router.push('/dashboard')
-                                        },3000)
+                                            setTimeout(()=>{
+                                                this.$router.push('/dashboard')
+                                            },3000)
+                                        })
                                     })
                                 })
                             })
-                        })
                     })
                 }, 400)
-            }, 500)
+            }, 700)
         },
 
         checkingError(){
@@ -1111,8 +1113,8 @@ export default {
             })
 
             // проверка на remarks
-            if(this.remarks){
-                if(this.remarks.length){
+            if(this.currentTest.remarks){
+                if(this.currentTest.remarks.length){
                     this.errors.push({type: 'remarks', ctx: this.currentLang.additional[67]}) 
                 }
             }
@@ -1120,7 +1122,6 @@ export default {
     },
     watch:{
         currentLang(){
-            console.log(1);
             this.checkingError()
         },
         'saveProcessFinally.value'(){

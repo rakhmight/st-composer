@@ -262,7 +262,7 @@
                     <v-icon
                     v-bind="attrs"
                     v-on="on"
-                    v-if="currentAnswer.id!=1 && currentAnswer.id!=2 && currentAnswer.id!=3 && currentAnswer.id!=4"
+                    v-if="currentAnswer.id!=1 && currentAnswer.id!=2"
                     color="red"
                     @click="deleteAnswer"
                     size="25"

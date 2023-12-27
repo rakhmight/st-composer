@@ -15,10 +15,10 @@
                 :currentTest="currentTest"
                 :questions="questions"
                 :saveProcessFinally="saveProcessFinally"
-                :remarks="currentTest.remarks"
                 :questionsCounter="questionsCounter"
                 :addQuestionsFromWordFile="addQuestionsFromWordFile"
                 :remarksHandler="remarksHandler"
+                :removeRemarks="removeRemarks"
                 />
 
                 <div class="workspace__sidebar-box"></div>
@@ -72,7 +72,7 @@
                     :parseMode="parseMode"
                     :showParse="showParse"
                     :switchCurrentQuestion="switchCurrentQuestion"
-                    :remarks="currentTest.remarks"
+                    :currentTest="currentTest"
                     :removeRemark="removeRemark"
                     />
 
@@ -340,6 +340,9 @@ export default {
             const remark = this.currentTest.remarks.find(remark => remark.type=='general')
             return remark.msg
         },
+        removeRemarks(){
+            this.currentTest.remarks = undefined
+        },
         removeRemark(type, id){
             if(type=='question'){
                 const target = this.currentTest.remarks.find(remark=>remark.question==id)
@@ -415,16 +418,16 @@ export default {
                     question.answers = [
                         {id:1, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:true},
                         {id:2, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
+                        // {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
+                        // {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
                     ]
                     this.currentTest.testInfo.qwi++
                 } else{
                     question.answers = [
                         {id:1, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:true},
                         {id:2, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
+                        // {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
+                        // {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
                     ]
                     this.currentTest.testInfo.bq++
                 }

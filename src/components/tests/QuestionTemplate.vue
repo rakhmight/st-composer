@@ -43,11 +43,11 @@
 
         <v-divider color="#bbb"></v-divider>
 
-        <div v-if="remarks">
+        <div v-if="currentTest.remarks">
             <div
             style="padding:15px;border: 1px solid #de2f13;border-radius: 5px; gap:10px"
             class="d-flex flex-row align-center mt-3"
-            v-if="remarks.find(remark=>remark.question==currentQuestion.id)"
+            v-if="currentTest.remarks.find(remark=>remark.question==currentQuestion.id)"
             >
                 <v-icon color="#de2f13">mdi-alert-circle-outline</v-icon>
                 <div class="d-flex flex-column w-full" style="gap: 5px">
@@ -67,7 +67,7 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="removeRemark('question', currentQuestion.id)"
-                    v-if="remarks.find(remark=>remark.question==currentQuestion.id).type == 'question' || remarks.find(remark=>remark.question==currentQuestion.id).type == 'global'"
+                    v-if="currentTest.remarks.find(remark=>remark.question==currentQuestion.id).type == 'question' || currentTest.remarks.find(remark=>remark.question==currentQuestion.id).type == 'global'"
                     >
                     mdi-check-circle-outline
                     </v-icon>
@@ -514,7 +514,7 @@ export default {
         deleteFunc: Function,
         questionFunc: Function,
         switchCurrentQuestion: Boolean,
-        remarks: undefined | Array,
+        currentTest: Object,
         removeRemark: Function
     },
     components:{
@@ -646,7 +646,7 @@ export default {
         },
         getRemarks(){
             const remarks = []
-            this.remarks.map(remark => {
+            this.currentTest.remarks.map(remark => {
                 if(remark.question==this.currentQuestion.id) remarks.push(remark)
             })
             return remarks

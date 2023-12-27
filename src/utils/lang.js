@@ -420,6 +420,7 @@ const lang = {
             '(на иностранном яз.)',
             '(на франц. яз.)',
             '(на нем. яз.)',
+            'Скопировать ID предмета' // 128
         ]
     },
 
@@ -1243,6 +1244,7 @@ const lang = {
             '(chet tilida)',
             '(frantsuz tilida)',
             '(nemis tilida)',
+            'Fun identifikatorini nusxalash' // 128
         ]
     },
 

@@ -62,7 +62,7 @@
                             <v-icon size="20">mdi-content-copy</v-icon>
                         </v-btn>
                     </template>
-                    <span>Скопировать ID предмета</span>
+                    <span>{{ currentLang.additional[128] }}</span>
                     </v-tooltip>  
                 </div>          
 
@@ -350,8 +350,8 @@ export default {
                                 counter++
                             })
                             
-                            if(outputAnswers.length < 4){
-                                while(outputAnswers.length!=4){
+                            if(outputAnswers.length < 2){
+                                while(outputAnswers.length!=2){
                                     outputAnswers.push({
                                         id: counter+1,
                                         imagePreview:'',

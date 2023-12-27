@@ -62,7 +62,7 @@
                             :key="question.id"
                             :changeCurrentQuestion="changeCurrentQuestion"
                             :question="question"
-                            :remarks="remarks"
+                            :currentTest="currentTest"
                             :getCurrentQuestion="getCurrentQuestion"
                             :getCurrentAnswer="getCurrentAnswer"
                             :currentQuestion="currentQuestion"
@@ -112,11 +112,11 @@
         :currentTest="currentTest"
         :questions="questions"
         :saveProcessFinally="saveProcessFinally"
-        :remarks="remarks"
         :saveProcess="saveProcess"
         :remarksHandler="remarksHandler"
         :changeCurrentQuestion="changeCurrentQuestion"
         :currentQuestion="currentQuestion"
+        :removeRemarks="removeRemarks"
         />
     </div>
 </template>
@@ -141,10 +141,11 @@ export default {
         currentTest: Object,
         questions: Array,
         saveProcessFinally: Object,
-        remarks: undefined | Array,
+        currentTest: Object,
         questionsCounter: Number,
         addQuestionsFromWordFile: Function,
-        remarksHandler: Function
+        remarksHandler: Function,
+        removeRemarks: Function
     },
     data(){
         return {

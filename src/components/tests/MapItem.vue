@@ -7,7 +7,7 @@
     @click="changeCurrentQuestion(question.id)"
     >
         <td style="width:20px">
-            <div v-if="remarks">
+            <div v-if="currentTest.remarks">
                 <v-tooltip bottom v-if="question.type=='basic-question' && !haveRemark">
                 <template v-slot:activator="{ on, attrs }">
                     <v-icon
@@ -144,7 +144,7 @@ export default {
         }
     },
     props:{
-        remarks: Array,
+        currentTest: Object,
         question: Object,
         getCurrentQuestion: Function,
         getCurrentAnswer: Function,
@@ -157,14 +157,14 @@ export default {
         this.haveRemarks()
     },
     watch:{
-        'remarks.length'(){
+        'currentTest.remarks.length'(){
             this.haveRemarks()
         }
     },
     methods:{
         haveRemarks(){
-            if(this.question && this.remarks && this.remarks.length){
-                const remark = this.remarks.find(remark=>remark.question==this.question.id)
+            if(this.question && this.currentTest.remarks && this.currentTest.remarks.length){
+                const remark = this.currentTest.remarks.find(remark=>remark.question==this.question.id)
 
                 if(remark) this.haveRemark = true
                 else this.haveRemark = false
