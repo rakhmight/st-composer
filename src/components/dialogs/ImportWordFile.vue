@@ -350,8 +350,8 @@ export default {
                                 counter++
                             })
                             
-                            if(outputAnswers.length < 2){
-                                while(outputAnswers.length!=2){
+                            if(outputAnswers.length < 4){
+                                while(outputAnswers.length!=4){
                                     outputAnswers.push({
                                         id: counter+1,
                                         imagePreview:'',

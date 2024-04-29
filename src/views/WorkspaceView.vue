@@ -293,6 +293,7 @@ export default {
         this.savingInterval = setInterval(()=>{
             this.saveProcess({forcedSave:true})
         }, 600000)
+        
     },
     methods:{
         ...mapMutations(['clearSign']),
@@ -301,15 +302,20 @@ export default {
             if(!this.currentTest.remarks) this.currentTest.remarks = []
             const target = this.currentTest.remarks.find(remark => remark.question == data.question && remark.type == data.type)
 
-            if(type == 'add'){
-                if(!target) this.currentTest.remarks.push({ ...data })
-                else {
+            if(type == 'add') {
+                    // console.log(+1);
+                    // console.log(data);
+                if(!target) {
+                    this.currentTest.remarks.push(data)
+                }
+                else{
                     const index = this.currentTest.remarks.indexOf(target)
                     if(this.currentTest.remarks[index].msg != data.msg) this.currentTest.remarks[index].msg = data.msg
                 }
-            }
-            else if(type == 'remove') {
+            } else if(type == 'remove') {
                 if(target){
+                    // console.log(-1);
+                    // console.log(data);
                     const index = this.currentTest.remarks.indexOf(target)
                     this.currentTest.remarks.splice(index, 1)
                 }
@@ -418,16 +424,16 @@ export default {
                     question.answers = [
                         {id:1, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:true},
                         {id:2, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        // {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        // {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
+                        {id:3, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
+                        {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
                     ]
                     this.currentTest.testInfo.qwi++
                 } else{
                     question.answers = [
                         {id:1, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:true},
                         {id:2, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        // {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
-                        // {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
+                        {id:3, answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false},
+                        {id:4, imagePreview:'', answerCtx:{ ru: undefined,eng: undefined,uz_l: undefined,uz_k: undefined, custom: undefined, fr: undefined, de: undefined}, isCurrect:false}
                     ]
                     this.currentTest.testInfo.bq++
                 }

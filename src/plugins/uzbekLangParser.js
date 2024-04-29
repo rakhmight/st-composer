@@ -255,6 +255,13 @@ export default function uzbekLangParser(ctx, mode){
                 string = string.replaceAll('◘', ',')
                 // Ya, Yu, Yo, ', Sh, Ch, O', G'
                 string = string.replaceAll('Йа', 'Я')
+                
+                string = string.replaceAll('Е', 'Е')
+                string = string.replaceAll('е', 'е')
+
+                // string = string.replaceAll('Йэ', 'Е')
+                // string = string.replaceAll('йэ', 'е')
+
                 string = string.replaceAll('йа', 'я')
                 string = string.replaceAll('Йо', 'Ё')
                 string = string.replaceAll('йо', 'ё')

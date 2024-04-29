@@ -235,8 +235,9 @@ export default {
                 const test = JSON.parse(reader.result)
                 // куча проверок
                 if(test){
+                console.log(test);
                     //if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'number' && test.history && typeof test.history == 'object' && test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object' && test.remarks && typeof test.remarks == 'object' && test.testImage && typeof test.testImage == 'string'){
-                    if(test.author && typeof test.author == 'string' && test.fileDate && typeof test.fileDate == 'object' && test.history && typeof test.history == 'object' &&test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object'){
+                    if(test.author && typeof test.author == 'string' && test.fileDate && test.history && typeof test.history == 'object' &&test.id && typeof test.id == 'number' && test.params && typeof test.params == 'object' && test.questions && typeof test.questions == 'string' && test.signHash && typeof test.signHash == 'string' && test.testInfo && typeof test.testInfo == 'object'){
                         this.blockBtn = false
                         this.testToImport = test
                         return

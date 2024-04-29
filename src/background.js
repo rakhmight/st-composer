@@ -50,8 +50,6 @@ async function createWindow() {
     width: 1500,
     height: 850,
     webPreferences: {
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: true,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       devTools: !app.isPackaged

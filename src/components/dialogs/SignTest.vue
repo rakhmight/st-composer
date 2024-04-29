@@ -259,8 +259,8 @@ export default {
             this.errors = []
 
             // проверка на незаполненные поля и не отмеченные темы, сложность
-            this.questions.forEach(question=>{
-                const qIndex = this.questions.indexOf(question)
+            this.questions.forEach((question, i)=>{
+                const qIndex = i
 
                 if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
                     if(!question.questionCtx.custom){
@@ -604,10 +604,10 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
@@ -615,10 +615,10 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[82], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-ru', msg: this.currentLang.additional[82], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[82]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-ru', question: question.id})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('eng')!=-1){
@@ -632,10 +632,10 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
@@ -643,10 +643,10 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[83], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-eng', msg: this.currentLang.additional[83], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[83]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-eng', question: question.id})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('uz_l')!=-1){
@@ -660,10 +660,10 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
@@ -671,10 +671,10 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[84], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-uzl', msg: this.currentLang.additional[84], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[84]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-uzl', question: question.id})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('uz_k')!=-1){
@@ -688,10 +688,10 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
@@ -699,10 +699,10 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[85], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-uzk', msg: this.currentLang.additional[85], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[85]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-uzk', question: question.id})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('custom')!=-1){
@@ -716,20 +716,21 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
+
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[86], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-custom', msg: this.currentLang.additional[86], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[86]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-custom', question: question.id})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('de')!=-1){
@@ -743,10 +744,10 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
@@ -754,10 +755,10 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[87], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-de', msg: this.currentLang.additional[87], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[87]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-de', question: question.id})
                     }
 
                     if(this.currentTest.languagesSettings.languages.indexOf('fr')!=-1){
@@ -771,10 +772,10 @@ export default {
                                     if(prepareString(answersImagesByLang[s]) && prepareString(answersImagesByLang[f]) && prepareString(answersImagesByLang[f]) == prepareString(answersImagesByLang[s])){
                                         if(!hasDouble){
                                             hasDouble = true
-                                            this.remarksHandler('add', { type: 'answers-doubled', msg: this.currentLang.additional[81], question: question.id})
+                                            this.remarksHandler('add', { type: `answers-doubled-${f}${s}`, msg: this.currentLang.additional[81], question: question.id})
                                             this.errors.push({type: 'answers-doubled', ctx: `${this.currentLang.additional[81]}: ${question.id}`})
                                         }
-                                    } else this.remarksHandler('remove', { type: 'answers-doubled', question: question.id})
+                                    } else this.remarksHandler('remove', { type: `answers-doubled-${f}${s}`, question: question.id})
                                 }
                             }
                         }
@@ -782,10 +783,10 @@ export default {
                         const maxLength = Math.max(...answersByLang)
                         const minLength = Math.min(...answersByLang)
 
-                        if(maxLength-minLength>70){
-                            this.remarksHandler('add', { type: 'answers-proportional', msg: this.currentLang.additional[88], question: question.id})
+                        if(maxLength-minLength>120){
+                            this.remarksHandler('add', { type: 'answers-proportional-fr', msg: this.currentLang.additional[88], question: question.id})
                             this.errors.push({type: 'answers-proportional', ctx: `${this.currentLang.additional[88]}: ${question.id}`})
-                        } else this.remarksHandler('remove', { type: 'answers-proportional', question: question.id})
+                        } else this.remarksHandler('remove', { type: 'answers-proportional-fr', question: question.id})
                     }
                 }
 
@@ -800,7 +801,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -824,14 +825,14 @@ export default {
                                     })
 
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[109]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[109]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[109]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
@@ -845,7 +846,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -869,14 +870,14 @@ export default {
                                     })
                                     
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[110]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[110]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[110]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
@@ -890,7 +891,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -915,14 +916,14 @@ export default {
 
                                     
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[111]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[111]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[111]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
@@ -936,7 +937,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -961,14 +962,14 @@ export default {
 
                                     
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[112]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[112]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[112]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
@@ -983,7 +984,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -1007,14 +1008,14 @@ export default {
                                     })
                                     
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[113]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[113]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[113]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
@@ -1028,7 +1029,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -1052,14 +1053,14 @@ export default {
                                     })
                                     
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[114]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[114]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[114]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
@@ -1073,7 +1074,7 @@ export default {
                         })
 
                         if(duplicateQuestions.length){
-                            duplicateQuestions.map(dq=>{
+                            duplicateQuestions.map((dq, i)=>{
                                 if(dq.id != question.id){
                                     let duplicateAnswersCounter = 0
                                     let similarAnswersCounter = 0
@@ -1097,14 +1098,14 @@ export default {
                                     })
                                     
                                     if(duplicateAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-doubled', msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-doubled-${i}`, msg:`${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-doubled', ctx: `${this.currentLang.additional[94]}: ${question.id} = ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-doubled', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-doubled-${i}`, question: question.id}) 
 
                                     if(similarAnswersCounter > 2 && question.id != dq.id){
-                                        this.remarksHandler('add', { type: 'question-similar', msg:`${this.currentLang.additional[115]}: ${question.id} ~ ${dq.id}`, question: question.id})
+                                        this.remarksHandler('add', { type: `question-similar-${i}`, msg:`${this.currentLang.additional[115]}: ${question.id} ~ ${dq.id}`, question: question.id})
                                         this.errors.push({type: 'question-similar', ctx: `${this.currentLang.additional[115]}: ${question.id} ~ ${dq.id}`})
-                                    } else this.remarksHandler('remove', { type: 'question-similar', question: question.id}) 
+                                    } else this.remarksHandler('remove', { type: `question-similar-${i}`, question: question.id}) 
                                 }
                             })
                         }
